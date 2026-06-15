@@ -1,0 +1,57 @@
+# Dev environment topology for Allarounder.
+#
+#   app  -> the devcontainer you work in (FastAPI + Next.js tooling).
+#           Runs Docker-in-Docker (via the docker-in-docker feature) so
+#           testcontainers-based integration tests can spin up throwaway
+#           containers from inside here.
+#   db   -> a long-lived PostgreSQL 16 service for local dev + Alembic
+#           migrations. Note: integration tests use testcontainers (ephemeral),
+#           NOT this instance — this is for running the app locally.
+#
+# Versions are pinned to mirror Azure Database for PostgreSQL Flexible Server.
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      # Mount the repo at its workspaceFolder path. cached = good perf for
+      # source-heavy workspaces. (.. = repo root, since this file lives in
+      # .devcontainer/.)
+      - ..:/workspaces/Podcast Blog Build:cached
+    command: sleep infinity
+    environment:
+      # Default local connection string; the app/Alembic can read this.
+      DATABASE_URL: postgresql+psycopg://allarounder:allarounder@db:5432/allarounder
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - allarounder
+
+  db:
+    image: postgres:16-bookworm
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: allarounder
+      POSTGRES_PASSWORD: allarounder
+      POSTGRES_DB: allarounder
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    # Not published to the host by default; reach it from `app` as host `db`.
+    # Uncomment to expose on localhost:5432.
+    # ports:
+    #   - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U allarounder -d allarounder"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - allarounder
+
+volumes:
+  pgdata:
+
+networks:
+  allarounder:

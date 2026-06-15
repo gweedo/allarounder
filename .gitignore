@@ -1,0 +1,15 @@
+# Claude Code local settings (personal, not shared)
+.claude/settings.local.json
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+
+# Future build artifacts (backend/frontend not scaffolded yet)
+node_modules/
+__pycache__/
+*.pyc
+.venv/
+dist/
+build/
+.next/
