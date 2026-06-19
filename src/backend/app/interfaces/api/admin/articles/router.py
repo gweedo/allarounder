@@ -1,0 +1,98 @@
+"""Admin article endpoints: create draft, list articles."""
+
+import uuid
+from typing import Annotated
+
+from fastapi import APIRouter, Depends, HTTPException, Query, status
+from sqlalchemy.orm import Session
+
+from app.application.content.use_cases import CreateArticle
+from app.domain.content.entities import Article
+from app.domain.content.value_objects import PublicationStatus
+from app.infrastructure.content.repositories import SqlArticleRepository
+from app.interfaces.api.admin.articles.schemas import (
+    ArticleListResponse,
+    ArticleResponse,
+    CreateArticleRequest,
+)
+from app.interfaces.api.auth.dependencies import (
+    CurrentUser,
+    get_db_session,
+    require_editor,
+)
+
+router = APIRouter(prefix="/api/admin/articles", tags=["articles"])
+
+
+def get_article_repo(
+    session: Annotated[Session, Depends(get_db_session)],
+) -> SqlArticleRepository:
+    return SqlArticleRepository(session)
+
+
+def _to_response(article: Article) -> ArticleResponse:
+    return ArticleResponse(
+        id=article.id,
+        title=article.title,
+        slug=article.slug.value,
+        body=article.body.value,
+        status=article.status.value,
+        author_id=article.author_id,
+        created_at=article.created_at,
+        updated_at=article.updated_at,
+        publish_at=article.publish_at,
+    )
+
+
+@router.post("", response_model=ArticleResponse, status_code=status.HTTP_201_CREATED)
+def create_article(
+    body: CreateArticleRequest,
+    current_user: Annotated[CurrentUser, Depends(require_editor)],
+    repo: Annotated[SqlArticleRepository, Depends(get_article_repo)],
+) -> ArticleResponse:
+    use_case = CreateArticle(repo)
+    try:
+        article = use_case.execute(
+            title=body.title,
+            author_id=uuid.UUID(current_user.user_id),
+            body=body.body,
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(e))
+    return _to_response(article)
+
+
+@router.get("", response_model=ArticleListResponse)
+def list_articles(
+    current_user: Annotated[CurrentUser, Depends(require_editor)],
+    repo: Annotated[SqlArticleRepository, Depends(get_article_repo)],
+    article_status: Annotated[str | None, Query(alias="status")] = None,
+    page: int = 1,
+    page_size: int = 20,
+) -> ArticleListResponse:
+    filter_status: PublicationStatus | None = None
+    if article_status is not None:
+        try:
+            filter_status = PublicationStatus(article_status)
+        except ValueError:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+                detail=f"Invalid status: {article_status!r}",
+            )
+
+    author_id: uuid.UUID | None = None
+    if current_user.role != "admin":
+        author_id = uuid.UUID(current_user.user_id)
+
+    articles, total = repo.list(
+        author_id=author_id,
+        status=filter_status,
+        page=page,
+        page_size=page_size,
+    )
+    return ArticleListResponse(
+        items=[_to_response(a) for a in articles],
+        total=total,
+        page=page,
+        page_size=page_size,
+    )
