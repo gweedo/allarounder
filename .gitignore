@@ -5,11 +5,29 @@
 .DS_Store
 Thumbs.db
 
-# Future build artifacts (backend/frontend not scaffolded yet)
-node_modules/
+# Python
 __pycache__/
 *.pyc
-.venv/
+*.pyo
+*.egg-info/
 dist/
 build/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+htmlcov/
+.coverage
+coverage.xml
+
+# Node
+node_modules/
 .next/
+out/
+npm-debug.log*
+
+# Environment
+.env
+.env.local
+.env.*.local

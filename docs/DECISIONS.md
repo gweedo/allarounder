@@ -82,6 +82,36 @@ Last updated: 2026-06-14
 - **Status**: ✅ Final (name); 🔄 visual identity pending
 - **Decided by**: Team
 
+### Product definition (PRD) — topic, audience, goals
+- **Date**: 2026-06-17
+- **Decision**: Allarounder is a written platform about **artistic gymnastics** (expanding to sport in general). Audience: the **Italian gymnastics niche** (gym parents, gymnasts, insiders, enthusiasts, ~18–50), with a growth target of **generalists** reached via cross-over articles. The site's **primary goal is to drive listeners to the Spotify podcast and broaden beyond the niche**; secondary is growing the site's own readership. Discovery is Instagram-led today (+ Google/SEO for generalists). Captured from the content team's questionnaire.
+- **Status**: ✅ Final (see `product/PRD.md`)
+- **Decided by**: Team (content)
+
+### Article categories (taxonomy)
+- **Date**: 2026-06-17
+- **Decision**: v1 categories are **Interviste, Analisi, Roundtable, Out of the Box** (the last for sport-adjacent / off-topic pieces).
+- **Status**: ✅ Final
+- **Decided by**: Team (content)
+
+### Article–episode link is optional
+- **Date**: 2026-06-17
+- **Decision**: Not every article maps to an episode — `Article.spotify_url` is **nullable**. Some articles are standalone; some may seed future episodes. The Spotify block/CTA renders only when a link is present.
+- **Status**: ✅ Final
+- **Decided by**: Team
+
+### Events in v1 (simple)
+- **Date**: 2026-06-17
+- **Decision**: Add a **simple Event content type** in v1 (title, date, location, description, optional link; informational only — no ticketing/registration), with `/eventi/` listing and admin CRUD. Plus an **Autori** (authors) public section.
+- **Status**: ✅ Final
+- **Decided by**: Team
+
+### Launch timeline (target)
+- **Date**: 2026-06-17
+- **Decision**: Desired launch **September**; meaningful deadline is **ready before "Chiara's event" (second week of December)**. Editorial calendar runs as a side project.
+- **Status**: 🔄 Provisional (target, not committed)
+- **Decided by**: Team
+
 ### Content language: Italian only
 - **Date**: 2026-06-14
 - **Decision**: All blog content is in **Italian only** (no English/bilingual version for now).
@@ -106,6 +136,13 @@ Last updated: 2026-06-14
 - **Date**: 2026-06-14
 - **Decision**: Build and deployment run through **GitHub Actions**, deploying to **Azure Container Apps**. Pipeline builds the Docker image(s), pushes to a registry (Azure Container Registry), and deploys to Container Apps.
 - **Status**: ✅ Final
+- **Decided by**: Team
+
+### CI/CD pipeline & deployment strategy (detailed)
+- **Date**: 2026-06-14
+- **Decision**: **GitHub Flow** branching (PR → checks; merge to `main` → staging; **manual approval** → prod). Path-filtered workflows run **lint/type-check → tiered tests** (unit+app+frontend+integration on PR, **80% coverage gate**; Playwright **E2E on staging**) **→ security scans** (pip-audit/npm audit/Dependabot, gitleaks+push protection, Trivy, CodeQL; **block on high/critical**) **→ build** (multi-stage, **immutable git SHA** tag + semver on release, deploy by digest) **→ deploy**. CI authenticates to Azure via **OIDC federated credentials**; apps read secrets via **Key Vault references + managed identity**. **Migrations** run as a **dedicated job before traffic shift** with **expand/contract + roll-forward**. Release uses **blue-green** (deploy green @ 0%, gate on health+smoke, flip 100%, instant revert to blue); **automated rollback** on thresholds (conservative, manual fallback until baselines). **Canary deferred to phase 2.**
+- **Rationale**: Fast, safe, low-ceremony delivery for one developer with a clean path to scale; traceable images + blue-green + expand/contract make rollback trivial; OIDC + managed identity remove all long-lived secrets from CI.
+- **Status**: ✅ Final (see ADR-0012)
 - **Decided by**: Team
 
 ### Repository layout: monorepo
@@ -157,6 +194,26 @@ Last updated: 2026-06-14
 - **Rationale**: Keeps the core mission (written articles → Spotify) intact while controlling the custom-admin build effort. Tags and guests were kept in v1 by team choice. Newsletter and comments carry the most build/moderation/compliance overhead for the least near-term value.
 - **Note**: Guest capability is committed for v1; the content team's answer on whether the show is interview-driven will refine how prominent guest pages are. An external embedded form remains an interim option for email capture before the phase-2 newsletter.
 - **Status**: ✅ Final
+- **Decided by**: Team
+
+### Security architecture (ADR-0013)
+- **Date**: 2026-06-18
+- **Decision**: A layered security posture covering auth, secrets, upload safety, rendering, network, and access control. Key points:
+  - **JWT in `httpOnly`/`Secure`/`SameSite=Strict` cookies** — JS never reads the token; immune to XSS exfiltration.
+  - **30-min access token + 14-day rotating refresh token** — `refresh_tokens` table; revoked on logout/password change.
+  - **Password policy** — 12-char minimum, HaveIBeenPwned breach check, soft lockout after 10 failures (5-min cooldown).
+  - **Role boundaries** — `editor` manages own content only; `admin` has cross-author edit, delete, and user management.
+  - **Next.js Middleware** protects `/admin/:path*` using `jose` (Edge-compatible); redirects to `/admin/login` on failure.
+  - **CORS** — explicit allowlist (`allarounder.it` + staging); `allow_credentials=True`; no wildcard.
+  - **Rate limiting** — WAF (1 000 req/min/IP volumetric) + `slowapi` per-endpoint (login 10/min, refresh 20/min, search 60/min, upload 10/min/user).
+  - **Image uploads** — magic-bytes allowlist (JPEG/PNG/WebP/GIF only, no SVG); 10 MB limit; explicit `Content-Type` on Blob write.
+  - **Markdown rendering** — `remark-rehype` (no raw HTML) → `rehype-sanitize`; raw HTML in article bodies is not supported.
+  - **HTTP headers** — `nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy`, `Permissions-Policy` in `next.config.js`; HSTS at Front Door. CSP deferred to post-launch hardening.
+  - **Blob Storage** — private container; all image URLs through Front Door (`cdn.allarounder.it/...`); raw Blob URLs never exposed.
+  - **WAF** — `Microsoft_DefaultRuleSet_2.1` provisioned in Bicep; Detection mode at launch → Prevention after burn-in.
+  - **Secrets** — managed identity for Postgres and Blob (no passwords in Key Vault); JWT signing key is the only Key Vault secret.
+  - **Audit logging** — deferred to phase 2.
+- **Status**: ✅ Final (see ADR-0013)
 - **Decided by**: Team
 
 ### Logging & observability: OpenTelemetry → Azure Monitor
@@ -222,6 +279,16 @@ Last updated: 2026-06-14
 - **Status**: In progress (not blocking backend/data-model work)
 - **Owner**: Rest of the team (writers)
 - **Target date**: Before frontend design work starts
+
+### ❓ Article length unit & bands
+- **Context**: The team said articles run "500–1800" without specifying characters vs words, or short/medium/long bands. Affects editorial guidelines (not the build).
+- **Owner**: Team (content)
+- **Target date**: Before content guidelines are finalized
+
+### ❓ Success metrics & instrumentation
+- **Context**: Primary goal is driving to Spotify + broadening reach, but concrete targets and tracking (CTR to Spotify, organic search traffic, new-visitor share) aren't defined yet.
+- **Owner**: Team
+- **Target date**: Before/at launch
 
 ---
 

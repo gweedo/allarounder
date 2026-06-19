@@ -15,6 +15,8 @@ This directory records the significant architectural decisions for the Allaround
 | [0009](0009-test-driven-development.md) | Development methodology: Test-Driven Development | Accepted | 2026-06-14 |
 | [0010](0010-logging-observability.md) | Logging & observability | Accepted | 2026-06-14 |
 | [0011](0011-author-user-separation.md) | Author and User as separate entities (optional 1:1 link) | Accepted | 2026-06-14 |
+| [0012](0012-cicd-pipeline-and-deployment-strategy.md) | CI/CD pipeline & deployment strategy | Accepted | 2026-06-14 |
+| [0013](0013-security-architecture.md) | Security architecture | Accepted | 2026-06-18 |
 
 ## Conventions
 
