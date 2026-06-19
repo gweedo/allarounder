@@ -1,0 +1,20 @@
+repos:
+  # Backend — ruff lint + format
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.6.0
+    hooks:
+      - id: ruff
+        args: [--fix, --exit-non-zero-on-fix]
+        files: ^src/backend/
+      - id: ruff-format
+        files: ^src/backend/
+
+  # Frontend — eslint on staged JS/TS files
+  - repo: local
+    hooks:
+      - id: eslint-frontend
+        name: ESLint (frontend)
+        entry: bash -c 'cd src/frontend && npx eslint --fix .'
+        language: system
+        files: ^src/frontend/.*\.[jt]sx?$
+        pass_filenames: false
