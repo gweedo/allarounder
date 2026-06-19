@@ -17,6 +17,8 @@ export default defineConfig({
         "**/*.config.*",
         "app/layout.tsx",
         "vitest.setup.ts",
+        "e2e/**",
+        "middleware.ts",
       ],
     },
   },
