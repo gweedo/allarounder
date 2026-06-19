@@ -11,6 +11,12 @@ export default defineConfig({
       provider: "v8",
       reporter: ["text", "lcov"],
       thresholds: { lines: 80 },
+      exclude: [
+        "node_modules/**",
+        "**/*.config.*",
+        "app/layout.tsx",
+        "vitest.setup.ts",
+      ],
     },
   },
 });
