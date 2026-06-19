@@ -4,6 +4,7 @@ from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from slowapi.util import get_remote_address
 
+from app.interfaces.api.admin.articles.router import router as articles_router
 from app.interfaces.api.auth.router import router as auth_router
 from app.interfaces.api.health import router as health_router
 from app.settings import get_settings
@@ -25,3 +26,4 @@ app.add_middleware(
 
 app.include_router(health_router)
 app.include_router(auth_router)
+app.include_router(articles_router)
