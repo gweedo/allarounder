@@ -15,15 +15,15 @@ docs/
 │       ├── README.md             #   ADR index
 │       └── NNNN-*.md             #   one decision per file
 └── product/
+    ├── PRD.md                          # product requirements (vision, audience, goals, scope)
     └── content-team-questionnaire.md   # input questionnaire for the writers (PRD source)
 ```
-
-> The PRD will live at `docs/product/PRD.md` once the content team returns the questionnaire answers.
 
 ## Start here
 
 | If you want to… | Read |
 |---|---|
+| Understand the product (vision, audience, goals, scope) | [product/PRD.md](product/PRD.md) |
 | Understand *what* was decided and *why* | [DECISIONS.md](DECISIONS.md) |
 | Understand *how* the system is built | [architecture/TECH-SPEC.md](architecture/TECH-SPEC.md) |
 | See pages, data models, API, SEO | [architecture/SITE-STRUCTURE.md](architecture/SITE-STRUCTURE.md) |

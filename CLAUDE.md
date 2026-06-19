@@ -74,3 +74,17 @@ Both CI workflows run their test suite with a **coverage gate before** building/
 No build, test, or run commands exist yet — there is no `src/`, `package.json`, `pyproject.toml`, or `Makefile`. Fill this section in once the backend (pytest, alembic, uvicorn) and frontend (Next.js, vitest, playwright) are scaffolded.
 
 The working directory is on Windows; available shells are PowerShell (primary) and a Bash tool for POSIX scripts.
+
+## Agent skills
+
+### Issue tracker
+
+Issues live in GitHub Issues (`gweedo/allarounder`). See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Default mattpocock/skills label vocabulary (no overrides). See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context: `CONTEXT.md` at repo root + ADRs at `docs/architecture/adr/`. See `docs/agents/domain.md`.

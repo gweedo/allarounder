@@ -15,24 +15,30 @@ Italian URLs, since content is Italian-only.
 ```
 Home                          /
 Articoli (index)              /articoli/
-  Single article              /articoli/{slug}/        → links out to Spotify
-Argomenti (categories)        /argomenti/
+  Single article              /articoli/{slug}/        → optional link to Spotify episode
+Categories (Argomenti)        /argomenti/              (Interviste, Analisi, Roundtable, Out of the Box)
   Category archive            /argomenti/{slug}/
+Out of the Box (shortcut)     /out-of-the-box/         → the "Out of the Box" category archive
 Ospiti (guests)               /ospiti/
   Guest profile               /ospiti/{slug}/
+Autori (authors)              /autori/
+  Author profile              /autori/{slug}/
+Eventi (events)               /eventi/
+  Single event                /eventi/{slug}/
 Tag archive                   /tag/{slug}/             (tags are v1)
 Chi siamo (about)             /chi-siamo/
 Ascolta su Spotify            /spotify/                → 301/redirect to the Spotify show
 Contatti                      /contatti/
-Cerca (search)                /cerca/?q=...
 Sitemap XML                   /sitemap.xml
 Robots                        /robots.txt
 
 Newsletter                    /newsletter/             (PHASE 2 — deferred)
+Cerca (search)                /cerca/?q=...            (PHASE 2 — deferred)
 ```
 
+**Article categories (v1):** Interviste · Analisi · Roundtable · Out of the Box (sport-adjacent / off-topic pieces).
 Footer: Privacy Policy, Cookie Policy, social links, Spotify link.
-Primary nav: Home · Articoli · Argomenti · Chi siamo · Ascolta su Spotify.
+Primary nav: Home · Articoli · Argomenti · Autori · Eventi · Chi siamo · Ascolta su Spotify.
 
 The `.eu` domain 301-redirects to the matching `.it` path at the edge (Azure Front Door).
 
@@ -53,8 +59,8 @@ No `Episode`/audio model — the Spotify link is just a URL field on the article
 | body | text | **Markdown** (decided); rendered to HTML by Next.js |
 | cover_image_url | varchar | Blob Storage URL |
 | cover_image_alt | varchar(160) | `Copertina articolo: {title}` default |
-| spotify_url | varchar | link to the related episode (or show) |
-| status | enum | `draft` / `scheduled` / `published` |
+| spotify_url | varchar, **nullable** | optional link to the related episode (some articles are standalone) |
+| status | enum | `draft` / `published` / `archived` |
 | publish_at | timestamptz | when it goes live (drives scheduling) |
 | author_id | FK → Author | |
 | category_id | FK → Category | one primary category |
@@ -87,6 +93,8 @@ Byline/profile, **optionally linked 1:1 to a User** (`user_id` nullable) so gues
 | slug | varchar unique | |
 | description | varchar(200) | shown on archive page |
 
+Seed categories (v1): **Interviste**, **Analisi**, **Roundtable**, **Out of the Box**.
+
 ### Guest (Ospite)
 
 | Field | Type | Notes |
@@ -101,6 +109,27 @@ Byline/profile, **optionally linked 1:1 to a User** (`user_id` nullable) so gues
 ### Tag (in v1, for finer grouping alongside categories)
 
 `id, name, slug` — many-to-many with Article via `article_tags`.
+
+### Event (Evento) — simple, v1
+
+| Field | Type | Notes |
+|---|---|---|
+| id | PK | |
+| title | varchar(200) | |
+| slug | varchar unique | |
+| starts_at | timestamptz | event date/time |
+| ends_at | timestamptz, nullable | optional |
+| location | varchar, nullable | place / venue |
+| body | text (Markdown) | description |
+| cover_image_url | varchar, nullable | Blob Storage |
+| cost | varchar(100), nullable | e.g. "€10", "Gratuito" — display string, not numeric |
+| max_capacity | int, nullable | maximum number of attendees |
+| registration_url | varchar, nullable | external link for registration/tickets |
+| link_url | varchar, nullable | external info link (separate from registration) |
+| status | enum | `draft` / `published` |
+| created_at / updated_at | timestamptz | |
+
+Simple informational listing for v1 — no ticketing/registration.
 
 ### Page (static: Chi siamo, Contatti, Privacy…)
 
@@ -142,10 +171,14 @@ GET  /api/tags                                             all tags
 GET  /api/tags/{slug}                                      tag + its articles
 GET  /api/guests                                           all guests
 GET  /api/guests/{slug}                                    guest + their articles
+GET  /api/authors                                          all authors
+GET  /api/authors/{slug}                                   author + their articles
+GET  /api/events                                           upcoming/past events
+GET  /api/events/{slug}                                    single event
 GET  /api/pages/{slug}                                     static page
-GET  /api/search?q=                                        article search
+GET  /api/search?q=                                        article search           (PHASE 2 — deferred)
 
-POST /api/newsletter                                       { email } → subscribe   (PHASE 2)
+POST /api/newsletter                                       { email } → subscribe   (PHASE 2 — deferred)
 ```
 
 Returns only `status = published` and `publish_at <= now`. Paginated responses include `{ items, total, page, page_size }`.
@@ -159,9 +192,9 @@ POST   /api/admin/articles                    create
 GET    /api/admin/articles/{id}               fetch for editing
 PUT    /api/admin/articles/{id}               update
 DELETE /api/admin/articles/{id}               delete
-POST   /api/admin/articles/{id}/publish       publish / schedule
-POST   /api/admin/media                        upload image → Blob Storage, returns URL
-CRUD   /api/admin/categories | /tags | /guests | /authors | /pages
+POST   /api/admin/articles/{id}/publish       publish (set status=published + publish_at)
+POST   /api/admin/media/sas                    request SAS token → returns { sas_url, blob_url }; browser uploads direct to Blob Storage
+CRUD   /api/admin/categories | /tags | /guests | /authors | /events | /pages
 ```
 
 - Auth: OAuth2 + JWT, password hashing (bcrypt/argon2). Roles enforced (editor vs admin).
@@ -175,10 +208,10 @@ CRUD   /api/admin/categories | /tags | /guests | /authors | /pages
 URL: `/articoli/{slug}/`. Sections in order:
 
 1. **Header** — H1 title, then date · author · category.
-2. **Listen-on-Spotify block** — prominent "Ascolta su Spotify" button near the top (optional embedded player, but always keep a plain link).
+2. **Listen-on-Spotify block** *(only when the article has a `spotify_url`)* — prominent "Ascolta su Spotify" button near the top (optional embedded player, but always keep a plain link). Standalone articles omit this block.
 3. **Body** — the written content (headings, images, pull quotes).
-4. **Related episode recap** (optional) — short summary of the linked episode, guest mention.
-5. **Closing Spotify CTA** — "Ascolta / Segui su Spotify".
+4. **Related episode recap** (optional, when linked) — short summary of the linked episode, guest mention.
+5. **Closing Spotify CTA** *(when linked)* — "Ascolta / Segui su Spotify".
 6. **Related articles** — 3 cards from the same category.
 
 Rendering: use **ISR (incremental static regeneration)** or SSG with on-publish revalidation for article pages — fast and fully indexable. Dynamic bits (search) can be SSR/client.
@@ -204,8 +237,11 @@ Per article (stored on the model, rendered by Next.js):
 
 1. ~~**Body format**~~ — RESOLVED: Markdown.
 2. ~~**Tags**~~ — RESOLVED: in v1, alongside categories.
-3. ~~**Guests**~~ — RESOLVED: in v1 (prominence to be refined by the content team's format answer).
+3. ~~**Guests**~~ — RESOLVED: in v1.
 4. ~~**Newsletter**~~ — RESOLVED: phase 2 (external embedded form as interim).
 5. ~~**Comments**~~ — RESOLVED: phase 2 / likely dropped (moderation load).
+6. ~~**Categories**~~ — RESOLVED: Interviste, Analisi, Roundtable, Out of the Box (PRD).
+7. ~~**Episode link**~~ — RESOLVED: `spotify_url` is **optional** (standalone articles allowed).
+8. ~~**Events**~~ — RESOLVED: simple Event content type in v1 (informational; no ticketing).
 
-**v1 scope:** articles, categories, tags, guests, cover image, Spotify link, custom admin, SEO. **Phase 2:** newsletter, comments.
+**v1 scope:** articles (4 categories), tags, guests, **authors**, **simple events**, cover images, optional Spotify link, custom admin, SEO, OG tags. **Phase 2:** newsletter, comments, search. **Launch sequence:** articles + admin first (September target), events after launch (before December).

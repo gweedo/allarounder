@@ -130,10 +130,10 @@ flowchart TB
 
 Full field-level detail is in `SITE-STRUCTURE.md §2`. Summary:
 
-- **Article** (core): title, slug, excerpt, body (Markdown — see §10), cover_image_url, cover_image_alt, **spotify_url**, status (`draft`/`scheduled`/`published`), publish_at, author_id, category_id, SEO fields (meta_title, meta_description, og_image_url), reading_time, timestamps.
-- **Author**, **Category**, **Tag**, **Guest**, **Page** (static), **User** (login accounts). *(NewsletterSubscriber is phase 2.)*
-- Relationships: Article → Author (M:1), Article → Category (M:1), Article ↔ Guest (M:N), Article ↔ Tag (M:N), Author → User (optional 1:1 via `Author.user_id`).
-- **No Episode/audio model** — the Spotify link is a URL field on Article.
+- **Article** (core): title, slug, excerpt, body (Markdown — see §10), cover_image_url, cover_image_alt, **spotify_url** *(nullable — standalone articles allowed)*, status (`draft`/`scheduled`/`published`), publish_at, author_id, category_id, SEO fields (meta_title, meta_description, og_image_url), reading_time, timestamps.
+- **Author**, **Category** (seed: Interviste/Analisi/Roundtable/Out of the Box), **Tag**, **Guest**, **Event** (simple, v1), **Page** (static), **User** (login accounts). *(NewsletterSubscriber is phase 2.)*
+- Relationships: Article → Author (M:1), Article → Category (M:1), Article ↔ Guest (M:N), Article ↔ Tag (M:N), Author → User (optional 1:1 via `Author.user_id`). Event is standalone.
+- **No Episode/audio model** — the Spotify link is an optional URL field on Article.
 
 ```mermaid
 %%{init: {'theme':'base', 'themeVariables': {'primaryColor':'#ffffff','primaryBorderColor':'#333333','primaryTextColor':'#000000','lineColor':'#333333','fontFamily':'sans-serif'}}}%%
@@ -151,10 +151,16 @@ erDiagram
         string excerpt
         text body_markdown
         string cover_image_url
-        string spotify_url
+        string spotify_url "nullable"
         enum status
         datetime publish_at
     }
+    EVENT    { uuid id PK
+               string title
+               string slug UK
+               datetime starts_at
+               string location "nullable"
+               enum status }
     AUTHOR   { uuid id PK
                uuid user_id FK "nullable, unique"
                string name
@@ -185,8 +191,8 @@ erDiagram
 
 Full endpoint list in `SITE-STRUCTURE.md §3`. Two surfaces:
 
-- **Public read API** — published content only (filters `status = published AND publish_at <= now`): articles (list/detail, paginated), categories, tags, guests, pages, search. *(Newsletter subscribe is phase 2.)*
-- **Admin API** (auth required) — login; full CRUD for articles (incl. drafts/scheduled), categories, tags, guests, authors, pages; media upload; publish/schedule.
+- **Public read API** — published content only (filters `status = published AND publish_at <= now`): articles (list/detail, paginated), categories, tags, guests, authors, events, pages, search. *(Newsletter subscribe is phase 2.)*
+- **Admin API** (auth required) — login; full CRUD for articles (incl. drafts/scheduled), categories, tags, guests, authors, events, pages; media upload; publish/schedule.
 
 Contract: JSON over REST; paginated responses as `{ items, total, page, page_size }`. The OpenAPI schema is the source of truth for the frontend.
 
@@ -209,28 +215,33 @@ Secrets are never committed; the apps read them from Key Vault (or Container App
 
 ---
 
-## 7. CI/CD
+## 7. CI/CD (see ADR-0012)
 
-- **Source control:** GitHub, single **monorepo** (ADR-0006).
-- **Pipelines:** GitHub Actions, two **path-filtered** workflows:
-  - `deploy-backend.yml` — triggers on `src/backend/**`: lint/test → build image → push to ACR → deploy backend Container App.
-  - `deploy-frontend.yml` — triggers on `src/frontend/**`: lint/test/build → build image → push to ACR → deploy frontend Container App.
-- **Auth to Azure:** GitHub → Azure via OIDC federated credentials (no long-lived secrets) — recommended.
-- **Migrations:** Alembic runs as a release step in the backend pipeline (or an init job) before the new revision takes traffic.
-- **Environments:** **separate `staging` and `production`** environments (each its own Container Apps environment, database, and config), both stamped from the same Bicep with different parameters. Deploy → verify on staging → promote to production. Migrations are rehearsed on staging first.
+- **Source control & branching:** GitHub, single **monorepo** (ADR-0006), **GitHub Flow** — `main` plus short-lived feature branches via PR; `main` is always deployable.
+- **Triggers:** PR → checks only (no deploy); merge to `main` → deploy **staging**; **production via manual approval** (GitHub Environment protection rule), restricted to `main`/release tags.
+- **Pipelines:** GitHub Actions, two **path-filtered** workflows (`src/backend/**`, `src/frontend/**`), each running:
+  1. **Lint & type-check** — Ruff + Black + mypy (backend); ESLint + Prettier + `tsc`/`next build` (frontend).
+  2. **Test (tiered)** — unit + application + frontend-unit + **integration** (testcontainers; hosted runners include Docker) with an **80% coverage gate** (domain/application near 100%) **before** the image builds. **Playwright E2E** runs post-deploy on staging as the promotion gate.
+  3. **Security scans** — dependency audit (pip-audit, npm audit, Dependabot) + secret scanning (gitleaks + push protection) + container image scan (Trivy) + SAST (CodeQL); **block on high/critical**.
+  4. **Build** — multi-stage Dockerfile; tag with **immutable git SHA** (+ **semver** on release); push to **ACR**; deploy by **digest**.
+  5. **Deploy** — staging on merge; **blue-green** flip to production after approval.
+- **Auth to Azure:** **OIDC federated credentials** — GitHub presents a signed, short-lived token (claims: repo/branch/environment) verified by Azure against a federated credential; no secrets stored in GitHub. The prod identity is assumable only from the protected `production` environment.
+- **Runtime secrets:** **Key Vault references via managed identity** — each Container App reads secrets directly from Key Vault using its Azure identity; values never pass through CI.
+- **Migrations:** a **dedicated job runs `alembic upgrade head` before traffic shifts**, rehearsed on staging; schema changes follow **expand/contract** (backward-compatible) with **roll-forward** — no down-migrations.
+- **Deployment strategy (blue-green):** deploy the new revision (“green”) at **0% traffic**; gate the flip on **health/readiness probe + smoke tests** against green; shift 100% via revision weights. **Rollback** = revert traffic to the warm previous revision (“blue”); **automated rollback** on health/error-rate/latency thresholds (conservative initially, with manual alert-driven revert as fallback until baselines exist). **Canary is phase 2.**
+- **Environments:** **separate `staging` and `production`** (each its own Container Apps environment, database, and config), both stamped from the same Bicep with different parameters.
+- **Hygiene:** dependency + Docker layer caching; **concurrency** cancellation of superseded runs; failure/deploy notifications.
 
 ```mermaid
 %%{init: {'theme':'base', 'themeVariables': {'primaryColor':'#ffffff','primaryBorderColor':'#333333','primaryTextColor':'#000000','lineColor':'#333333','clusterBkg':'#ffffff','clusterBorder':'#999999','fontFamily':'sans-serif'}}}%%
-flowchart LR
-    Dev["Developer — push / PR"] --> GH["GitHub monorepo"]
-    GH --> WF{"Path-filtered workflow"}
-    WF -- "src/backend/**" --> CIB["pytest + testcontainers<br/>coverage gate · build image"]
-    WF -- "src/frontend/**" --> CIF["Vitest / Playwright<br/>build image"]
-    CIB --> ACR["Azure Container Registry"]
-    CIF --> ACR
-    ACR --> STG["Staging env<br/>(deploy + Alembic migrations)"]
-    STG --> V{"Verify on staging"}
-    V -- "promote" --> PROD["Production env"]
+flowchart TD
+    PR["PR — feature branch"] --> CHK["Checks: lint · type-check<br/>unit + app + integration · coverage gate 80%<br/>scans (block high/critical)"]
+    CHK -->|"merge to main"| BUILD["Build multi-stage image<br/>tag = git SHA · push to ACR"]
+    BUILD --> STG["Deploy STAGING<br/>(alembic migrate before traffic)"]
+    STG --> E2E{"Playwright E2E on staging"}
+    E2E -->|"pass + manual approval"| GREEN["Deploy PROD 'green' @ 0%<br/>health probe + smoke tests"]
+    GREEN -->|"flip traffic 100%"| PROD["Production (blue-green)"]
+    PROD -. "auto-rollback on thresholds" .-> BLUE["Revert traffic to warm 'blue'"]
 ```
 
 ---
@@ -250,16 +261,41 @@ Development follows **Test-Driven Development** (red → green → refactor); te
 
 - The framework-free `domain/` layer (ADR-0008) makes domain tests fast and trivial, which is what makes TDD practical here.
 - **CI gate:** both GitHub Actions workflows (§7) run their test suite with a coverage threshold **before** building/pushing images. testcontainers requires Docker in the CI runner.
-- If CI time grows, integration/e2e tests can be tiered to PR/main runs while unit tests stay on every push.
+- **Tiering (ADR-0012):** unit + application + frontend-unit + **integration** run on every PR (with the 80% coverage gate before image build); **E2E (Playwright)** runs post-deploy on staging as the production-promotion gate.
 
 ## 9. Cross-cutting concerns
 
-### Security
-- HTTPS everywhere (Front Door managed certs for both domains).
-- JWT-based admin auth, hashed passwords, role-based authorization (`admin`/`editor`).
-- Secrets in Key Vault; OIDC for CI; least-privilege managed identities for app→Azure access.
-- Input validation via Pydantic; Markdown is stored as text and safely rendered (see §10, item 1).
-- Basic rate limiting on auth, search, and media-upload endpoints.
+### Security (see ADR-0013)
+
+**Auth**
+- JWT stored in **`httpOnly`, `Secure`, `SameSite=Strict` cookies** — JS never reads the token.
+- **30-min access token + 14-day rotating refresh token** (`refresh_tokens` table); revoked on logout, password change, or by admin.
+- Passwords hashed with **argon2**; **12-char minimum**, HaveIBeenPwned breach check, soft lockout after 10 failures (5-min cooldown).
+
+**Authorization**
+- Roles `admin` and `editor` enforced as FastAPI dependencies (`Depends(require_admin)`, `Depends(require_editor_owns_resource)`).
+- Editors manage only their own content; admins have cross-author edit, delete, and user management.
+- All `/admin/:path*` routes protected by **Next.js Middleware** (`middleware.ts`) using `jose`; unauthenticated requests redirect to `/admin/login`.
+
+**Network**
+- HTTPS everywhere (Front Door managed certs for both domains; HSTS at Front Door).
+- **CORS** — explicit allowlist (`allarounder.it` + staging); `allow_credentials=True`; no wildcard.
+- **Rate limiting** — WAF (1 000 req/min/IP) + `slowapi` per-endpoint: login 10/min, refresh 20/min, search 60/min, upload 10/min/user.
+- **WAF** — `Microsoft_DefaultRuleSet_2.1` (OWASP Top 10); Detection mode at launch → Prevention after burn-in; provisioned in Bicep.
+
+**Content safety**
+- **Image uploads:** magic-bytes validation (`python-magic`); JPEG/PNG/WebP/GIF only (SVG rejected); 10 MB limit; explicit `Content-Type` on Blob write.
+- **Markdown rendering:** `remark-rehype (allowDangerousHtml: false)` → `rehype-sanitize` — raw HTML in article bodies is not supported.
+- **HTTP headers** in `next.config.js`: `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy`. CSP deferred to post-launch hardening.
+
+**Secrets & infra**
+- Postgres and Blob Storage accessed via **managed identity** (`DefaultAzureCredential`) — no passwords or storage keys in Key Vault.
+- Key Vault holds only the **JWT signing key**. CI uses OIDC federated credentials (ADR-0012) — no long-lived secrets in GitHub.
+- **Blob Storage container is private**; images served exclusively through Front Door (`cdn.allarounder.it/...`).
+
+**Deferred**
+- Content-Security-Policy (post-launch hardening pass).
+- Audit logging (`audit_log` table) — phase 2.
 
 ### Observability & logging (see ADR-0010)
 - **Instrumentation:** OpenTelemetry in both apps, exporting to **Azure Monitor / Application Insights** (Log Analytics workspace, Italy North).
