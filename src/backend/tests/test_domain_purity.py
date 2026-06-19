@@ -6,7 +6,6 @@ This test enforces ADR-0008: the strict inward dependency rule.
 import ast
 import pathlib
 
-
 FORBIDDEN_TOP_LEVEL = {"fastapi", "sqlalchemy", "structlog", "pydantic", "uvicorn"}
 DOMAIN_DIR = pathlib.Path(__file__).parent.parent / "app" / "domain"
 
