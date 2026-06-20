@@ -7,6 +7,7 @@ from slowapi.util import get_remote_address
 from app.interfaces.api.admin.articles.router import router as articles_router
 from app.interfaces.api.admin.authors.router import router as admin_authors_router
 from app.interfaces.api.admin.categories.router import router as admin_categories_router
+from app.interfaces.api.admin.guests.router import router as admin_guests_router
 from app.interfaces.api.admin.media.router import router as media_router
 from app.interfaces.api.admin.tags.router import router as admin_tags_router
 from app.interfaces.api.auth.router import router as auth_router
@@ -15,6 +16,7 @@ from app.interfaces.api.preview.router import router as preview_router
 from app.interfaces.api.public.articles.router import router as public_articles_router
 from app.interfaces.api.public.authors.router import router as public_authors_router
 from app.interfaces.api.public.categories.router import router as public_categories_router
+from app.interfaces.api.public.guests.router import router as public_guests_router
 from app.interfaces.api.public.tags.router import router as public_tags_router
 from app.settings import get_settings
 
@@ -38,10 +40,12 @@ app.include_router(auth_router)
 app.include_router(articles_router)
 app.include_router(admin_authors_router)
 app.include_router(admin_categories_router)
+app.include_router(admin_guests_router)
 app.include_router(admin_tags_router)
 app.include_router(media_router)
 app.include_router(preview_router)
 app.include_router(public_articles_router)
 app.include_router(public_authors_router)
 app.include_router(public_categories_router)
+app.include_router(public_guests_router)
 app.include_router(public_tags_router)

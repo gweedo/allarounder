@@ -12,10 +12,12 @@ from jose import jwt
 from app.domain.content.entities import Article
 from app.domain.content.value_objects import Body, PublicationStatus, Slug
 from app.interfaces.api.admin.articles.router import get_article_repo as admin_get_repo
+from app.interfaces.api.admin.articles.router import get_guest_repo as admin_get_guest_repo
 from app.interfaces.api.admin.articles.router import get_tag_repo as admin_get_tag_repo
 from app.interfaces.api.public.articles.router import get_article_repo as public_get_repo
 from app.interfaces.api.public.articles.router import get_author_repo as public_get_author_repo
 from app.interfaces.api.public.articles.router import get_category_repo as public_get_cat_repo
+from app.interfaces.api.public.articles.router import get_guest_repo as public_get_guest_repo
 from app.interfaces.api.public.articles.router import get_tag_repo as public_get_tag_repo
 from app.main import app
 from app.settings import get_settings
@@ -67,12 +69,16 @@ def mock_tag_repo() -> MagicMock:
 
 @pytest.fixture()
 def client(mock_repo: MagicMock, mock_tag_repo: MagicMock) -> Generator[TestClient, None, None]:
+    mock_guest_repo = MagicMock()
+    mock_guest_repo.get_by_article.return_value = []
     app.dependency_overrides[admin_get_repo] = lambda: mock_repo
     app.dependency_overrides[admin_get_tag_repo] = lambda: mock_tag_repo
+    app.dependency_overrides[admin_get_guest_repo] = lambda: mock_guest_repo
     app.dependency_overrides[public_get_repo] = lambda: mock_repo
     app.dependency_overrides[public_get_cat_repo] = lambda: MagicMock()
     app.dependency_overrides[public_get_tag_repo] = lambda: mock_tag_repo
     app.dependency_overrides[public_get_author_repo] = lambda: MagicMock()
+    app.dependency_overrides[public_get_guest_repo] = lambda: mock_guest_repo
     with TestClient(app, raise_server_exceptions=False) as c:
         yield c
     app.dependency_overrides.clear()

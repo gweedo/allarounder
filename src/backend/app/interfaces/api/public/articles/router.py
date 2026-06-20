@@ -7,18 +7,20 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from app.domain.content.entities import Article, Author, Category, Tag
+from app.domain.content.entities import Article, Author, Category, Guest, Tag
 from app.domain.content.value_objects import PublicationStatus
 from app.infrastructure.content.repositories import (
     SqlArticleRepository,
     SqlAuthorRepository,
     SqlCategoryRepository,
+    SqlGuestRepository,
     SqlTagRepository,
 )
 from app.interfaces.api.auth.dependencies import get_db_session
 from app.interfaces.api.public.articles.schemas import (
     AuthorRef,
     CategoryRef,
+    GuestRef,
     PublicArticleListResponse,
     PublicArticleResponse,
     TagRef,
@@ -51,6 +53,12 @@ def get_author_repo(
     return SqlAuthorRepository(session)
 
 
+def get_guest_repo(
+    session: Annotated[Session, Depends(get_db_session)],
+) -> SqlGuestRepository:
+    return SqlGuestRepository(session)
+
+
 def _category_ref(category: Category | None) -> CategoryRef | None:
     if category is None:
         return None
@@ -68,8 +76,10 @@ def _to_response(
     category: Category | None = None,
     tags: list[Tag] | None = None,
     author: Author | None = None,
+    guests: list[Guest] | None = None,
 ) -> PublicArticleResponse:
     tag_refs = [TagRef(id=t.id, name=t.name, slug=t.slug.value) for t in (tags or [])]
+    guest_refs = [GuestRef(id=g.id, name=g.name, slug=g.slug.value) for g in (guests or [])]
     return PublicArticleResponse(
         id=article.id,
         title=article.title,
@@ -89,6 +99,7 @@ def _to_response(
         category=_category_ref(category),
         author_profile=_author_ref(author),
         tags=tag_refs,
+        guests=guest_refs,
     )
 
 
@@ -134,6 +145,7 @@ def get_public_article(
     category_repo: Annotated[SqlCategoryRepository, Depends(get_category_repo)],
     tag_repo: Annotated[SqlTagRepository, Depends(get_tag_repo)],
     author_repo: Annotated[SqlAuthorRepository, Depends(get_author_repo)],
+    guest_repo: Annotated[SqlGuestRepository, Depends(get_guest_repo)],
 ) -> PublicArticleResponse:
     now = datetime.now(tz=UTC)
     article = repo.get_by_slug(slug)
@@ -151,4 +163,5 @@ def get_public_article(
     author: Author | None = None
     if article.author_profile_id is not None:
         author = author_repo.get_by_id(article.author_profile_id)
-    return _to_response(article, cat, tags, author)
+    guests = guest_repo.get_by_article(article.id)
+    return _to_response(article, cat, tags, author, guests)

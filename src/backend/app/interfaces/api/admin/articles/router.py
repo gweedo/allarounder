@@ -11,13 +11,18 @@ from app.application.content.use_cases import (
     CreateArticle,
     GeneratePreviewToken,
     PublishArticle,
+    SetArticleGuests,
     SetArticleTags,
     UpdateArticle,
 )
-from app.domain.content.entities import Article, Tag
+from app.domain.content.entities import Article, Guest, Tag
 from app.domain.content.exceptions import ArticleNotFoundError, SlugLockedError
 from app.domain.content.value_objects import PublicationStatus
-from app.infrastructure.content.repositories import SqlArticleRepository, SqlTagRepository
+from app.infrastructure.content.repositories import (
+    SqlArticleRepository,
+    SqlGuestRepository,
+    SqlTagRepository,
+)
 from app.interfaces.api.admin.articles.schemas import (
     ArticleListResponse,
     ArticleResponse,
@@ -46,7 +51,17 @@ def get_tag_repo(
     return SqlTagRepository(session)
 
 
-def _to_response(article: Article, tag_names: list[str] | None = None) -> ArticleResponse:
+def get_guest_repo(
+    session: Annotated[Session, Depends(get_db_session)],
+) -> SqlGuestRepository:
+    return SqlGuestRepository(session)
+
+
+def _to_response(
+    article: Article,
+    tag_names: list[str] | None = None,
+    guests: list[Guest] | None = None,
+) -> ArticleResponse:
     return ArticleResponse(
         id=article.id,
         title=article.title,
@@ -69,6 +84,7 @@ def _to_response(article: Article, tag_names: list[str] | None = None) -> Articl
         reading_time=article.reading_time,
         category_id=article.category_id,
         tags=tag_names or [],
+        guest_ids=[g.id for g in (guests or [])],
     )
 
 
@@ -135,12 +151,14 @@ def get_article(
     current_user: Annotated[CurrentUser, Depends(require_editor)],
     repo: Annotated[SqlArticleRepository, Depends(get_article_repo)],
     tag_repo: Annotated[SqlTagRepository, Depends(get_tag_repo)],
+    guest_repo: Annotated[SqlGuestRepository, Depends(get_guest_repo)],
 ) -> ArticleResponse:
     article = repo.get_by_id(article_id)
     if article is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Article not found")
     tag_names = [t.name for t in tag_repo.get_by_article(article_id)]
-    return _to_response(article, tag_names)
+    guests = guest_repo.get_by_article(article_id)
+    return _to_response(article, tag_names, guests)
 
 
 @router.put("/{article_id}", response_model=ArticleResponse)
@@ -150,6 +168,7 @@ def update_article(
     current_user: Annotated[CurrentUser, Depends(require_editor)],
     repo: Annotated[SqlArticleRepository, Depends(get_article_repo)],
     tag_repo: Annotated[SqlTagRepository, Depends(get_tag_repo)],
+    guest_repo: Annotated[SqlGuestRepository, Depends(get_guest_repo)],
 ) -> ArticleResponse:
     use_case = UpdateArticle(repo)
     try:
@@ -181,7 +200,14 @@ def update_article(
     else:
         existing = tag_repo.get_by_article(article_id)
         tag_names = [t.name for t in existing]
-    return _to_response(article, tag_names)
+    guests: list[Guest] = []
+    if body.guest_ids is not None:
+        guests = SetArticleGuests(guest_repo).execute(
+            article_id=article_id, guest_ids=body.guest_ids
+        )
+    else:
+        guests = guest_repo.get_by_article(article_id)
+    return _to_response(article, tag_names, guests)
 
 
 @router.post("/{article_id}/publish", response_model=ArticleResponse)

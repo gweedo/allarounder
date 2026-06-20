@@ -16,6 +16,12 @@ interface Category {
   slug: string;
 }
 
+interface Guest {
+  id: string;
+  name: string;
+  slug: string;
+}
+
 interface Article {
   id: string;
   title: string;
@@ -34,6 +40,7 @@ interface Article {
   reading_time: number | null;
   category_id: string | null;
   tags: string[];
+  guest_ids: string[];
 }
 
 interface Props {
@@ -58,6 +65,8 @@ export default function EditArticlePage({ params }: Props) {
   const [categories, setCategories] = useState<Category[]>([]);
   const [tags, setTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState("");
+  const [guestIds, setGuestIds] = useState<string[]>([]);
+  const [allGuests, setAllGuests] = useState<Guest[]>([]);
   const [uploadProgress, setUploadProgress] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -72,6 +81,10 @@ export default function EditArticlePage({ params }: Props) {
     fetch("/api/admin/categories", { credentials: "include" })
       .then((res) => (res.ok ? (res.json() as Promise<{ items: Category[] }>) : Promise.reject()))
       .then((data) => setCategories(data.items))
+      .catch(() => {});
+    fetch("/api/admin/guests", { credentials: "include" })
+      .then((res) => (res.ok ? (res.json() as Promise<{ items: Guest[] }>) : Promise.reject()))
+      .then((data) => setAllGuests(data.items))
       .catch(() => {});
   }, []);
 
@@ -96,6 +109,7 @@ export default function EditArticlePage({ params }: Props) {
         setOgImageUrl(data.og_image_url ?? "");
         setCategoryId(data.category_id ?? "");
         setTags(data.tags ?? []);
+        setGuestIds(data.guest_ids ?? []);
       })
       .catch((err: Error) => setError(err.message))
       .finally(() => setLoading(false));
@@ -140,6 +154,7 @@ export default function EditArticlePage({ params }: Props) {
           og_image_url: ogImageUrl || undefined,
           category_id: categoryId || undefined,
           tags,
+          guest_ids: guestIds,
         }),
         credentials: "include",
       });
@@ -151,6 +166,7 @@ export default function EditArticlePage({ params }: Props) {
       const saved = await (res.json() as Promise<Article>);
       setArticle(saved);
       setTags(saved.tags ?? []);
+      setGuestIds(saved.guest_ids ?? []);
     } catch {
       setError("Errore di rete. Riprova.");
     } finally {
@@ -415,6 +431,41 @@ export default function EditArticlePage({ params }: Props) {
             </button>
           </div>
         </div>
+        {allGuests.length > 0 && (
+          <div style={{ marginTop: "1rem" }}>
+            <label>Ospiti</label>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem", marginTop: "0.25rem" }}>
+              {allGuests.map((guest) => (
+                <label
+                  key={guest.id}
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "0.25rem",
+                    padding: "0.2rem 0.5rem",
+                    background: guestIds.includes(guest.id) ? "#d0e8ff" : "#f0f0f0",
+                    borderRadius: "4px",
+                    fontSize: "0.875rem",
+                    cursor: "pointer",
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={guestIds.includes(guest.id)}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setGuestIds((prev) => [...prev, guest.id]);
+                      } else {
+                        setGuestIds((prev) => prev.filter((id) => id !== guest.id));
+                      }
+                    }}
+                  />
+                  {guest.name}
+                </label>
+              ))}
+            </div>
+          </div>
+        )}
         <div style={{ marginTop: "1rem" }}>
           <label htmlFor="spotify-url">URL Spotify (episodio)</label>
           <br />

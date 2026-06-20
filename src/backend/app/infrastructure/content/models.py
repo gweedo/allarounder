@@ -26,6 +26,35 @@ article_tags = Table(
     ),
 )
 
+article_guests = Table(
+    "article_guests",
+    Base.metadata,
+    Column(
+        "article_id",
+        UUID(as_uuid=True),
+        ForeignKey("articles.id", ondelete="CASCADE"),
+        primary_key=True,
+    ),
+    Column(
+        "guest_id",
+        UUID(as_uuid=True),
+        ForeignKey("guests.id", ondelete="CASCADE"),
+        primary_key=True,
+    ),
+)
+
+
+class GuestModel(Base):
+    __tablename__ = "guests"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    name: Mapped[str] = mapped_column(String(300), nullable=False)
+    slug: Mapped[str] = mapped_column(String(300), unique=True, nullable=False, index=True)
+    bio: Mapped[str | None] = mapped_column(Text, nullable=True)
+    photo_url: Mapped[str | None] = mapped_column(String(2048), nullable=True)
+    links: Mapped[dict[str, str]] = mapped_column(JSONB, nullable=False, server_default="{}")
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+
 
 class AuthorModel(Base):
     __tablename__ = "authors"

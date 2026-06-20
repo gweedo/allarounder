@@ -25,6 +25,12 @@ interface TagRef {
   slug: string;
 }
 
+interface GuestRef {
+  id: string;
+  name: string;
+  slug: string;
+}
+
 interface Article {
   id: string;
   title: string;
@@ -43,6 +49,7 @@ interface Article {
   author_profile: AuthorRef | null;
   category: CategoryRef | null;
   tags: TagRef[];
+  guests: GuestRef[];
 }
 
 async function getArticle(slug: string): Promise<Article | null> {
@@ -166,6 +173,22 @@ export default async function ArticlePage({ params }: Props) {
               >
                 #{tag.name}
               </a>
+            ))}
+          </div>
+        )}
+        {article.guests && article.guests.length > 0 && (
+          <div style={{ marginTop: "1rem", fontSize: "0.9rem", color: "#555" }}>
+            <span>Ospiti: </span>
+            {article.guests.map((guest, i) => (
+              <span key={guest.id}>
+                <a
+                  href={`/ospiti/${guest.slug}`}
+                  style={{ color: "#444", textDecoration: "underline" }}
+                >
+                  {guest.name}
+                </a>
+                {i < article.guests.length - 1 && ", "}
+              </span>
             ))}
           </div>
         )}

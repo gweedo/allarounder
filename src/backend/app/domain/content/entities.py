@@ -19,6 +19,17 @@ class Author:
 
 
 @dataclass
+class Guest:
+    id: uuid.UUID
+    name: str
+    slug: Slug
+    created_at: datetime
+    bio: str | None = field(default=None)
+    photo_url: str | None = field(default=None)
+    links: dict[str, str] = field(default_factory=dict)
+
+
+@dataclass
 class Category:
     id: uuid.UUID
     name: str
@@ -57,6 +68,7 @@ class Article:
     category_id: uuid.UUID | None = field(default=None)
     author_profile_id: uuid.UUID | None = field(default=None)
     tag_ids: list[uuid.UUID] = field(default_factory=list)
+    guest_ids: list[uuid.UUID] = field(default_factory=list)
 
     def set_slug(self, new_slug: Slug) -> None:
         if self.slug_locked:

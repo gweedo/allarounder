@@ -1,18 +1,23 @@
 import uuid
 from datetime import UTC, datetime
 
-from app.domain.content.entities import Article, Author, Category, Tag
+from app.domain.content.entities import Article, Author, Category, Guest, Tag
 from app.domain.content.exceptions import ArticleNotFoundError
 from app.domain.content.repositories import (
     ArticleRepository,
     AuthorRepository,
     CategoryRepository,
+    GuestRepository,
     TagRepository,
 )
 from app.domain.content.value_objects import Body, PublicationStatus, Slug, SpotifyUrl
 
 
 class AuthorNotFoundError(Exception):
+    pass
+
+
+class GuestNotFoundError(Exception):
     pass
 
 
@@ -94,6 +99,110 @@ class DeleteAuthor:
         if self._repo.get_by_id(author_id) is None:
             raise AuthorNotFoundError(f"Author {author_id} not found")
         self._repo.delete(author_id)
+
+
+class CreateGuest:
+    def __init__(self, repo: GuestRepository) -> None:
+        self._repo = repo
+
+    def execute(
+        self,
+        *,
+        name: str,
+        bio: str | None = None,
+        photo_url: str | None = None,
+        links: dict[str, str] | None = None,
+    ) -> Guest:
+        now = datetime.now(tz=UTC)
+        guest = Guest(
+            id=uuid.uuid4(),
+            name=name,
+            slug=Slug.from_title(name),
+            created_at=now,
+            bio=bio,
+            photo_url=photo_url,
+            links=links or {},
+        )
+        self._repo.add(guest)
+        return guest
+
+
+class UpdateGuest:
+    def __init__(self, repo: GuestRepository) -> None:
+        self._repo = repo
+
+    def execute(
+        self,
+        *,
+        guest_id: uuid.UUID,
+        name: str | None = None,
+        bio: str | None = None,
+        photo_url: str | None = None,
+        links: dict[str, str] | None = None,
+    ) -> Guest:
+        guest = self._repo.get_by_id(guest_id)
+        if guest is None:
+            raise GuestNotFoundError(f"Guest {guest_id} not found")
+        if name is not None:
+            guest.name = name
+        if bio is not None:
+            guest.bio = bio
+        if photo_url is not None:
+            guest.photo_url = photo_url
+        if links is not None:
+            guest.links = links
+        self._repo.save(guest)
+        return guest
+
+
+class DeleteGuest:
+    def __init__(self, repo: GuestRepository) -> None:
+        self._repo = repo
+
+    def execute(self, *, guest_id: uuid.UUID) -> None:
+        if self._repo.get_by_id(guest_id) is None:
+            raise GuestNotFoundError(f"Guest {guest_id} not found")
+        self._repo.delete(guest_id)
+
+
+class GetGuestWithArticles:
+    def __init__(
+        self,
+        guest_repo: GuestRepository,
+        article_repo: ArticleRepository,
+    ) -> None:
+        self._guest_repo = guest_repo
+        self._article_repo = article_repo
+
+    def execute(
+        self,
+        *,
+        slug: str,
+        page: int = 1,
+        page_size: int = 20,
+    ) -> tuple[Guest, list[Article], int]:
+        guest = self._guest_repo.get_by_slug(slug)
+        if guest is None:
+            raise GuestNotFoundError(f"Guest '{slug}' not found")
+        now = datetime.now(tz=UTC)
+        articles, total = self._article_repo.list_published_by_guest(
+            guest_id=guest.id,
+            before=now,
+            page=page,
+            page_size=page_size,
+        )
+        return guest, articles, total
+
+
+class SetArticleGuests:
+    def __init__(self, guest_repo: GuestRepository) -> None:
+        self._guest_repo = guest_repo
+
+    def execute(self, *, article_id: uuid.UUID, guest_ids: list[uuid.UUID]) -> list[Guest]:
+        guests = [self._guest_repo.get_by_id(gid) for gid in guest_ids]
+        valid = [g for g in guests if g is not None]
+        self._guest_repo.set_article_guests(article_id, [g.id for g in valid])
+        return valid
 
 
 class GetAuthorWithArticles:

@@ -26,6 +26,7 @@ class UpdateArticleRequest(BaseModel):
     og_image_url: str | None = None
     category_id: UUID | None = None
     tags: list[str] | None = None
+    guest_ids: list[UUID] | None = None
 
 
 class ArticleResponse(BaseModel):
@@ -50,6 +51,7 @@ class ArticleResponse(BaseModel):
     reading_time: int | None = None
     category_id: UUID | None = None
     tags: list[str] = []
+    guest_ids: list[UUID] = []
 
 
 class PreviewTokenResponse(BaseModel):

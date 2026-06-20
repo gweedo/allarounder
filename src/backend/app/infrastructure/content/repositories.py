@@ -8,15 +8,29 @@ from datetime import datetime
 from sqlalchemy import delete, insert, select
 from sqlalchemy.orm import Session
 
-from app.domain.content.entities import Article, Author, Category, Tag
+from app.domain.content.entities import Article, Author, Category, Guest, Tag
 from app.domain.content.value_objects import Body, PublicationStatus, Slug
 from app.infrastructure.content.models import (
     ArticleModel,
     AuthorModel,
     CategoryModel,
+    GuestModel,
     TagModel,
+    article_guests,
     article_tags,
 )
+
+
+def _model_to_guest(m: GuestModel) -> Guest:
+    return Guest(
+        id=m.id,
+        name=m.name,
+        slug=Slug(m.slug),
+        created_at=m.created_at,
+        bio=m.bio,
+        photo_url=m.photo_url,
+        links=dict(m.links) if m.links else {},
+    )
 
 
 def _model_to_author(m: AuthorModel) -> Author:
@@ -35,6 +49,7 @@ def _model_to_author(m: AuthorModel) -> Author:
 def _model_to_article(
     m: ArticleModel,
     tag_ids: list[uuid.UUID] | None = None,
+    guest_ids: list[uuid.UUID] | None = None,
 ) -> Article:
     return Article(
         id=m.id,
@@ -59,6 +74,7 @@ def _model_to_article(
         category_id=m.category_id,
         author_profile_id=m.author_profile_id,
         tag_ids=tag_ids or [],
+        guest_ids=guest_ids or [],
     )
 
 
@@ -73,6 +89,73 @@ def _model_to_category(m: CategoryModel) -> Category:
         slug=Slug(m.slug),
         description=m.description,
     )
+
+
+class SqlGuestRepository:
+    def __init__(self, session: Session) -> None:
+        self._session = session
+
+    def add(self, guest: Guest) -> None:
+        m = GuestModel(
+            id=guest.id,
+            name=guest.name,
+            slug=guest.slug.value,
+            bio=guest.bio,
+            photo_url=guest.photo_url,
+            links=guest.links,
+            created_at=guest.created_at,
+        )
+        self._session.add(m)
+
+    def get_by_id(self, guest_id: uuid.UUID) -> Guest | None:
+        m = self._session.get(GuestModel, guest_id)
+        return _model_to_guest(m) if m else None
+
+    def get_by_slug(self, slug: str) -> Guest | None:
+        m = self._session.query(GuestModel).filter_by(slug=slug).one_or_none()
+        return _model_to_guest(m) if m else None
+
+    def list_all(self) -> list[Guest]:
+        rows = self._session.query(GuestModel).order_by(GuestModel.name).all()
+        return [_model_to_guest(r) for r in rows]
+
+    def save(self, guest: Guest) -> None:
+        m = self._session.get(GuestModel, guest.id)
+        if m is None:
+            raise ValueError(f"Guest {guest.id} not found in database")
+        m.name = guest.name
+        m.slug = guest.slug.value
+        m.bio = guest.bio
+        m.photo_url = guest.photo_url
+        m.links = guest.links
+
+    def delete(self, guest_id: uuid.UUID) -> None:
+        m = self._session.get(GuestModel, guest_id)
+        if m is not None:
+            self._session.delete(m)
+
+    def get_by_article(self, article_id: uuid.UUID) -> list[Guest]:
+        guest_ids = list(
+            self._session.execute(
+                select(article_guests.c.guest_id).where(
+                    article_guests.c.article_id == article_id
+                )
+            ).scalars().all()
+        )
+        if not guest_ids:
+            return []
+        rows = self._session.query(GuestModel).filter(GuestModel.id.in_(guest_ids)).all()
+        return [_model_to_guest(r) for r in rows]
+
+    def set_article_guests(self, article_id: uuid.UUID, guest_ids: list[uuid.UUID]) -> None:
+        self._session.execute(
+            delete(article_guests).where(article_guests.c.article_id == article_id)
+        )
+        if guest_ids:
+            self._session.execute(
+                insert(article_guests),
+                [{"article_id": article_id, "guest_id": g} for g in guest_ids],
+            )
 
 
 class SqlAuthorRepository:
@@ -255,17 +338,38 @@ class SqlArticleRepository:
             ).scalars().all()
         )
 
+    def _get_guest_ids(self, article_id: uuid.UUID) -> list[uuid.UUID]:
+        return list(
+            self._session.execute(
+                select(article_guests.c.guest_id).where(
+                    article_guests.c.article_id == article_id
+                )
+            ).scalars().all()
+        )
+
     def get_by_id(self, article_id: uuid.UUID) -> Article | None:
         m = self._session.get(ArticleModel, article_id)
-        return _model_to_article(m, self._get_tag_ids(article_id)) if m else None
+        return (
+            _model_to_article(m, self._get_tag_ids(article_id), self._get_guest_ids(article_id))
+            if m
+            else None
+        )
 
     def get_by_slug(self, slug: str) -> Article | None:
         m = self._session.query(ArticleModel).filter_by(slug=slug).one_or_none()
-        return _model_to_article(m, self._get_tag_ids(m.id) if m else None) if m else None
+        return (
+            _model_to_article(m, self._get_tag_ids(m.id), self._get_guest_ids(m.id))
+            if m
+            else None
+        )
 
     def get_by_preview_token(self, token: uuid.UUID) -> Article | None:
         m = self._session.query(ArticleModel).filter_by(preview_token=token).one_or_none()
-        return _model_to_article(m, self._get_tag_ids(m.id) if m else None) if m else None
+        return (
+            _model_to_article(m, self._get_tag_ids(m.id), self._get_guest_ids(m.id))
+            if m
+            else None
+        )
 
     def save(self, article: Article) -> None:
         m = self._session.get(ArticleModel, article.id)
@@ -306,6 +410,30 @@ class SqlArticleRepository:
         total = q.count()
         rows = (
             q.order_by(ArticleModel.created_at.desc())
+            .offset((page - 1) * page_size)
+            .limit(page_size)
+            .all()
+        )
+        return [_model_to_article(r) for r in rows], total
+
+    def list_published_by_guest(
+        self,
+        *,
+        guest_id: uuid.UUID,
+        before: datetime,
+        page: int = 1,
+        page_size: int = 20,
+    ) -> tuple[list[Article], int]:
+        q = (
+            self._session.query(ArticleModel)
+            .join(article_guests, article_guests.c.article_id == ArticleModel.id)
+            .filter(article_guests.c.guest_id == guest_id)
+            .filter(ArticleModel.status == "published")
+            .filter(ArticleModel.publish_at <= before)
+        )
+        total = q.count()
+        rows = (
+            q.order_by(ArticleModel.publish_at.desc())
             .offset((page - 1) * page_size)
             .limit(page_size)
             .all()

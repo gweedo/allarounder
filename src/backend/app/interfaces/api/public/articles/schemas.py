@@ -22,6 +22,12 @@ class TagRef(BaseModel):
     slug: str
 
 
+class GuestRef(BaseModel):
+    id: UUID
+    name: str
+    slug: str
+
+
 class PublicArticleResponse(BaseModel):
     id: UUID
     title: str
@@ -41,6 +47,7 @@ class PublicArticleResponse(BaseModel):
     category: CategoryRef | None = None
     author_profile: AuthorRef | None = None
     tags: list[TagRef] = []
+    guests: list[GuestRef] = []
 
 
 class PublicArticleListResponse(BaseModel):
