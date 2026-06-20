@@ -12,8 +12,8 @@ from jose import jwt
 from app.domain.content.entities import Category
 from app.domain.content.value_objects import Slug
 from app.interfaces.api.admin.categories.router import get_category_repo as admin_get_cat_repo
-from app.interfaces.api.public.categories.router import get_category_repo as public_get_cat_repo
 from app.interfaces.api.public.categories.router import get_article_repo as public_get_art_repo
+from app.interfaces.api.public.categories.router import get_category_repo as public_get_cat_repo
 from app.main import app
 from app.settings import get_settings
 

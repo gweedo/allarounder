@@ -23,6 +23,7 @@ const DRAFT_ARTICLE = {
   og_image_url: null,
   reading_time: null,
   category_id: null,
+  tags: [],
 };
 
 const PUBLISHED_ARTICLE = {
@@ -190,6 +191,78 @@ describe("EditArticlePage", () => {
     render(<EditArticlePage params={mockParams("art-1")} />);
     await waitFor(() => {
       expect(screen.getByLabelText(/categoria/i)).toBeInTheDocument();
+    });
+  });
+
+  it("shows tag input and adds tag on button click", async () => {
+    setupFetch(DRAFT_ARTICLE);
+    render(<EditArticlePage params={mockParams("art-1")} />);
+    await waitFor(() => screen.getByLabelText(/tag/i));
+    const tagInput = screen.getByPlaceholderText(/aggiungi tag/i);
+    fireEvent.change(tagInput, { target: { value: "podcast" } });
+    fireEvent.click(screen.getByRole("button", { name: /aggiungi/i }));
+    await waitFor(() => {
+      expect(screen.getByText(/#podcast/i)).toBeInTheDocument();
+    });
+  });
+
+  it("adds tag on Enter key press", async () => {
+    setupFetch(DRAFT_ARTICLE);
+    render(<EditArticlePage params={mockParams("art-1")} />);
+    await waitFor(() => screen.getByLabelText(/tag/i));
+    const tagInput = screen.getByPlaceholderText(/aggiungi tag/i);
+    fireEvent.change(tagInput, { target: { value: "sport" } });
+    fireEvent.keyDown(tagInput, { key: "Enter" });
+    await waitFor(() => {
+      expect(screen.getByText(/#sport/i)).toBeInTheDocument();
+    });
+  });
+
+  it("shows existing tags loaded from article", async () => {
+    setupFetch({ ...DRAFT_ARTICLE, tags: ["calcio", "serie-a"] });
+    render(<EditArticlePage params={mockParams("art-1")} />);
+    await waitFor(() => {
+      expect(screen.getByText(/#calcio/i)).toBeInTheDocument();
+      expect(screen.getByText(/#serie-a/i)).toBeInTheDocument();
+    });
+  });
+
+  it("removes a tag when × is clicked", async () => {
+    setupFetch({ ...DRAFT_ARTICLE, tags: ["calcio"] });
+    render(<EditArticlePage params={mockParams("art-1")} />);
+    await waitFor(() => screen.getByText(/#calcio/i));
+    fireEvent.click(screen.getByRole("button", { name: /rimuovi tag calcio/i }));
+    await waitFor(() => {
+      expect(screen.queryByText(/#calcio/i)).toBeNull();
+    });
+  });
+
+  it("includes tags in save payload", async () => {
+    setupFetch({ ...DRAFT_ARTICLE, tags: ["calcio"] });
+    (global.fetch as ReturnType<typeof vi.fn>).mockImplementation((url: unknown, opts?: RequestInit) => {
+      const u = String(url);
+      if (u === "/api/admin/categories") {
+        return Promise.resolve({ ok: true, json: async () => ({ items: [] }) });
+      }
+      if (u.match(/\/api\/admin\/articles\/[^/]+$/) && opts?.method === "PUT") {
+        return Promise.resolve({ ok: true, json: async () => ({ ...DRAFT_ARTICLE, tags: ["calcio"] }) });
+      }
+      if (u.match(/\/api\/admin\/articles\/[^/]+$/)) {
+        return Promise.resolve({ ok: true, json: async () => ({ ...DRAFT_ARTICLE, tags: ["calcio"] }) });
+      }
+      return Promise.resolve({ ok: false, json: async () => ({}) });
+    });
+    render(<EditArticlePage params={mockParams("art-1")} />);
+    await waitFor(() => screen.getByLabelText(/^titolo$/i));
+    fireEvent.click(screen.getByRole("button", { name: /^salva$/i }));
+    await waitFor(() => {
+      const calls = (global.fetch as ReturnType<typeof vi.fn>).mock.calls;
+      const putCall = calls.find((c: unknown[]) =>
+        String(c[0]).match(/\/api\/admin\/articles\/[^/]+$/) && (c[1] as RequestInit)?.method === "PUT"
+      );
+      expect(putCall).toBeTruthy();
+      const body = JSON.parse((putCall![1] as RequestInit).body as string) as { tags: string[] };
+      expect(body.tags).toEqual(["calcio"]);
     });
   });
 });

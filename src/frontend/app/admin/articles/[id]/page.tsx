@@ -33,6 +33,7 @@ interface Article {
   og_image_url: string | null;
   reading_time: number | null;
   category_id: string | null;
+  tags: string[];
 }
 
 interface Props {
@@ -55,6 +56,8 @@ export default function EditArticlePage({ params }: Props) {
   const [ogImageUrl, setOgImageUrl] = useState("");
   const [categoryId, setCategoryId] = useState<string>("");
   const [categories, setCategories] = useState<Category[]>([]);
+  const [tags, setTags] = useState<string[]>([]);
+  const [tagInput, setTagInput] = useState("");
   const [uploadProgress, setUploadProgress] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -92,6 +95,7 @@ export default function EditArticlePage({ params }: Props) {
         setMetaDescription(data.meta_description ?? "");
         setOgImageUrl(data.og_image_url ?? "");
         setCategoryId(data.category_id ?? "");
+        setTags(data.tags ?? []);
       })
       .catch((err: Error) => setError(err.message))
       .finally(() => setLoading(false));
@@ -135,6 +139,7 @@ export default function EditArticlePage({ params }: Props) {
           meta_description: metaDescription || undefined,
           og_image_url: ogImageUrl || undefined,
           category_id: categoryId || undefined,
+          tags,
         }),
         credentials: "include",
       });
@@ -143,7 +148,9 @@ export default function EditArticlePage({ params }: Props) {
         setError((data as { detail?: string }).detail ?? "Errore nel salvataggio.");
         return;
       }
-      setArticle(await (res.json() as Promise<Article>));
+      const saved = await (res.json() as Promise<Article>);
+      setArticle(saved);
+      setTags(saved.tags ?? []);
     } catch {
       setError("Errore di rete. Riprova.");
     } finally {
@@ -345,6 +352,68 @@ export default function EditArticlePage({ params }: Props) {
               </option>
             ))}
           </select>
+        </div>
+        <div style={{ marginTop: "1rem" }}>
+          <label htmlFor="tag-input">Tag</label>
+          <br />
+          <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", marginTop: "0.25rem" }}>
+            {tags.map((tag) => (
+              <span
+                key={tag}
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "0.25rem",
+                  padding: "0.2rem 0.5rem",
+                  background: "#e8e8e8",
+                  borderRadius: "4px",
+                  fontSize: "0.875rem",
+                }}
+              >
+                #{tag}
+                <button
+                  type="button"
+                  aria-label={`Rimuovi tag ${tag}`}
+                  onClick={() => setTags((prev) => prev.filter((t) => t !== tag))}
+                  style={{ background: "none", border: "none", cursor: "pointer", padding: 0 }}
+                >
+                  ×
+                </button>
+              </span>
+            ))}
+          </div>
+          <div style={{ display: "flex", gap: "0.5rem", marginTop: "0.5rem" }}>
+            <input
+              id="tag-input"
+              type="text"
+              value={tagInput}
+              onChange={(e) => setTagInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === ",") {
+                  e.preventDefault();
+                  const name = tagInput.trim().toLowerCase();
+                  if (name && !tags.includes(name)) {
+                    setTags((prev) => [...prev, name]);
+                  }
+                  setTagInput("");
+                }
+              }}
+              placeholder="Aggiungi tag e premi Invio"
+              style={{ flex: 1 }}
+            />
+            <button
+              type="button"
+              onClick={() => {
+                const name = tagInput.trim().toLowerCase();
+                if (name && !tags.includes(name)) {
+                  setTags((prev) => [...prev, name]);
+                }
+                setTagInput("");
+              }}
+            >
+              Aggiungi
+            </button>
+          </div>
         </div>
         <div style={{ marginTop: "1rem" }}>
           <label htmlFor="spotify-url">URL Spotify (episodio)</label>

@@ -1,18 +1,22 @@
-"""SQLAlchemy implementations of ArticleRepository and CategoryRepository."""
+"""SQLAlchemy implementations of ArticleRepository, CategoryRepository, TagRepository."""
 
 from __future__ import annotations
 
 import uuid
 from datetime import datetime
 
+from sqlalchemy import delete, insert, select
 from sqlalchemy.orm import Session
 
-from app.domain.content.entities import Article, Category
+from app.domain.content.entities import Article, Category, Tag
 from app.domain.content.value_objects import Body, PublicationStatus, Slug
-from app.infrastructure.content.models import ArticleModel, CategoryModel
+from app.infrastructure.content.models import ArticleModel, CategoryModel, TagModel, article_tags
 
 
-def _model_to_article(m: ArticleModel) -> Article:
+def _model_to_article(
+    m: ArticleModel,
+    tag_ids: list[uuid.UUID] | None = None,
+) -> Article:
     return Article(
         id=m.id,
         title=m.title,
@@ -34,7 +38,12 @@ def _model_to_article(m: ArticleModel) -> Article:
         og_image_url=m.og_image_url,
         reading_time=m.reading_time,
         category_id=m.category_id,
+        tag_ids=tag_ids or [],
     )
+
+
+def _model_to_tag(m: TagModel) -> Tag:
+    return Tag(id=m.id, name=m.name, slug=Slug(m.slug))
 
 
 def _model_to_category(m: CategoryModel) -> Category:
@@ -44,6 +53,60 @@ def _model_to_category(m: CategoryModel) -> Category:
         slug=Slug(m.slug),
         description=m.description,
     )
+
+
+class SqlTagRepository:
+    def __init__(self, session: Session) -> None:
+        self._session = session
+
+    def _get_article_tag_ids(self, article_id: uuid.UUID) -> list[uuid.UUID]:
+        rows = self._session.execute(
+            select(article_tags.c.tag_id).where(article_tags.c.article_id == article_id)
+        ).scalars().all()
+        return list(rows)
+
+    def get_by_id(self, tag_id: uuid.UUID) -> Tag | None:
+        m = self._session.get(TagModel, tag_id)
+        return _model_to_tag(m) if m else None
+
+    def get_by_slug(self, slug: str) -> Tag | None:
+        m = self._session.query(TagModel).filter_by(slug=slug).one_or_none()
+        return _model_to_tag(m) if m else None
+
+    def get_or_create(self, name: str) -> Tag:
+        m = self._session.query(TagModel).filter_by(name=name).one_or_none()
+        if m is None:
+            slug_val = Slug.from_title(name).value
+            m = TagModel(id=uuid.uuid4(), name=name, slug=slug_val)
+            self._session.add(m)
+            self._session.flush()
+        return _model_to_tag(m)
+
+    def list_all(self) -> list[Tag]:
+        rows = self._session.query(TagModel).order_by(TagModel.name).all()
+        return [_model_to_tag(r) for r in rows]
+
+    def get_by_article(self, article_id: uuid.UUID) -> list[Tag]:
+        tag_ids = self._get_article_tag_ids(article_id)
+        if not tag_ids:
+            return []
+        rows = self._session.query(TagModel).filter(TagModel.id.in_(tag_ids)).all()
+        return [_model_to_tag(r) for r in rows]
+
+    def set_article_tags(self, article_id: uuid.UUID, tag_ids: list[uuid.UUID]) -> None:
+        self._session.execute(
+            delete(article_tags).where(article_tags.c.article_id == article_id)
+        )
+        if tag_ids:
+            self._session.execute(
+                insert(article_tags),
+                [{"article_id": article_id, "tag_id": t} for t in tag_ids],
+            )
+
+    def delete(self, tag_id: uuid.UUID) -> None:
+        m = self._session.get(TagModel, tag_id)
+        if m is not None:
+            self._session.delete(m)
 
 
 class SqlCategoryRepository:
@@ -114,17 +177,24 @@ class SqlArticleRepository:
         )
         self._session.add(m)
 
+    def _get_tag_ids(self, article_id: uuid.UUID) -> list[uuid.UUID]:
+        return list(
+            self._session.execute(
+                select(article_tags.c.tag_id).where(article_tags.c.article_id == article_id)
+            ).scalars().all()
+        )
+
     def get_by_id(self, article_id: uuid.UUID) -> Article | None:
         m = self._session.get(ArticleModel, article_id)
-        return _model_to_article(m) if m else None
+        return _model_to_article(m, self._get_tag_ids(article_id)) if m else None
 
     def get_by_slug(self, slug: str) -> Article | None:
         m = self._session.query(ArticleModel).filter_by(slug=slug).one_or_none()
-        return _model_to_article(m) if m else None
+        return _model_to_article(m, self._get_tag_ids(m.id) if m else None) if m else None
 
     def get_by_preview_token(self, token: uuid.UUID) -> Article | None:
         m = self._session.query(ArticleModel).filter_by(preview_token=token).one_or_none()
-        return _model_to_article(m) if m else None
+        return _model_to_article(m, self._get_tag_ids(m.id) if m else None) if m else None
 
     def save(self, article: Article) -> None:
         m = self._session.get(ArticleModel, article.id)
@@ -175,6 +245,7 @@ class SqlArticleRepository:
         *,
         before: datetime,
         category_id: uuid.UUID | None = None,
+        tag_id: uuid.UUID | None = None,
         page: int = 1,
         page_size: int = 20,
     ) -> tuple[list[Article], int]:
@@ -185,6 +256,10 @@ class SqlArticleRepository:
         )
         if category_id is not None:
             q = q.filter(ArticleModel.category_id == category_id)
+        if tag_id is not None:
+            q = q.join(
+                article_tags, article_tags.c.article_id == ArticleModel.id
+            ).filter(article_tags.c.tag_id == tag_id)
         total = q.count()
         rows = (
             q.order_by(ArticleModel.publish_at.desc())

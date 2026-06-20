@@ -10,6 +10,12 @@ class CategoryRef(BaseModel):
     slug: str
 
 
+class TagRef(BaseModel):
+    id: UUID
+    name: str
+    slug: str
+
+
 class PublicArticleResponse(BaseModel):
     id: UUID
     title: str
@@ -27,6 +33,7 @@ class PublicArticleResponse(BaseModel):
     reading_time: int | None = None
     category_id: UUID | None = None
     category: CategoryRef | None = None
+    tags: list[TagRef] = []
 
 
 class PublicArticleListResponse(BaseModel):

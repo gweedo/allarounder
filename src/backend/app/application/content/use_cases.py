@@ -1,14 +1,68 @@
 import uuid
 from datetime import UTC, datetime
 
-from app.domain.content.entities import Article, Category
+from app.domain.content.entities import Article, Category, Tag
 from app.domain.content.exceptions import ArticleNotFoundError
-from app.domain.content.repositories import ArticleRepository, CategoryRepository
+from app.domain.content.repositories import ArticleRepository, CategoryRepository, TagRepository
 from app.domain.content.value_objects import Body, PublicationStatus, Slug, SpotifyUrl
 
 
 class CategoryNotFoundError(Exception):
     pass
+
+
+class TagNotFoundError(Exception):
+    pass
+
+
+class SetArticleTags:
+    def __init__(self, tag_repo: TagRepository) -> None:
+        self._tag_repo = tag_repo
+
+    def execute(self, *, article_id: uuid.UUID, tag_names: list[str]) -> list[Tag]:
+        tags = [self._tag_repo.get_or_create(name) for name in tag_names if name.strip()]
+        tag_ids = [t.id for t in tags]
+        self._tag_repo.set_article_tags(article_id, tag_ids)
+        return tags
+
+
+class DeleteTag:
+    def __init__(self, repo: TagRepository) -> None:
+        self._repo = repo
+
+    def execute(self, *, tag_id: uuid.UUID) -> None:
+        if self._repo.get_by_id(tag_id) is None:
+            raise TagNotFoundError(f"Tag {tag_id} not found")
+        self._repo.delete(tag_id)
+
+
+class GetTagWithArticles:
+    def __init__(
+        self,
+        tag_repo: TagRepository,
+        article_repo: ArticleRepository,
+    ) -> None:
+        self._tag_repo = tag_repo
+        self._article_repo = article_repo
+
+    def execute(
+        self,
+        *,
+        slug: str,
+        page: int = 1,
+        page_size: int = 20,
+    ) -> tuple[Tag, list[Article], int]:
+        tag = self._tag_repo.get_by_slug(slug)
+        if tag is None:
+            raise TagNotFoundError(f"Tag '{slug}' not found")
+        now = datetime.now(tz=UTC)
+        articles, total = self._article_repo.list_published(
+            before=now,
+            tag_id=tag.id,
+            page=page,
+            page_size=page_size,
+        )
+        return tag, articles, total
 
 
 class CreateCategory:

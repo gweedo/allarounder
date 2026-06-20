@@ -13,6 +13,12 @@ interface CategoryRef {
   slug: string;
 }
 
+interface TagRef {
+  id: string;
+  name: string;
+  slug: string;
+}
+
 interface Article {
   id: string;
   title: string;
@@ -29,6 +35,7 @@ interface Article {
   og_image_url: string | null;
   reading_time: number | null;
   category: CategoryRef | null;
+  tags: TagRef[];
 }
 
 async function getArticle(slug: string): Promise<Article | null> {
@@ -120,6 +127,27 @@ export default async function ArticlePage({ params }: Props) {
           <p style={{ fontStyle: "italic", marginTop: "1rem", color: "#555" }}>
             {article.excerpt}
           </p>
+        )}
+        {article.tags && article.tags.length > 0 && (
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem", marginTop: "1rem" }}>
+            {article.tags.map((tag) => (
+              <a
+                key={tag.id}
+                href={`/tag/${tag.slug}`}
+                style={{
+                  display: "inline-block",
+                  padding: "0.2rem 0.6rem",
+                  background: "#f0f0f0",
+                  borderRadius: "4px",
+                  fontSize: "0.8rem",
+                  color: "#444",
+                  textDecoration: "none",
+                }}
+              >
+                #{tag.name}
+              </a>
+            ))}
+          </div>
         )}
         <div
           className="article-body"

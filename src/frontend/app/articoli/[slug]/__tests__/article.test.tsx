@@ -39,6 +39,7 @@ const BASE_ARTICLE = {
   og_image_url: null as string | null,
   reading_time: null as number | null,
   category: null as { id: string; name: string; slug: string } | null,
+  tags: [] as { id: string; name: string; slug: string }[],
 };
 
 beforeEach(() => {
@@ -118,6 +119,25 @@ describe("ArticlePage", () => {
     });
     const link = screen.getByRole("link", { name: "Interviste" });
     expect(link).toHaveAttribute("href", "/argomenti/interviste");
+  });
+
+  it("renders tag chips linking to /tag/{slug}", async () => {
+    await renderArticlePage({
+      ...BASE_ARTICLE,
+      tags: [
+        { id: "t1", name: "calcio", slug: "calcio" },
+        { id: "t2", name: "serie-a", slug: "serie-a" },
+      ],
+    });
+    const calcioLink = screen.getByRole("link", { name: /#calcio/i });
+    expect(calcioLink).toHaveAttribute("href", "/tag/calcio");
+    const serieaLink = screen.getByRole("link", { name: /#serie-a/i });
+    expect(serieaLink).toHaveAttribute("href", "/tag/serie-a");
+  });
+
+  it("does not render tags section when tags list is empty", async () => {
+    await renderArticlePage({ ...BASE_ARTICLE, tags: [] });
+    expect(screen.queryByText(/#/i)).toBeNull();
   });
 
   it("calls notFound when article fetch fails", async () => {

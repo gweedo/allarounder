@@ -15,6 +15,13 @@ class Category:
 
 
 @dataclass
+class Tag:
+    id: uuid.UUID
+    name: str
+    slug: Slug
+
+
+@dataclass
 class Article:
     id: uuid.UUID
     title: str
@@ -36,6 +43,7 @@ class Article:
     reading_time: int | None = field(default=None)
     preview_token: uuid.UUID | None = field(default=None)
     category_id: uuid.UUID | None = field(default=None)
+    tag_ids: list[uuid.UUID] = field(default_factory=list)
 
     def set_slug(self, new_slug: Slug) -> None:
         if self.slug_locked:

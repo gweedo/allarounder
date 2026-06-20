@@ -7,14 +7,19 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from app.domain.content.entities import Article, Category
+from app.domain.content.entities import Article, Category, Tag
 from app.domain.content.value_objects import PublicationStatus
-from app.infrastructure.content.repositories import SqlArticleRepository, SqlCategoryRepository
+from app.infrastructure.content.repositories import (
+    SqlArticleRepository,
+    SqlCategoryRepository,
+    SqlTagRepository,
+)
 from app.interfaces.api.auth.dependencies import get_db_session
 from app.interfaces.api.public.articles.schemas import (
     CategoryRef,
     PublicArticleListResponse,
     PublicArticleResponse,
+    TagRef,
 )
 
 router = APIRouter(prefix="/api/articles", tags=["public-articles"])
@@ -32,6 +37,12 @@ def get_category_repo(
     return SqlCategoryRepository(session)
 
 
+def get_tag_repo(
+    session: Annotated[Session, Depends(get_db_session)],
+) -> SqlTagRepository:
+    return SqlTagRepository(session)
+
+
 def _category_ref(category: Category | None) -> CategoryRef | None:
     if category is None:
         return None
@@ -41,7 +52,9 @@ def _category_ref(category: Category | None) -> CategoryRef | None:
 def _to_response(
     article: Article,
     category: Category | None = None,
+    tags: list[Tag] | None = None,
 ) -> PublicArticleResponse:
+    tag_refs = [TagRef(id=t.id, name=t.name, slug=t.slug.value) for t in (tags or [])]
     return PublicArticleResponse(
         id=article.id,
         title=article.title,
@@ -59,6 +72,7 @@ def _to_response(
         reading_time=article.reading_time,
         category_id=article.category_id,
         category=_category_ref(category),
+        tags=tag_refs,
     )
 
 
@@ -102,6 +116,7 @@ def get_public_article(
     slug: str,
     repo: Annotated[SqlArticleRepository, Depends(get_article_repo)],
     category_repo: Annotated[SqlCategoryRepository, Depends(get_category_repo)],
+    tag_repo: Annotated[SqlTagRepository, Depends(get_tag_repo)],
 ) -> PublicArticleResponse:
     now = datetime.now(tz=UTC)
     article = repo.get_by_slug(slug)
@@ -115,4 +130,5 @@ def get_public_article(
     cat: Category | None = None
     if article.category_id is not None:
         cat = category_repo.get_by_id(article.category_id)
-    return _to_response(article, cat)
+    tags = tag_repo.get_by_article(article.id)
+    return _to_response(article, cat, tags)

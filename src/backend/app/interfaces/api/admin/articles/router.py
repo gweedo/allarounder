@@ -11,12 +11,13 @@ from app.application.content.use_cases import (
     CreateArticle,
     GeneratePreviewToken,
     PublishArticle,
+    SetArticleTags,
     UpdateArticle,
 )
-from app.domain.content.entities import Article
+from app.domain.content.entities import Article, Tag
 from app.domain.content.exceptions import ArticleNotFoundError, SlugLockedError
 from app.domain.content.value_objects import PublicationStatus
-from app.infrastructure.content.repositories import SqlArticleRepository
+from app.infrastructure.content.repositories import SqlArticleRepository, SqlTagRepository
 from app.interfaces.api.admin.articles.schemas import (
     ArticleListResponse,
     ArticleResponse,
@@ -39,7 +40,13 @@ def get_article_repo(
     return SqlArticleRepository(session)
 
 
-def _to_response(article: Article) -> ArticleResponse:
+def get_tag_repo(
+    session: Annotated[Session, Depends(get_db_session)],
+) -> SqlTagRepository:
+    return SqlTagRepository(session)
+
+
+def _to_response(article: Article, tag_names: list[str] | None = None) -> ArticleResponse:
     return ArticleResponse(
         id=article.id,
         title=article.title,
@@ -61,6 +68,7 @@ def _to_response(article: Article) -> ArticleResponse:
         og_image_url=article.og_image_url,
         reading_time=article.reading_time,
         category_id=article.category_id,
+        tags=tag_names or [],
     )
 
 
@@ -121,12 +129,27 @@ def list_articles(
     )
 
 
+@router.get("/{article_id}", response_model=ArticleResponse)
+def get_article(
+    article_id: uuid.UUID,
+    current_user: Annotated[CurrentUser, Depends(require_editor)],
+    repo: Annotated[SqlArticleRepository, Depends(get_article_repo)],
+    tag_repo: Annotated[SqlTagRepository, Depends(get_tag_repo)],
+) -> ArticleResponse:
+    article = repo.get_by_id(article_id)
+    if article is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Article not found")
+    tag_names = [t.name for t in tag_repo.get_by_article(article_id)]
+    return _to_response(article, tag_names)
+
+
 @router.put("/{article_id}", response_model=ArticleResponse)
 def update_article(
     article_id: uuid.UUID,
     body: UpdateArticleRequest,
     current_user: Annotated[CurrentUser, Depends(require_editor)],
     repo: Annotated[SqlArticleRepository, Depends(get_article_repo)],
+    tag_repo: Annotated[SqlTagRepository, Depends(get_tag_repo)],
 ) -> ArticleResponse:
     use_case = UpdateArticle(repo)
     try:
@@ -149,7 +172,16 @@ def update_article(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Article not found")
     except SlugLockedError as e:
         raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(e))
-    return _to_response(article)
+    tag_names: list[str] = []
+    if body.tags is not None:
+        tags: list[Tag] = SetArticleTags(tag_repo).execute(
+            article_id=article_id, tag_names=body.tags
+        )
+        tag_names = [t.name for t in tags]
+    else:
+        existing = tag_repo.get_by_article(article_id)
+        tag_names = [t.name for t in existing]
+    return _to_response(article, tag_names)
 
 
 @router.post("/{article_id}/publish", response_model=ArticleResponse)
