@@ -14,6 +14,7 @@ from app.domain.content.value_objects import Body, PublicationStatus, Slug
 from app.interfaces.api.admin.articles.router import get_article_repo as admin_get_repo
 from app.interfaces.api.admin.articles.router import get_tag_repo as admin_get_tag_repo
 from app.interfaces.api.public.articles.router import get_article_repo as public_get_repo
+from app.interfaces.api.public.articles.router import get_author_repo as public_get_author_repo
 from app.interfaces.api.public.articles.router import get_category_repo as public_get_cat_repo
 from app.interfaces.api.public.articles.router import get_tag_repo as public_get_tag_repo
 from app.main import app
@@ -71,6 +72,7 @@ def client(mock_repo: MagicMock, mock_tag_repo: MagicMock) -> Generator[TestClie
     app.dependency_overrides[public_get_repo] = lambda: mock_repo
     app.dependency_overrides[public_get_cat_repo] = lambda: MagicMock()
     app.dependency_overrides[public_get_tag_repo] = lambda: mock_tag_repo
+    app.dependency_overrides[public_get_author_repo] = lambda: MagicMock()
     with TestClient(app, raise_server_exceptions=False) as c:
         yield c
     app.dependency_overrides.clear()

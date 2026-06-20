@@ -7,6 +7,12 @@ import rehypeStringify from "rehype-stringify";
 
 export const revalidate = 60;
 
+interface AuthorRef {
+  id: string;
+  name: string;
+  slug: string;
+}
+
 interface CategoryRef {
   id: string;
   name: string;
@@ -34,6 +40,7 @@ interface Article {
   meta_description: string | null;
   og_image_url: string | null;
   reading_time: number | null;
+  author_profile: AuthorRef | null;
   category: CategoryRef | null;
   tags: TagRef[];
 }
@@ -105,14 +112,27 @@ export default async function ArticlePage({ params }: Props) {
           />
         )}
         <h1>{article.title}</h1>
-        <time dateTime={article.publish_at}>
-          {new Date(article.publish_at).toLocaleDateString("it-IT")}
-        </time>
-        {article.reading_time && (
-          <span style={{ marginLeft: "1rem", color: "#666" }}>
-            {article.reading_time} min di lettura
-          </span>
-        )}
+        <div style={{ color: "#666", marginTop: "0.25rem" }}>
+          <time dateTime={article.publish_at}>
+            {new Date(article.publish_at).toLocaleDateString("it-IT")}
+          </time>
+          {article.reading_time && (
+            <span style={{ marginLeft: "1rem" }}>
+              {article.reading_time} min di lettura
+            </span>
+          )}
+          {article.author_profile && (
+            <span style={{ marginLeft: "1rem" }}>
+              di{" "}
+              <a
+                href={`/autori/${article.author_profile.slug}`}
+                style={{ color: "#444", textDecoration: "underline" }}
+              >
+                {article.author_profile.name}
+              </a>
+            </span>
+          )}
+        </div>
         {article.category && (
           <p style={{ marginTop: "0.5rem" }}>
             <a

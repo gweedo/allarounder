@@ -4,6 +4,12 @@ from uuid import UUID
 from pydantic import BaseModel
 
 
+class AuthorRef(BaseModel):
+    id: UUID
+    name: str
+    slug: str
+
+
 class CategoryRef(BaseModel):
     id: UUID
     name: str
@@ -33,6 +39,7 @@ class PublicArticleResponse(BaseModel):
     reading_time: int | None = None
     category_id: UUID | None = None
     category: CategoryRef | None = None
+    author_profile: AuthorRef | None = None
     tags: list[TagRef] = []
 
 

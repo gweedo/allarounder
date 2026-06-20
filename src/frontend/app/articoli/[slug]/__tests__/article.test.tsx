@@ -38,6 +38,7 @@ const BASE_ARTICLE = {
   meta_description: null as string | null,
   og_image_url: null as string | null,
   reading_time: null as number | null,
+  author_profile: null as { id: string; name: string; slug: string } | null,
   category: null as { id: string; name: string; slug: string } | null,
   tags: [] as { id: string; name: string; slug: string }[],
 };
@@ -110,6 +111,15 @@ describe("ArticlePage", () => {
     expect(img).toBeTruthy();
     expect(img?.getAttribute("src")).toBe("https://cdn.allarounder.it/images/copertina.jpg");
     expect(img?.getAttribute("alt")).toBe("Copertina episodio sport");
+  });
+
+  it("renders author name linking to /autori/{slug}", async () => {
+    await renderArticlePage({
+      ...BASE_ARTICLE,
+      author_profile: { id: "a1", name: "Marco Rossi", slug: "marco-rossi" },
+    });
+    const link = screen.getByRole("link", { name: "Marco Rossi" });
+    expect(link).toHaveAttribute("href", "/autori/marco-rossi");
   });
 
   it("renders category link when category is present", async () => {

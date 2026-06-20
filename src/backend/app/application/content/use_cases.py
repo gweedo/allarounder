@@ -1,10 +1,19 @@
 import uuid
 from datetime import UTC, datetime
 
-from app.domain.content.entities import Article, Category, Tag
+from app.domain.content.entities import Article, Author, Category, Tag
 from app.domain.content.exceptions import ArticleNotFoundError
-from app.domain.content.repositories import ArticleRepository, CategoryRepository, TagRepository
+from app.domain.content.repositories import (
+    ArticleRepository,
+    AuthorRepository,
+    CategoryRepository,
+    TagRepository,
+)
 from app.domain.content.value_objects import Body, PublicationStatus, Slug, SpotifyUrl
+
+
+class AuthorNotFoundError(Exception):
+    pass
 
 
 class CategoryNotFoundError(Exception):
@@ -13,6 +22,107 @@ class CategoryNotFoundError(Exception):
 
 class TagNotFoundError(Exception):
     pass
+
+
+class CreateAuthor:
+    def __init__(self, repo: AuthorRepository) -> None:
+        self._repo = repo
+
+    def execute(
+        self,
+        *,
+        name: str,
+        bio: str | None = None,
+        photo_url: str | None = None,
+        links: dict[str, str] | None = None,
+        user_id: uuid.UUID | None = None,
+    ) -> Author:
+        now = datetime.now(tz=UTC)
+        author = Author(
+            id=uuid.uuid4(),
+            name=name,
+            slug=Slug.from_title(name),
+            created_at=now,
+            user_id=user_id,
+            bio=bio,
+            photo_url=photo_url,
+            links=links or {},
+        )
+        self._repo.add(author)
+        return author
+
+
+class UpdateAuthor:
+    def __init__(self, repo: AuthorRepository) -> None:
+        self._repo = repo
+
+    def execute(
+        self,
+        *,
+        author_id: uuid.UUID,
+        name: str | None = None,
+        bio: str | None = None,
+        photo_url: str | None = None,
+        links: dict[str, str] | None = None,
+        user_id: uuid.UUID | None = None,
+        clear_user: bool = False,
+    ) -> Author:
+        author = self._repo.get_by_id(author_id)
+        if author is None:
+            raise AuthorNotFoundError(f"Author {author_id} not found")
+        if name is not None:
+            author.name = name
+        if bio is not None:
+            author.bio = bio
+        if photo_url is not None:
+            author.photo_url = photo_url
+        if links is not None:
+            author.links = links
+        if clear_user:
+            author.user_id = None
+        elif user_id is not None:
+            author.user_id = user_id
+        self._repo.save(author)
+        return author
+
+
+class DeleteAuthor:
+    def __init__(self, repo: AuthorRepository) -> None:
+        self._repo = repo
+
+    def execute(self, *, author_id: uuid.UUID) -> None:
+        if self._repo.get_by_id(author_id) is None:
+            raise AuthorNotFoundError(f"Author {author_id} not found")
+        self._repo.delete(author_id)
+
+
+class GetAuthorWithArticles:
+    def __init__(
+        self,
+        author_repo: AuthorRepository,
+        article_repo: ArticleRepository,
+    ) -> None:
+        self._author_repo = author_repo
+        self._article_repo = article_repo
+
+    def execute(
+        self,
+        *,
+        slug: str,
+        page: int = 1,
+        page_size: int = 20,
+    ) -> tuple[Author, list[Article], int]:
+        author = self._author_repo.get_by_slug(slug)
+        if author is None:
+            raise AuthorNotFoundError(f"Author '{slug}' not found")
+        now = datetime.now(tz=UTC)
+        articles, total = self._article_repo.list_published(
+            before=now,
+            author_profile_id=author.id,
+            page=page,
+            page_size=page_size,
+        )
+        return author, articles, total
 
 
 class SetArticleTags:
@@ -234,6 +344,7 @@ class UpdateArticle:
         meta_description: str | None = None,
         og_image_url: str | None = None,
         category_id: uuid.UUID | None = None,
+        author_profile_id: uuid.UUID | None = None,
     ) -> Article:
         article = self._repo.get_by_id(article_id)
         if article is None:
@@ -263,6 +374,8 @@ class UpdateArticle:
             article.og_image_url = og_image_url
         if category_id is not None:
             article.category_id = category_id
+        if author_profile_id is not None:
+            article.author_profile_id = author_profile_id
         article.updated_at = datetime.now(tz=UTC)
         self._repo.save(article)
         return article

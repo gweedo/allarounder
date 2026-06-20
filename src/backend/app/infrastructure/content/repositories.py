@@ -1,4 +1,4 @@
-"""SQLAlchemy implementations of ArticleRepository, CategoryRepository, TagRepository."""
+"""SQLAlchemy implementations of repository protocols for the content context."""
 
 from __future__ import annotations
 
@@ -8,9 +8,28 @@ from datetime import datetime
 from sqlalchemy import delete, insert, select
 from sqlalchemy.orm import Session
 
-from app.domain.content.entities import Article, Category, Tag
+from app.domain.content.entities import Article, Author, Category, Tag
 from app.domain.content.value_objects import Body, PublicationStatus, Slug
-from app.infrastructure.content.models import ArticleModel, CategoryModel, TagModel, article_tags
+from app.infrastructure.content.models import (
+    ArticleModel,
+    AuthorModel,
+    CategoryModel,
+    TagModel,
+    article_tags,
+)
+
+
+def _model_to_author(m: AuthorModel) -> Author:
+    return Author(
+        id=m.id,
+        name=m.name,
+        slug=Slug(m.slug),
+        created_at=m.created_at,
+        user_id=m.user_id,
+        bio=m.bio,
+        photo_url=m.photo_url,
+        links=dict(m.links) if m.links else {},
+    )
 
 
 def _model_to_article(
@@ -38,6 +57,7 @@ def _model_to_article(
         og_image_url=m.og_image_url,
         reading_time=m.reading_time,
         category_id=m.category_id,
+        author_profile_id=m.author_profile_id,
         tag_ids=tag_ids or [],
     )
 
@@ -53,6 +73,56 @@ def _model_to_category(m: CategoryModel) -> Category:
         slug=Slug(m.slug),
         description=m.description,
     )
+
+
+class SqlAuthorRepository:
+    def __init__(self, session: Session) -> None:
+        self._session = session
+
+    def add(self, author: Author) -> None:
+        m = AuthorModel(
+            id=author.id,
+            name=author.name,
+            slug=author.slug.value,
+            bio=author.bio,
+            photo_url=author.photo_url,
+            links=author.links,
+            created_at=author.created_at,
+            user_id=author.user_id,
+        )
+        self._session.add(m)
+
+    def get_by_id(self, author_id: uuid.UUID) -> Author | None:
+        m = self._session.get(AuthorModel, author_id)
+        return _model_to_author(m) if m else None
+
+    def get_by_slug(self, slug: str) -> Author | None:
+        m = self._session.query(AuthorModel).filter_by(slug=slug).one_or_none()
+        return _model_to_author(m) if m else None
+
+    def get_by_user_id(self, user_id: uuid.UUID) -> Author | None:
+        m = self._session.query(AuthorModel).filter_by(user_id=user_id).one_or_none()
+        return _model_to_author(m) if m else None
+
+    def list_all(self) -> list[Author]:
+        rows = self._session.query(AuthorModel).order_by(AuthorModel.name).all()
+        return [_model_to_author(r) for r in rows]
+
+    def save(self, author: Author) -> None:
+        m = self._session.get(AuthorModel, author.id)
+        if m is None:
+            raise ValueError(f"Author {author.id} not found in database")
+        m.name = author.name
+        m.slug = author.slug.value
+        m.bio = author.bio
+        m.photo_url = author.photo_url
+        m.links = author.links
+        m.user_id = author.user_id
+
+    def delete(self, author_id: uuid.UUID) -> None:
+        m = self._session.get(AuthorModel, author_id)
+        if m is not None:
+            self._session.delete(m)
 
 
 class SqlTagRepository:
@@ -174,6 +244,7 @@ class SqlArticleRepository:
             og_image_url=article.og_image_url,
             reading_time=article.reading_time,
             category_id=article.category_id,
+            author_profile_id=article.author_profile_id,
         )
         self._session.add(m)
 
@@ -217,6 +288,7 @@ class SqlArticleRepository:
         m.og_image_url = article.og_image_url
         m.reading_time = article.reading_time
         m.category_id = article.category_id
+        m.author_profile_id = article.author_profile_id
 
     def list_all(
         self,
@@ -246,6 +318,7 @@ class SqlArticleRepository:
         before: datetime,
         category_id: uuid.UUID | None = None,
         tag_id: uuid.UUID | None = None,
+        author_profile_id: uuid.UUID | None = None,
         page: int = 1,
         page_size: int = 20,
     ) -> tuple[list[Article], int]:
@@ -256,6 +329,8 @@ class SqlArticleRepository:
         )
         if category_id is not None:
             q = q.filter(ArticleModel.category_id == category_id)
+        if author_profile_id is not None:
+            q = q.filter(ArticleModel.author_profile_id == author_profile_id)
         if tag_id is not None:
             q = q.join(
                 article_tags, article_tags.c.article_id == ArticleModel.id

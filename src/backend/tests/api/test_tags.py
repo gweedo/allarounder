@@ -66,7 +66,10 @@ def client(mock_tag_repo: MagicMock, mock_art_repo: MagicMock) -> Generator[Test
 
 class TestAdminTagList:
     def test_200_returns_tags(self, client: TestClient, mock_tag_repo: MagicMock) -> None:
-        mock_tag_repo.list_all.return_value = [_make_tag("calcio", "calcio"), _make_tag("sport", "sport")]
+        mock_tag_repo.list_all.return_value = [
+            _make_tag("calcio", "calcio"),
+            _make_tag("sport", "sport"),
+        ]
         resp = client.get("/api/admin/tags", cookies={"access_token": _make_token()})
         assert resp.status_code == 200
         data = resp.json()
