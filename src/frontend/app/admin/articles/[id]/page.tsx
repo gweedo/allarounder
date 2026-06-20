@@ -1,7 +1,14 @@
 "use client";
 
 import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
+import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
+import { uploadImage, UploadError } from "../../../../lib/upload";
+
+const MarkdownEditor = dynamic(() => import("../../../../components/MarkdownEditor"), {
+  ssr: false,
+  loading: () => <textarea rows={15} style={{ width: "100%", fontFamily: "monospace" }} />,
+});
 
 interface Article {
   id: string;
@@ -24,8 +31,6 @@ interface Article {
 interface Props {
   params: Promise<{ id: string }>;
 }
-
-const MAX_FILE_SIZE = 10 * 1024 * 1024;
 
 export default function EditArticlePage({ params }: Props) {
   const router = useRouter();
@@ -76,45 +81,20 @@ export default function EditArticlePage({ params }: Props) {
   }, [articleId]);
 
   const handleCoverImageUpload = useCallback(async (file: File) => {
-    if (file.size > MAX_FILE_SIZE) {
-      setError("L'immagine è troppo grande (max 10 MB).");
-      return;
-    }
     setUploadProgress("Caricamento...");
     setError(null);
     try {
-      const previewBytes = await file.slice(0, 512).arrayBuffer();
-      const preview = btoa(String.fromCharCode(...new Uint8Array(previewBytes)));
-      const sasRes = await fetch("/api/admin/media/sas", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ filename: file.name, size: file.size, preview }),
-        credentials: "include",
-      });
-      if (!sasRes.ok) {
-        const data = await sasRes.json().catch(() => ({}));
-        setError((data as { detail?: string }).detail ?? "Tipo file non supportato.");
-        return;
-      }
-      const { sas_url, blob_url } = (await sasRes.json()) as {
-        sas_url: string;
-        blob_url: string;
-      };
-      const uploadRes = await fetch(sas_url, {
-        method: "PUT",
-        headers: { "x-ms-blob-type": "BlockBlob", "Content-Type": file.type },
-        body: file,
-      });
-      if (!uploadRes.ok) {
-        setError("Errore nel caricamento dell'immagine su Azure.");
-        return;
-      }
-      setCoverImageUrl(blob_url);
+      const url = await uploadImage(file);
+      setCoverImageUrl(url);
       setUploadProgress(null);
-    } catch {
-      setError("Errore di rete durante il caricamento.");
+    } catch (err) {
+      setError(err instanceof UploadError ? err.message : "Errore di rete durante il caricamento.");
       setUploadProgress(null);
     }
+  }, []);
+
+  const handleBodyImageUpload = useCallback(async (file: File): Promise<string> => {
+    return uploadImage(file);
   }, []);
 
   async function handleSave(e: FormEvent) {
@@ -289,15 +269,14 @@ export default function EditArticlePage({ params }: Props) {
           />
         </div>
         <div style={{ marginTop: "1rem" }}>
-          <label htmlFor="body">Testo (Markdown)</label>
-          <br />
-          <textarea
-            id="body"
-            rows={15}
-            value={body}
-            onChange={(e) => setBody(e.target.value)}
-            style={{ width: "100%", marginTop: "0.25rem", fontFamily: "monospace" }}
-          />
+          <label>Testo (Markdown)</label>
+          <div style={{ marginTop: "0.25rem" }}>
+            <MarkdownEditor
+              value={body}
+              onChange={setBody}
+              onUploadImage={handleBodyImageUpload}
+            />
+          </div>
         </div>
         <div style={{ marginTop: "1rem" }}>
           <label htmlFor="cover-image">Immagine di copertina</label>
