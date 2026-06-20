@@ -10,6 +10,15 @@ from sqlalchemy.orm import Mapped, mapped_column
 from app.infrastructure.database import Base
 
 
+class CategoryModel(Base):
+    __tablename__ = "categories"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    name: Mapped[str] = mapped_column(String(200), nullable=False)
+    slug: Mapped[str] = mapped_column(String(200), unique=True, nullable=False, index=True)
+    description: Mapped[str | None] = mapped_column(Text, nullable=True)
+
+
 class ArticleModel(Base):
     __tablename__ = "articles"
 
@@ -43,3 +52,9 @@ class ArticleModel(Base):
     meta_description: Mapped[str | None] = mapped_column(String(160), nullable=True)
     og_image_url: Mapped[str | None] = mapped_column(String(2048), nullable=True)
     reading_time: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    category_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("categories.id", ondelete="SET NULL"),
+        nullable=True,
+        index=True,
+    )

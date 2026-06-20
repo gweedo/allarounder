@@ -7,6 +7,14 @@ from app.domain.content.value_objects import Body, PublicationStatus, Slug
 
 
 @dataclass
+class Category:
+    id: uuid.UUID
+    name: str
+    slug: Slug
+    description: str | None = field(default=None)
+
+
+@dataclass
 class Article:
     id: uuid.UUID
     title: str
@@ -27,6 +35,7 @@ class Article:
     og_image_url: str | None = field(default=None)
     reading_time: int | None = field(default=None)
     preview_token: uuid.UUID | None = field(default=None)
+    category_id: uuid.UUID | None = field(default=None)
 
     def set_slug(self, new_slug: Slug) -> None:
         if self.slug_locked:

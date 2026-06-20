@@ -9,6 +9,7 @@ class CreateArticleRequest(BaseModel):
     body: str = ""
     excerpt: str | None = None
     spotify_url: str | None = None
+    category_id: UUID | None = None
 
 
 class UpdateArticleRequest(BaseModel):
@@ -23,6 +24,7 @@ class UpdateArticleRequest(BaseModel):
     meta_title: str | None = None
     meta_description: str | None = None
     og_image_url: str | None = None
+    category_id: UUID | None = None
 
 
 class ArticleResponse(BaseModel):
@@ -45,6 +47,7 @@ class ArticleResponse(BaseModel):
     meta_description: str | None = None
     og_image_url: str | None = None
     reading_time: int | None = None
+    category_id: UUID | None = None
 
 
 class PreviewTokenResponse(BaseModel):

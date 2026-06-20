@@ -1,10 +1,90 @@
 import uuid
 from datetime import UTC, datetime
 
-from app.domain.content.entities import Article
+from app.domain.content.entities import Article, Category
 from app.domain.content.exceptions import ArticleNotFoundError
-from app.domain.content.repositories import ArticleRepository
+from app.domain.content.repositories import ArticleRepository, CategoryRepository
 from app.domain.content.value_objects import Body, PublicationStatus, Slug, SpotifyUrl
+
+
+class CategoryNotFoundError(Exception):
+    pass
+
+
+class CreateCategory:
+    def __init__(self, repo: CategoryRepository) -> None:
+        self._repo = repo
+
+    def execute(self, *, name: str, description: str | None = None) -> Category:
+        category = Category(
+            id=uuid.uuid4(),
+            name=name,
+            slug=Slug.from_title(name),
+            description=description,
+        )
+        self._repo.add(category)
+        return category
+
+
+class UpdateCategory:
+    def __init__(self, repo: CategoryRepository) -> None:
+        self._repo = repo
+
+    def execute(
+        self,
+        *,
+        category_id: uuid.UUID,
+        name: str | None = None,
+        description: str | None = None,
+    ) -> Category:
+        category = self._repo.get_by_id(category_id)
+        if category is None:
+            raise CategoryNotFoundError(f"Category {category_id} not found")
+        if name is not None:
+            category.name = name
+        if description is not None:
+            category.description = description
+        self._repo.save(category)
+        return category
+
+
+class DeleteCategory:
+    def __init__(self, repo: CategoryRepository) -> None:
+        self._repo = repo
+
+    def execute(self, *, category_id: uuid.UUID) -> None:
+        if self._repo.get_by_id(category_id) is None:
+            raise CategoryNotFoundError(f"Category {category_id} not found")
+        self._repo.delete(category_id)
+
+
+class GetCategoryWithArticles:
+    def __init__(
+        self,
+        category_repo: CategoryRepository,
+        article_repo: ArticleRepository,
+    ) -> None:
+        self._category_repo = category_repo
+        self._article_repo = article_repo
+
+    def execute(
+        self,
+        *,
+        slug: str,
+        page: int = 1,
+        page_size: int = 20,
+    ) -> tuple[Category, list[Article], int]:
+        category = self._category_repo.get_by_slug(slug)
+        if category is None:
+            raise CategoryNotFoundError(f"Category '{slug}' not found")
+        now = datetime.now(tz=UTC)
+        articles, total = self._article_repo.list_published(
+            before=now,
+            category_id=category.id,
+            page=page,
+            page_size=page_size,
+        )
+        return category, articles, total
 
 
 class CreateArticle:
@@ -20,6 +100,7 @@ class CreateArticle:
         publish_at: datetime | None = None,
         excerpt: str | None = None,
         spotify_url: str | None = None,
+        category_id: uuid.UUID | None = None,
     ) -> Article:
         now = datetime.now(tz=UTC)
         body_vo = Body(body)
@@ -39,6 +120,7 @@ class CreateArticle:
             excerpt=excerpt,
             spotify_url=validated_spotify,
             reading_time=body_vo.reading_time_minutes() if body else None,
+            category_id=category_id,
         )
         self._repo.add(article)
         return article
@@ -97,6 +179,7 @@ class UpdateArticle:
         meta_title: str | None = None,
         meta_description: str | None = None,
         og_image_url: str | None = None,
+        category_id: uuid.UUID | None = None,
     ) -> Article:
         article = self._repo.get_by_id(article_id)
         if article is None:
@@ -124,6 +207,8 @@ class UpdateArticle:
             article.meta_description = meta_description
         if og_image_url is not None:
             article.og_image_url = og_image_url
+        if category_id is not None:
+            article.category_id = category_id
         article.updated_at = datetime.now(tz=UTC)
         self._repo.save(article)
         return article

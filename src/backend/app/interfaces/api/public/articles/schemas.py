@@ -4,6 +4,12 @@ from uuid import UUID
 from pydantic import BaseModel
 
 
+class CategoryRef(BaseModel):
+    id: UUID
+    name: str
+    slug: str
+
+
 class PublicArticleResponse(BaseModel):
     id: UUID
     title: str
@@ -19,6 +25,8 @@ class PublicArticleResponse(BaseModel):
     meta_description: str | None = None
     og_image_url: str | None = None
     reading_time: int | None = None
+    category_id: UUID | None = None
+    category: CategoryRef | None = None
 
 
 class PublicArticleListResponse(BaseModel):

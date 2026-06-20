@@ -38,6 +38,7 @@ const BASE_ARTICLE = {
   meta_description: null as string | null,
   og_image_url: null as string | null,
   reading_time: null as number | null,
+  category: null as { id: string; name: string; slug: string } | null,
 };
 
 beforeEach(() => {
@@ -108,6 +109,15 @@ describe("ArticlePage", () => {
     expect(img).toBeTruthy();
     expect(img?.getAttribute("src")).toBe("https://cdn.allarounder.it/images/copertina.jpg");
     expect(img?.getAttribute("alt")).toBe("Copertina episodio sport");
+  });
+
+  it("renders category link when category is present", async () => {
+    await renderArticlePage({
+      ...BASE_ARTICLE,
+      category: { id: "cat-1", name: "Interviste", slug: "interviste" },
+    });
+    const link = screen.getByRole("link", { name: "Interviste" });
+    expect(link).toHaveAttribute("href", "/argomenti/interviste");
   });
 
   it("calls notFound when article fetch fails", async () => {

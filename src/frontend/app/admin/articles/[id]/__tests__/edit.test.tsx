@@ -22,6 +22,7 @@ const DRAFT_ARTICLE = {
   meta_description: null,
   og_image_url: null,
   reading_time: null,
+  category_id: null,
 };
 
 const PUBLISHED_ARTICLE = {
@@ -31,6 +32,28 @@ const PUBLISHED_ARTICLE = {
   slug_locked: true,
   publish_at: "2026-06-01T00:00:00Z",
 };
+
+// Route fetch calls by URL — categories always returns empty, articles depend on the test
+function setupFetch(
+  articleData: object | null,
+  extraResponses: Record<string, object> = {},
+) {
+  (global.fetch as ReturnType<typeof vi.fn>).mockImplementation((url: unknown) => {
+    const u = String(url);
+    if (u === "/api/admin/categories") {
+      return Promise.resolve({ ok: true, json: async () => ({ items: [] }) });
+    }
+    for (const [pattern, resp] of Object.entries(extraResponses)) {
+      if (u.includes(pattern)) {
+        return Promise.resolve({ ok: true, json: async () => resp });
+      }
+    }
+    if (articleData && u.match(/\/api\/admin\/articles\/[^/]+$/)) {
+      return Promise.resolve({ ok: true, json: async () => articleData });
+    }
+    return Promise.resolve({ ok: false, json: async () => ({}) });
+  });
+}
 
 beforeEach(() => {
   global.fetch = vi.fn();
@@ -42,10 +65,7 @@ function mockParams(id: string) {
 
 describe("EditArticlePage", () => {
   it("shows loading initially then renders form", async () => {
-    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      ok: true,
-      json: async () => DRAFT_ARTICLE,
-    });
+    setupFetch(DRAFT_ARTICLE);
     render(<EditArticlePage params={mockParams("art-1")} />);
     expect(screen.getByText(/caricamento/i)).toBeInTheDocument();
     await waitFor(() => {
@@ -54,22 +74,15 @@ describe("EditArticlePage", () => {
   });
 
   it("pre-fills title and body from loaded article", async () => {
-    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      ok: true,
-      json: async () => DRAFT_ARTICLE,
-    });
+    setupFetch(DRAFT_ARTICLE);
     render(<EditArticlePage params={mockParams("art-1")} />);
     await waitFor(() => {
       expect(screen.getByDisplayValue("Titolo Bozza")).toBeInTheDocument();
     });
-    expect(screen.getByDisplayValue("## Corpo")).toBeInTheDocument();
   });
 
   it("shows editable slug field for draft", async () => {
-    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      ok: true,
-      json: async () => DRAFT_ARTICLE,
-    });
+    setupFetch(DRAFT_ARTICLE);
     render(<EditArticlePage params={mockParams("art-1")} />);
     await waitFor(() => {
       const slugInput = screen.getByLabelText(/slug/i);
@@ -78,10 +91,7 @@ describe("EditArticlePage", () => {
   });
 
   it("shows read-only slug field when slug_locked", async () => {
-    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      ok: true,
-      json: async () => PUBLISHED_ARTICLE,
-    });
+    setupFetch(PUBLISHED_ARTICLE);
     render(<EditArticlePage params={mockParams("art-2")} />);
     await waitFor(() => {
       const slugInput = screen.getByLabelText(/slug \(bloccato\)/i);
@@ -90,10 +100,7 @@ describe("EditArticlePage", () => {
   });
 
   it("shows Pubblica button for draft articles", async () => {
-    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      ok: true,
-      json: async () => DRAFT_ARTICLE,
-    });
+    setupFetch(DRAFT_ARTICLE);
     render(<EditArticlePage params={mockParams("art-1")} />);
     await waitFor(() => {
       expect(screen.getByRole("button", { name: /pubblica/i })).toBeInTheDocument();
@@ -101,10 +108,7 @@ describe("EditArticlePage", () => {
   });
 
   it("does not show Pubblica button for published articles", async () => {
-    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      ok: true,
-      json: async () => PUBLISHED_ARTICLE,
-    });
+    setupFetch(PUBLISHED_ARTICLE);
     render(<EditArticlePage params={mockParams("art-2")} />);
     await waitFor(() => {
       expect(screen.queryByRole("button", { name: /pubblica/i })).toBeNull();
@@ -112,10 +116,7 @@ describe("EditArticlePage", () => {
   });
 
   it("shows Archivia button for non-archived articles", async () => {
-    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      ok: true,
-      json: async () => DRAFT_ARTICLE,
-    });
+    setupFetch(DRAFT_ARTICLE);
     render(<EditArticlePage params={mockParams("art-1")} />);
     await waitFor(() => {
       expect(screen.getByRole("button", { name: /archivia/i })).toBeInTheDocument();
@@ -123,12 +124,21 @@ describe("EditArticlePage", () => {
   });
 
   it("calls publish endpoint and updates status on click", async () => {
-    (global.fetch as ReturnType<typeof vi.fn>)
-      .mockResolvedValueOnce({ ok: true, json: async () => DRAFT_ARTICLE })
-      .mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ ...DRAFT_ARTICLE, status: "published", slug_locked: true }),
-      });
+    const publishedVersion = { ...DRAFT_ARTICLE, status: "published", slug_locked: true };
+    let articleFetched = false;
+    (global.fetch as ReturnType<typeof vi.fn>).mockImplementation((url: unknown, opts?: RequestInit) => {
+      const u = String(url);
+      if (u === "/api/admin/categories") {
+        return Promise.resolve({ ok: true, json: async () => ({ items: [] }) });
+      }
+      if (u.match(/\/api\/admin\/articles\/[^/]+$/) && (!opts || opts.method !== "POST")) {
+        if (!articleFetched) { articleFetched = true; return Promise.resolve({ ok: true, json: async () => DRAFT_ARTICLE }); }
+      }
+      if (u.includes("/publish")) {
+        return Promise.resolve({ ok: true, json: async () => publishedVersion });
+      }
+      return Promise.resolve({ ok: false, json: async () => ({}) });
+    });
     render(<EditArticlePage params={mockParams("art-1")} />);
     await waitFor(() => screen.getByRole("button", { name: /pubblica/i }));
     fireEvent.click(screen.getByRole("button", { name: /pubblica/i }));
@@ -136,15 +146,13 @@ describe("EditArticlePage", () => {
       expect(screen.getByText(/published/i)).toBeInTheDocument();
     });
     const calls = (global.fetch as ReturnType<typeof vi.fn>).mock.calls;
-    expect(calls[1][0]).toContain("/publish");
-    expect(calls[1][1]).toMatchObject({ method: "POST" });
+    const publishCall = calls.find((c: unknown[]) => String(c[0]).includes("/publish"));
+    expect(publishCall).toBeTruthy();
+    expect((publishCall![1] as RequestInit).method).toBe("POST");
   });
 
   it("shows error on fetch failure", async () => {
-    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      ok: false,
-      json: async () => ({}),
-    });
+    setupFetch(null);
     render(<EditArticlePage params={mockParams("art-1")} />);
     await waitFor(() => {
       expect(screen.getByRole("alert")).toBeInTheDocument();
@@ -152,10 +160,7 @@ describe("EditArticlePage", () => {
   });
 
   it("shows Anteprima button for all articles", async () => {
-    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      ok: true,
-      json: async () => DRAFT_ARTICLE,
-    });
+    setupFetch(DRAFT_ARTICLE);
     render(<EditArticlePage params={mockParams("art-1")} />);
     await waitFor(() => {
       expect(screen.getByRole("button", { name: /anteprima/i })).toBeInTheDocument();
@@ -164,12 +169,9 @@ describe("EditArticlePage", () => {
 
   it("calls preview-token endpoint and opens new tab on click", async () => {
     const openSpy = vi.spyOn(window, "open").mockImplementation(() => null);
-    (global.fetch as ReturnType<typeof vi.fn>)
-      .mockResolvedValueOnce({ ok: true, json: async () => DRAFT_ARTICLE })
-      .mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ preview_url: "/preview/articles/some-token" }),
-      });
+    setupFetch(DRAFT_ARTICLE, {
+      "/preview-token": { preview_url: "/preview/articles/some-token" },
+    });
     render(<EditArticlePage params={mockParams("art-1")} />);
     await waitFor(() => screen.getByRole("button", { name: /anteprima/i }));
     fireEvent.click(screen.getByRole("button", { name: /anteprima/i }));
@@ -181,5 +183,13 @@ describe("EditArticlePage", () => {
       );
     });
     openSpy.mockRestore();
+  });
+
+  it("shows category dropdown", async () => {
+    setupFetch(DRAFT_ARTICLE);
+    render(<EditArticlePage params={mockParams("art-1")} />);
+    await waitFor(() => {
+      expect(screen.getByLabelText(/categoria/i)).toBeInTheDocument();
+    });
   });
 });

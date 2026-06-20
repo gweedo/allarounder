@@ -7,6 +7,12 @@ import rehypeStringify from "rehype-stringify";
 
 export const revalidate = 60;
 
+interface CategoryRef {
+  id: string;
+  name: string;
+  slug: string;
+}
+
 interface Article {
   id: string;
   title: string;
@@ -22,6 +28,7 @@ interface Article {
   meta_description: string | null;
   og_image_url: string | null;
   reading_time: number | null;
+  category: CategoryRef | null;
 }
 
 async function getArticle(slug: string): Promise<Article | null> {
@@ -98,6 +105,16 @@ export default async function ArticlePage({ params }: Props) {
           <span style={{ marginLeft: "1rem", color: "#666" }}>
             {article.reading_time} min di lettura
           </span>
+        )}
+        {article.category && (
+          <p style={{ marginTop: "0.5rem" }}>
+            <a
+              href={`/argomenti/${article.category.slug}`}
+              style={{ color: "#555", textDecoration: "underline", fontSize: "0.9rem" }}
+            >
+              {article.category.name}
+            </a>
+          </p>
         )}
         {article.excerpt && (
           <p style={{ fontStyle: "italic", marginTop: "1rem", color: "#555" }}>

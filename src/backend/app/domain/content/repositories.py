@@ -4,8 +4,17 @@ import uuid
 from datetime import datetime
 from typing import Protocol
 
-from app.domain.content.entities import Article
+from app.domain.content.entities import Article, Category
 from app.domain.content.value_objects import PublicationStatus
+
+
+class CategoryRepository(Protocol):
+    def add(self, category: Category) -> None: ...
+    def get_by_id(self, category_id: uuid.UUID) -> Category | None: ...
+    def get_by_slug(self, slug: str) -> Category | None: ...
+    def list_all(self) -> list[Category]: ...
+    def save(self, category: Category) -> None: ...
+    def delete(self, category_id: uuid.UUID) -> None: ...
 
 
 class ArticleRepository(Protocol):
@@ -26,6 +35,7 @@ class ArticleRepository(Protocol):
         self,
         *,
         before: datetime,
+        category_id: uuid.UUID | None = None,
         page: int = 1,
         page_size: int = 20,
     ) -> tuple[list[Article], int]: ...

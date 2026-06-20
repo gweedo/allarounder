@@ -10,6 +10,12 @@ const MarkdownEditor = dynamic(() => import("../../../../components/MarkdownEdit
   loading: () => <textarea rows={15} style={{ width: "100%", fontFamily: "monospace" }} />,
 });
 
+interface Category {
+  id: string;
+  name: string;
+  slug: string;
+}
+
 interface Article {
   id: string;
   title: string;
@@ -26,6 +32,7 @@ interface Article {
   meta_description: string | null;
   og_image_url: string | null;
   reading_time: number | null;
+  category_id: string | null;
 }
 
 interface Props {
@@ -46,6 +53,8 @@ export default function EditArticlePage({ params }: Props) {
   const [metaTitle, setMetaTitle] = useState("");
   const [metaDescription, setMetaDescription] = useState("");
   const [ogImageUrl, setOgImageUrl] = useState("");
+  const [categoryId, setCategoryId] = useState<string>("");
+  const [categories, setCategories] = useState<Category[]>([]);
   const [uploadProgress, setUploadProgress] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -55,6 +64,13 @@ export default function EditArticlePage({ params }: Props) {
   useEffect(() => {
     params.then(({ id }) => setArticleId(id));
   }, [params]);
+
+  useEffect(() => {
+    fetch("/api/admin/categories", { credentials: "include" })
+      .then((res) => (res.ok ? (res.json() as Promise<{ items: Category[] }>) : Promise.reject()))
+      .then((data) => setCategories(data.items))
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     if (!articleId) return;
@@ -75,6 +91,7 @@ export default function EditArticlePage({ params }: Props) {
         setMetaTitle(data.meta_title ?? "");
         setMetaDescription(data.meta_description ?? "");
         setOgImageUrl(data.og_image_url ?? "");
+        setCategoryId(data.category_id ?? "");
       })
       .catch((err: Error) => setError(err.message))
       .finally(() => setLoading(false));
@@ -117,6 +134,7 @@ export default function EditArticlePage({ params }: Props) {
           meta_title: metaTitle || undefined,
           meta_description: metaDescription || undefined,
           og_image_url: ogImageUrl || undefined,
+          category_id: categoryId || undefined,
         }),
         credentials: "include",
       });
@@ -310,6 +328,23 @@ export default function EditArticlePage({ params }: Props) {
             onChange={(e) => setCoverImageAlt(e.target.value)}
             style={{ width: "100%", marginTop: "0.25rem" }}
           />
+        </div>
+        <div style={{ marginTop: "1rem" }}>
+          <label htmlFor="category">Categoria</label>
+          <br />
+          <select
+            id="category"
+            value={categoryId}
+            onChange={(e) => setCategoryId(e.target.value)}
+            style={{ width: "100%", marginTop: "0.25rem" }}
+          >
+            <option value="">— Nessuna categoria —</option>
+            {categories.map((cat) => (
+              <option key={cat.id} value={cat.id}>
+                {cat.name}
+              </option>
+            ))}
+          </select>
         </div>
         <div style={{ marginTop: "1rem" }}>
           <label htmlFor="spotify-url">URL Spotify (episodio)</label>

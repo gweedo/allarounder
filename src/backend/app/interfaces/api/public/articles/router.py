@@ -1,16 +1,18 @@
 """Public article endpoints — read-only, published content only."""
 
+import uuid
 from datetime import UTC, datetime
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from app.domain.content.entities import Article
+from app.domain.content.entities import Article, Category
 from app.domain.content.value_objects import PublicationStatus
-from app.infrastructure.content.repositories import SqlArticleRepository
+from app.infrastructure.content.repositories import SqlArticleRepository, SqlCategoryRepository
 from app.interfaces.api.auth.dependencies import get_db_session
 from app.interfaces.api.public.articles.schemas import (
+    CategoryRef,
     PublicArticleListResponse,
     PublicArticleResponse,
 )
@@ -24,7 +26,22 @@ def get_article_repo(
     return SqlArticleRepository(session)
 
 
-def _to_response(article: Article) -> PublicArticleResponse:
+def get_category_repo(
+    session: Annotated[Session, Depends(get_db_session)],
+) -> SqlCategoryRepository:
+    return SqlCategoryRepository(session)
+
+
+def _category_ref(category: Category | None) -> CategoryRef | None:
+    if category is None:
+        return None
+    return CategoryRef(id=category.id, name=category.name, slug=category.slug.value)
+
+
+def _to_response(
+    article: Article,
+    category: Category | None = None,
+) -> PublicArticleResponse:
     return PublicArticleResponse(
         id=article.id,
         title=article.title,
@@ -40,19 +57,40 @@ def _to_response(article: Article) -> PublicArticleResponse:
         meta_description=article.meta_description,
         og_image_url=article.og_image_url,
         reading_time=article.reading_time,
+        category_id=article.category_id,
+        category=_category_ref(category),
     )
 
 
 @router.get("", response_model=PublicArticleListResponse)
 def list_public_articles(
     repo: Annotated[SqlArticleRepository, Depends(get_article_repo)],
+    category_repo: Annotated[SqlCategoryRepository, Depends(get_category_repo)],
     page: int = 1,
     page_size: int = 20,
+    category: str | None = None,
 ) -> PublicArticleListResponse:
     now = datetime.now(tz=UTC)
-    articles, total = repo.list_published(before=now, page=page, page_size=page_size)
+    category_id = None
+    if category is not None:
+        cat = category_repo.get_by_slug(category)
+        if cat is None:
+            return PublicArticleListResponse(items=[], total=0, page=page, page_size=page_size)
+        category_id = cat.id
+    articles, total = repo.list_published(
+        before=now, category_id=category_id, page=page, page_size=page_size
+    )
+    cat_cache: dict[uuid.UUID, Category | None] = {}
+    responses = []
+    for a in articles:
+        cat_obj: Category | None = None
+        if a.category_id is not None:
+            if a.category_id not in cat_cache:
+                cat_cache[a.category_id] = category_repo.get_by_id(a.category_id)
+            cat_obj = cat_cache[a.category_id]
+        responses.append(_to_response(a, cat_obj))
     return PublicArticleListResponse(
-        items=[_to_response(a) for a in articles],
+        items=responses,
         total=total,
         page=page,
         page_size=page_size,
@@ -63,6 +101,7 @@ def list_public_articles(
 def get_public_article(
     slug: str,
     repo: Annotated[SqlArticleRepository, Depends(get_article_repo)],
+    category_repo: Annotated[SqlCategoryRepository, Depends(get_category_repo)],
 ) -> PublicArticleResponse:
     now = datetime.now(tz=UTC)
     article = repo.get_by_slug(slug)
@@ -73,4 +112,7 @@ def get_public_article(
         or article.publish_at > now
     ):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Article not found")
-    return _to_response(article)
+    cat: Category | None = None
+    if article.category_id is not None:
+        cat = category_repo.get_by_id(article.category_id)
+    return _to_response(article, cat)
