@@ -6,9 +6,16 @@
 #   ./infra/scripts/create-postgres-identity.sh staging allarounder-stg-pg-xxxxx
 #
 # Prerequisites:
-#   - az login (logged in as the Entra PostgreSQL admin)
+#   - az login (logged in as an Entra admin on the PostgreSQL server)
 #   - psql installed
 #   - The backend managed identity already created by Bicep
+#
+# Notes:
+#   - pgaadauth_create_principal_with_oid only exists in the 'postgres' db on
+#     Azure Flexible Server — role creation must target that database.
+#   - Grant statements must target the 'allarounder' application database.
+#   - ENTRA_ADMIN must be the full Entra UPN, not the MSA email (#EXT# format
+#     for external/personal accounts).
 
 set -euo pipefail
 
@@ -18,13 +25,18 @@ RESOURCE_GROUP="allarounder-${ENV}"
 BACKEND_IDENTITY_NAME="allarounder-${ENV}-backend-id"
 DATABASE="allarounder"
 
-echo "==> Fetching backend managed identity client ID..."
+echo "==> Fetching backend managed identity IDs..."
 IDENTITY_CLIENT_ID=$(az identity show \
   --name "$BACKEND_IDENTITY_NAME" \
   --resource-group "$RESOURCE_GROUP" \
   --query "clientId" -o tsv)
+IDENTITY_OBJECT_ID=$(az identity show \
+  --name "$BACKEND_IDENTITY_NAME" \
+  --resource-group "$RESOURCE_GROUP" \
+  --query "principalId" -o tsv)
 
-echo "    Client ID: ${IDENTITY_CLIENT_ID}"
+echo "    Client ID : ${IDENTITY_CLIENT_ID}"
+echo "    Object ID : ${IDENTITY_OBJECT_ID}"
 
 echo "==> Getting Entra access token for PostgreSQL..."
 PG_TOKEN=$(az account get-access-token \
@@ -32,22 +44,24 @@ PG_TOKEN=$(az account get-access-token \
   --query "accessToken" -o tsv)
 
 PG_HOST="${PG_SERVER}.postgres.database.azure.com"
-ENTRA_ADMIN=$(az account show --query "user.name" -o tsv)
+# Use the Entra UPN (not the MSA email) — external/MSA accounts have a #EXT# UPN
+ENTRA_ADMIN=$(az ad signed-in-user show --query userPrincipalName -o tsv)
 
-echo "==> Creating PostgreSQL role for managed identity..."
-PGPASSWORD="$PG_TOKEN" psql \
+PSQL_BASE="PGPASSWORD=$PG_TOKEN PGSSLMODE=require psql --host=$PG_HOST --username=$ENTRA_ADMIN"
+
+echo "==> Step 1/2: Creating PostgreSQL role for managed identity (must run against 'postgres' db)..."
+PGPASSWORD="$PG_TOKEN" PGSSLMODE=require psql \
+  --host="$PG_HOST" \
+  --username="$ENTRA_ADMIN" \
+  --dbname="postgres" \
+  -c "DO \$\$ BEGIN PERFORM pg_catalog.pgaadauth_create_principal_with_oid('${BACKEND_IDENTITY_NAME}'::text, '${IDENTITY_OBJECT_ID}'::text, 'service'::text, false, false); EXCEPTION WHEN duplicate_object THEN RAISE NOTICE 'Role already exists, skipping.'; END \$\$;"
+
+echo "==> Step 2/2: Granting privileges on the '${DATABASE}' database..."
+PGPASSWORD="$PG_TOKEN" PGSSLMODE=require psql \
   --host="$PG_HOST" \
   --username="$ENTRA_ADMIN" \
   --dbname="$DATABASE" \
-  --set=sslmode=require \
   <<SQL
--- Create the managed identity as a PostgreSQL role via Entra extension
-SELECT * FROM pgaad_admin.create_aad_user(
-  '${BACKEND_IDENTITY_NAME}',
-  '${IDENTITY_CLIENT_ID}'
-);
-
--- Grant access to the database
 GRANT ALL PRIVILEGES ON DATABASE "${DATABASE}" TO "${BACKEND_IDENTITY_NAME}";
 GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO "${BACKEND_IDENTITY_NAME}";
 GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO "${BACKEND_IDENTITY_NAME}";

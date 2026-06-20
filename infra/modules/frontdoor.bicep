@@ -93,11 +93,6 @@ resource frontendOrigin 'Microsoft.Cdn/profiles/originGroups/origins@2024-02-01'
   }
 }
 
-// Origin group for Blob Storage (CDN images)
-resource storageRef 'Microsoft.Storage/storageAccounts@2023-05-01' existing = {
-  name: storageAccountName
-}
-
 resource cdnOriginGroup 'Microsoft.Cdn/profiles/originGroups@2024-02-01' = {
   parent: frontDoorProfile
   name: 'cdn-origin-group'
@@ -120,10 +115,10 @@ resource cdnOrigin 'Microsoft.Cdn/profiles/originGroups/origins@2024-02-01' = {
   parent: cdnOriginGroup
   name: 'blob-storage'
   properties: {
-    hostName: '${storageAccountName}.blob.core.windows.net'
+    hostName: '${storageAccountName}.blob.${environment().suffixes.storage}'
     httpPort: 80
     httpsPort: 443
-    originHostHeader: '${storageAccountName}.blob.core.windows.net'
+    originHostHeader: '${storageAccountName}.blob.${environment().suffixes.storage}'
     priority: 1
     weight: 1000
     enabledState: 'Enabled'
@@ -236,7 +231,7 @@ resource cdnRoute 'Microsoft.Cdn/profiles/afdEndpoints/routes@2024-02-01' = {
   properties: {
     enabledState: 'Enabled'
     httpsRedirect: 'Enabled'
-    linkToDefaultDomain: 'Disabled'
+    linkToDefaultDomain: 'Enabled'
     patternsToMatch: ['/images/*']
     supportedProtocols: ['Http', 'Https']
     originGroup: {

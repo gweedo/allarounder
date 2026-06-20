@@ -1,11 +1,9 @@
 param env string
 param location string
-param logAnalyticsWorkspaceId string
 param logAnalyticsCustomerId string
 @secure()
 param logAnalyticsSharedKey string
 param acrLoginServer string
-param acrId string
 param storageAccountName string
 param storageContainerName string
 param keyVaultUri string
@@ -19,9 +17,8 @@ param corsAllowedOrigins string
 param cdnBaseUrl string
 
 // Built-in role IDs
-var acrPullRoleId = '7f951dda-4ed3-4680-a7ca-43fe172d538d'
 var storageBlobDataContributorRoleId = 'ba92f5b4-2d11-453d-a403-e96b0029c9fe'
-var keyVaultSecretsUserRoleId = '4633458b-17de-408a-b874-0445c86b69e0'
+var keyVaultSecretsUserRoleId = '4633458b-17de-408a-b874-0445c86b69e6'
 
 resource backendIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
   name: 'allarounder-${env}-backend-id'
@@ -31,31 +28,6 @@ resource backendIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-
 resource frontendIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
   name: 'allarounder-${env}-frontend-id'
   location: location
-}
-
-// ACR pull rights for both apps
-resource acrRef 'Microsoft.ContainerRegistry/registries@2023-07-01' existing = {
-  name: last(split(acrId, '/'))
-}
-
-resource backendAcrPull 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(acrId, backendIdentity.id, acrPullRoleId)
-  scope: acrRef
-  properties: {
-    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', acrPullRoleId)
-    principalId: backendIdentity.properties.principalId
-    principalType: 'ServicePrincipal'
-  }
-}
-
-resource frontendAcrPull 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(acrId, frontendIdentity.id, acrPullRoleId)
-  scope: acrRef
-  properties: {
-    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', acrPullRoleId)
-    principalId: frontendIdentity.properties.principalId
-    principalType: 'ServicePrincipal'
-  }
 }
 
 // Blob Storage access for backend
@@ -205,7 +177,7 @@ resource backendApp 'Microsoft.App/containerApps@2024-03-01' = {
       }
     }
   }
-  dependsOn: [backendAcrPull, backendBlobAccess, backendKvAccess]
+  dependsOn: [backendBlobAccess, backendKvAccess]
 }
 
 resource frontendApp 'Microsoft.App/containerApps@2024-03-01' = {
@@ -287,7 +259,7 @@ resource frontendApp 'Microsoft.App/containerApps@2024-03-01' = {
       }
     }
   }
-  dependsOn: [frontendAcrPull]
+  dependsOn: []
 }
 
 // One-off migration job run before each deployment
@@ -301,7 +273,7 @@ resource migrationJob 'Microsoft.App/jobs@2024-03-01' = {
     }
   }
   properties: {
-    managedEnvironmentId: cae.id
+    environmentId: cae.id
     workloadProfileName: 'Consumption'
     configuration: {
       replicaTimeout: 300
@@ -336,8 +308,8 @@ resource migrationJob 'Microsoft.App/jobs@2024-03-01' = {
       ]
     }
   }
-  dependsOn: [backendAcrPull]
 }
+
 
 output backendAppName string = backendApp.name
 output frontendAppName string = frontendApp.name
