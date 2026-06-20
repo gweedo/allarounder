@@ -2,6 +2,7 @@
 
 import { FormEvent, useEffect, useState } from "react";
 import dynamic from "next/dynamic";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 const MarkdownEditor = dynamic(() => import("../../../../components/MarkdownEditor"), {
@@ -158,7 +159,7 @@ export default function EditStaticPagePage({ params }: Props) {
           <button type="submit" disabled={saving}>
             {saving ? "Salvataggio…" : "Salva"}
           </button>
-          <a href="/admin/pages">Annulla</a>
+          <Link href="/admin/pages">Annulla</Link>
         </div>
       </form>
     </main>

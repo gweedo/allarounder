@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
 interface StaticPage {
@@ -58,7 +59,7 @@ export default function AdminPagesPage() {
                   /{page.slug}
                 </span>
               </div>
-              <a href={`/admin/pages/${page.id}`}>Modifica</a>
+              <Link href={`/admin/pages/${page.id}`}>Modifica</Link>
             </li>
           ))}
         </ul>

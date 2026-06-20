@@ -7,8 +7,8 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.application.content.use_cases import UpdatePage
-from app.domain.content.exceptions import PageNotFoundError
 from app.domain.content.entities import StaticPage
+from app.domain.content.exceptions import PageNotFoundError
 from app.infrastructure.content.repositories import SqlPageRepository
 from app.interfaces.api.admin.pages.schemas import (
     PageListResponse,
