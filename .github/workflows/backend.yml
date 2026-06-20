@@ -1,7 +1,8 @@
-name: Backend CI
+name: Backend CI/CD
 
 on:
   push:
+    branches: [main]
     paths:
       - "src/backend/**"
       - ".github/workflows/backend.yml"
@@ -10,7 +11,20 @@ on:
       - "src/backend/**"
       - ".github/workflows/backend.yml"
 
+concurrency:
+  group: backend-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  id-token: write
+  security-events: write
+
+env:
+  IMAGE_NAME: allarounder-backend
+
 jobs:
+  # ── Lint & type-check ────────────────────────────────────────────────────────
   lint-and-typecheck:
     name: Lint & type-check
     runs-on: ubuntu-latest
@@ -35,6 +49,7 @@ jobs:
       - name: Type-check (mypy)
         run: python -m mypy app
 
+  # ── Tests with coverage gate ─────────────────────────────────────────────────
   test:
     name: Test (pytest)
     runs-on: ubuntu-latest
@@ -78,3 +93,311 @@ jobs:
         if: always()
         with:
           files: src/backend/coverage.xml
+
+  # ── Security scans (block on high/critical findings) ─────────────────────────
+  security:
+    name: Security scan
+    needs: [lint-and-typecheck, test]
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: src/backend
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -e ".[dev]" pip-audit
+
+      - name: Dependency audit (pip-audit)
+        run: pip-audit --strict --vulnerability-service pypi
+
+      - name: Secret scan (gitleaks)
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: SAST (CodeQL)
+        uses: github/codeql-action/init@v3
+        with:
+          languages: python
+          source-root: src/backend
+
+      - name: CodeQL analyze
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:python"
+
+  # ── Build & push image (main branch only) ────────────────────────────────────
+  build:
+    name: Build & push image
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: security
+    runs-on: ubuntu-latest
+    outputs:
+      image-digest: ${{ steps.push.outputs.digest }}
+      image-tag: ${{ github.sha }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Azure login (OIDC)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID_BUILD }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: ACR login
+        run: az acr login --name ${{ secrets.ACR_NAME }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build & push
+        id: push
+        uses: docker/build-push-action@v6
+        with:
+          context: src/backend
+          file: src/backend/Dockerfile
+          push: true
+          tags: |
+            ${{ secrets.ACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+            ${{ secrets.ACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:latest
+          cache-from: type=registry,ref=${{ secrets.ACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:latest
+          cache-to: type=inline
+
+      - name: Trivy image scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ secrets.ACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}@${{ steps.push.outputs.digest }}
+          format: sarif
+          output: trivy-results.sarif
+          exit-code: "1"
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+
+      - name: Upload Trivy results
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: trivy-results.sarif
+          category: trivy-backend
+
+  # ── Deploy to staging ─────────────────────────────────────────────────────────
+  deploy-staging:
+    name: Deploy → staging
+    needs: build
+    runs-on: ubuntu-latest
+    environment: staging
+
+    steps:
+      - name: Azure login (OIDC — staging)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Run Alembic migrations
+        run: |
+          DIGEST="${{ needs.build.outputs.image-digest }}"
+          IMAGE="${{ secrets.ACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}@${DIGEST}"
+
+          # Update migration job to use the new image
+          az containerapp job update \
+            --name "${{ vars.MIGRATION_JOB_NAME }}" \
+            --resource-group "${{ vars.RESOURCE_GROUP }}" \
+            --image "$IMAGE"
+
+          # Start the migration job
+          EXECUTION=$(az containerapp job start \
+            --name "${{ vars.MIGRATION_JOB_NAME }}" \
+            --resource-group "${{ vars.RESOURCE_GROUP }}" \
+            --query "name" -o tsv)
+
+          echo "Migration execution: $EXECUTION"
+
+          # Poll until the job completes
+          for i in $(seq 1 60); do
+            STATUS=$(az containerapp job execution show \
+              --name "${{ vars.MIGRATION_JOB_NAME }}" \
+              --resource-group "${{ vars.RESOURCE_GROUP }}" \
+              --job-execution-name "$EXECUTION" \
+              --query "properties.status" -o tsv)
+            echo "  Status ($i/60): $STATUS"
+            if [[ "$STATUS" == "Succeeded" ]]; then
+              echo "Migrations succeeded."
+              break
+            elif [[ "$STATUS" == "Failed" || "$STATUS" == "Unknown" ]]; then
+              echo "Migration failed: $STATUS"
+              exit 1
+            fi
+            sleep 10
+          done
+
+      - name: Blue-green deploy (backend)
+        run: |
+          APP="${{ vars.BACKEND_APP_NAME }}"
+          RG="${{ vars.RESOURCE_GROUP }}"
+          DIGEST="${{ needs.build.outputs.image-digest }}"
+          IMAGE="${{ secrets.ACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}@${DIGEST}"
+          SHA="${{ github.sha }}"
+
+          # Deploy new revision at 0% traffic
+          az containerapp update \
+            --name "$APP" \
+            --resource-group "$RG" \
+            --image "$IMAGE" \
+            --revision-suffix "${SHA:0:8}"
+
+          NEW_REVISION="${APP}--${SHA:0:8}"
+
+          # Wait for the new revision to be running
+          for i in $(seq 1 30); do
+            STATE=$(az containerapp revision show \
+              --name "$APP" --resource-group "$RG" \
+              --revision "$NEW_REVISION" \
+              --query "properties.runningState" -o tsv 2>/dev/null || echo "Unknown")
+            echo "  Revision state ($i/30): $STATE"
+            if [[ "$STATE" == "Running" || "$STATE" == "RunningAtMaxScale" ]]; then
+              break
+            fi
+            sleep 10
+          done
+
+          # Health check against the new revision
+          FQDN=$(az containerapp revision show \
+            --name "$APP" --resource-group "$RG" \
+            --revision "$NEW_REVISION" \
+            --query "properties.fqdn" -o tsv)
+
+          curl -sf --retry 3 --retry-delay 5 "https://${FQDN}/api/health" \
+            || { echo "Health check failed for $FQDN"; exit 1; }
+
+          # Flip 100% traffic to the new revision
+          az containerapp ingress traffic set \
+            --name "$APP" --resource-group "$RG" \
+            --revision-weight "${NEW_REVISION}=100"
+
+          echo "Deployed ${NEW_REVISION} to staging with 100% traffic."
+
+  # ── Playwright E2E against staging ───────────────────────────────────────────
+  # E2E runs from the frontend workflow; skip here unless both apps changed.
+  # The staging smoke check below validates the backend health endpoint.
+  smoke-staging:
+    name: Smoke test (staging)
+    needs: deploy-staging
+    runs-on: ubuntu-latest
+    environment: staging
+
+    steps:
+      - name: Azure login (OIDC — staging)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Health & readiness checks
+        run: |
+          FQDN=$(az containerapp show \
+            --name "${{ vars.BACKEND_APP_NAME }}" \
+            --resource-group "${{ vars.RESOURCE_GROUP }}" \
+            --query "properties.configuration.ingress.fqdn" -o tsv)
+
+          curl -sf "https://${FQDN}/api/health" | jq .
+          curl -sf "https://${FQDN}/api/v1/articles?page_size=1" | jq .total
+
+  # ── Promote to production (manual approval required) ─────────────────────────
+  deploy-production:
+    name: Deploy → production
+    needs: [build, smoke-staging]
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Azure login (OIDC — production)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Run Alembic migrations (production)
+        run: |
+          DIGEST="${{ needs.build.outputs.image-digest }}"
+          IMAGE="${{ secrets.ACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}@${DIGEST}"
+
+          az containerapp job update \
+            --name "${{ vars.MIGRATION_JOB_NAME }}" \
+            --resource-group "${{ vars.RESOURCE_GROUP }}" \
+            --image "$IMAGE"
+
+          EXECUTION=$(az containerapp job start \
+            --name "${{ vars.MIGRATION_JOB_NAME }}" \
+            --resource-group "${{ vars.RESOURCE_GROUP }}" \
+            --query "name" -o tsv)
+
+          for i in $(seq 1 60); do
+            STATUS=$(az containerapp job execution show \
+              --name "${{ vars.MIGRATION_JOB_NAME }}" \
+              --resource-group "${{ vars.RESOURCE_GROUP }}" \
+              --job-execution-name "$EXECUTION" \
+              --query "properties.status" -o tsv)
+            echo "  Status ($i/60): $STATUS"
+            if [[ "$STATUS" == "Succeeded" ]]; then break; fi
+            if [[ "$STATUS" == "Failed" || "$STATUS" == "Unknown" ]]; then
+              echo "Migration failed: $STATUS"
+              exit 1
+            fi
+            sleep 10
+          done
+
+      - name: Blue-green deploy (backend — production)
+        run: |
+          APP="${{ vars.BACKEND_APP_NAME }}"
+          RG="${{ vars.RESOURCE_GROUP }}"
+          DIGEST="${{ needs.build.outputs.image-digest }}"
+          IMAGE="${{ secrets.ACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}@${DIGEST}"
+          SHA="${{ github.sha }}"
+
+          az containerapp update \
+            --name "$APP" --resource-group "$RG" \
+            --image "$IMAGE" \
+            --revision-suffix "${SHA:0:8}"
+
+          NEW_REVISION="${APP}--${SHA:0:8}"
+
+          for i in $(seq 1 30); do
+            STATE=$(az containerapp revision show \
+              --name "$APP" --resource-group "$RG" \
+              --revision "$NEW_REVISION" \
+              --query "properties.runningState" -o tsv 2>/dev/null || echo "Unknown")
+            echo "  Revision state ($i/30): $STATE"
+            if [[ "$STATE" == "Running" || "$STATE" == "RunningAtMaxScale" ]]; then
+              break
+            fi
+            sleep 10
+          done
+
+          FQDN=$(az containerapp revision show \
+            --name "$APP" --resource-group "$RG" \
+            --revision "$NEW_REVISION" \
+            --query "properties.fqdn" -o tsv)
+
+          curl -sf --retry 3 --retry-delay 5 "https://${FQDN}/api/health" \
+            || { echo "Health check failed"; exit 1; }
+
+          az containerapp ingress traffic set \
+            --name "$APP" --resource-group "$RG" \
+            --revision-weight "${NEW_REVISION}=100"
+
+          echo "Production deploy complete: ${NEW_REVISION}"
