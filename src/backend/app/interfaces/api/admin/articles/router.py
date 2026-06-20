@@ -1,4 +1,4 @@
-"""Admin article endpoints: create draft, list articles."""
+"""Admin article endpoints: create draft, list, publish, archive, update."""
 
 import uuid
 from typing import Annotated
@@ -6,14 +6,21 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
-from app.application.content.use_cases import CreateArticle
+from app.application.content.use_cases import (
+    ArchiveArticle,
+    CreateArticle,
+    PublishArticle,
+    UpdateArticle,
+)
 from app.domain.content.entities import Article
+from app.domain.content.exceptions import ArticleNotFoundError, SlugLockedError
 from app.domain.content.value_objects import PublicationStatus
 from app.infrastructure.content.repositories import SqlArticleRepository
 from app.interfaces.api.admin.articles.schemas import (
     ArticleListResponse,
     ArticleResponse,
     CreateArticleRequest,
+    UpdateArticleRequest,
 )
 from app.interfaces.api.auth.dependencies import (
     CurrentUser,
@@ -41,6 +48,8 @@ def _to_response(article: Article) -> ArticleResponse:
         created_at=article.created_at,
         updated_at=article.updated_at,
         publish_at=article.publish_at,
+        slug_locked=article.slug_locked,
+        spotify_url=article.spotify_url,
     )
 
 
@@ -84,7 +93,7 @@ def list_articles(
     if current_user.role != "admin":
         author_id = uuid.UUID(current_user.user_id)
 
-    articles, total = repo.list(
+    articles, total = repo.list_all(
         author_id=author_id,
         status=filter_status,
         page=page,
@@ -96,3 +105,55 @@ def list_articles(
         page=page,
         page_size=page_size,
     )
+
+
+@router.put("/{article_id}", response_model=ArticleResponse)
+def update_article(
+    article_id: uuid.UUID,
+    body: UpdateArticleRequest,
+    current_user: Annotated[CurrentUser, Depends(require_editor)],
+    repo: Annotated[SqlArticleRepository, Depends(get_article_repo)],
+) -> ArticleResponse:
+    use_case = UpdateArticle(repo)
+    try:
+        article = use_case.execute(
+            article_id=article_id,
+            title=body.title,
+            body=body.body,
+            slug=body.slug,
+            publish_at=body.publish_at,
+            spotify_url=body.spotify_url,
+        )
+    except ArticleNotFoundError:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Article not found")
+    except SlugLockedError as e:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(e))
+    return _to_response(article)
+
+
+@router.post("/{article_id}/publish", response_model=ArticleResponse)
+def publish_article(
+    article_id: uuid.UUID,
+    current_user: Annotated[CurrentUser, Depends(require_editor)],
+    repo: Annotated[SqlArticleRepository, Depends(get_article_repo)],
+) -> ArticleResponse:
+    use_case = PublishArticle(repo)
+    try:
+        article = use_case.execute(article_id=article_id)
+    except ArticleNotFoundError:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Article not found")
+    return _to_response(article)
+
+
+@router.post("/{article_id}/archive", response_model=ArticleResponse)
+def archive_article(
+    article_id: uuid.UUID,
+    current_user: Annotated[CurrentUser, Depends(require_editor)],
+    repo: Annotated[SqlArticleRepository, Depends(get_article_repo)],
+) -> ArticleResponse:
+    use_case = ArchiveArticle(repo)
+    try:
+        article = use_case.execute(article_id=article_id)
+    except ArticleNotFoundError:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Article not found")
+    return _to_response(article)

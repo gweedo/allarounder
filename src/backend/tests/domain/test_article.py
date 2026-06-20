@@ -102,6 +102,13 @@ class TestSlugMutability:
         with pytest.raises(SlugLockedError):
             article.set_slug(Slug("altra-slug"))
 
+    def test_slug_locked_permanently_after_publish_then_archive(self) -> None:
+        article = _make_article()
+        article.publish(_now())
+        article.archive(_now())
+        with pytest.raises(SlugLockedError):
+            article.set_slug(Slug("new-slug"))
+
     def test_slug_can_change_on_archived_article(self) -> None:
         article = _make_article()
         article.archive(_now())

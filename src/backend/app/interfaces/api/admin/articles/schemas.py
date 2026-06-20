@@ -9,6 +9,14 @@ class CreateArticleRequest(BaseModel):
     body: str = ""
 
 
+class UpdateArticleRequest(BaseModel):
+    title: str | None = None
+    body: str | None = None
+    slug: str | None = None
+    publish_at: datetime | None = None
+    spotify_url: str | None = None
+
+
 class ArticleResponse(BaseModel):
     id: UUID
     title: str
@@ -19,6 +27,8 @@ class ArticleResponse(BaseModel):
     created_at: datetime
     updated_at: datetime
     publish_at: datetime | None = None
+    slug_locked: bool = False
+    spotify_url: str | None = None
 
 
 class ArticleListResponse(BaseModel):

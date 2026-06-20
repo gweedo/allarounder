@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 import uuid
+from datetime import datetime
 from typing import Protocol
 
 from app.domain.content.entities import Article
@@ -8,11 +11,20 @@ from app.domain.content.value_objects import PublicationStatus
 class ArticleRepository(Protocol):
     def add(self, article: Article) -> None: ...
     def get_by_id(self, article_id: uuid.UUID) -> Article | None: ...
-    def list(
+    def get_by_slug(self, slug: str) -> Article | None: ...
+    def save(self, article: Article) -> None: ...
+    def list_all(
         self,
         *,
         author_id: uuid.UUID | None = None,
         status: PublicationStatus | None = None,
+        page: int = 1,
+        page_size: int = 20,
+    ) -> tuple[list[Article], int]: ...
+    def list_published(
+        self,
+        *,
+        before: datetime,
         page: int = 1,
         page_size: int = 20,
     ) -> tuple[list[Article], int]: ...

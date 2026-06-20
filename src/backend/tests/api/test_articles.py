@@ -131,7 +131,7 @@ class TestListArticles:
         self, client: TestClient, mock_repo: MagicMock
     ) -> None:
         article = _make_article()
-        mock_repo.list.return_value = ([article], 1)
+        mock_repo.list_all.return_value = ([article], 1)
         token = _make_token("editor")
         resp = client.get("/api/admin/articles", cookies={"access_token": token})
         assert resp.status_code == 200
@@ -144,30 +144,30 @@ class TestListArticles:
         self, client: TestClient, mock_repo: MagicMock
     ) -> None:
         author_id = str(uuid.uuid4())
-        mock_repo.list.return_value = ([], 0)
+        mock_repo.list_all.return_value = ([], 0)
         token = _make_token("editor", user_id=author_id)
         client.get("/api/admin/articles", cookies={"access_token": token})
-        call_kwargs = mock_repo.list.call_args.kwargs
+        call_kwargs = mock_repo.list_all.call_args.kwargs
         assert call_kwargs["author_id"] == uuid.UUID(author_id)
 
     def test_admin_sees_all_no_author_filter(
         self, client: TestClient, mock_repo: MagicMock
     ) -> None:
-        mock_repo.list.return_value = ([], 0)
+        mock_repo.list_all.return_value = ([], 0)
         token = _make_token("admin")
         client.get("/api/admin/articles", cookies={"access_token": token})
-        call_kwargs = mock_repo.list.call_args.kwargs
+        call_kwargs = mock_repo.list_all.call_args.kwargs
         assert call_kwargs["author_id"] is None
 
     def test_status_filter_passed_to_repo(
         self, client: TestClient, mock_repo: MagicMock
     ) -> None:
-        mock_repo.list.return_value = ([], 0)
+        mock_repo.list_all.return_value = ([], 0)
         token = _make_token("editor")
         client.get(
             "/api/admin/articles?status=draft", cookies={"access_token": token}
         )
-        call_kwargs = mock_repo.list.call_args.kwargs
+        call_kwargs = mock_repo.list_all.call_args.kwargs
         assert call_kwargs["status"] == PublicationStatus.draft
 
     def test_422_on_invalid_status(self, client: TestClient, mock_repo: MagicMock) -> None:

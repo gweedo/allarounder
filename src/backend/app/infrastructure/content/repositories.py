@@ -1,6 +1,9 @@
 """SQLAlchemy implementation of ArticleRepository."""
 
+from __future__ import annotations
+
 import uuid
+from datetime import datetime
 
 from sqlalchemy.orm import Session
 
@@ -20,6 +23,8 @@ def _model_to_article(m: ArticleModel) -> Article:
         created_at=m.created_at,
         updated_at=m.updated_at,
         publish_at=m.publish_at,
+        slug_locked=m.slug_locked,
+        spotify_url=m.spotify_url,
     )
 
 
@@ -38,6 +43,8 @@ class SqlArticleRepository:
             publish_at=article.publish_at,
             created_at=article.created_at,
             updated_at=article.updated_at,
+            slug_locked=article.slug_locked,
+            spotify_url=article.spotify_url,
         )
         self._session.add(m)
 
@@ -45,7 +52,24 @@ class SqlArticleRepository:
         m = self._session.get(ArticleModel, article_id)
         return _model_to_article(m) if m else None
 
-    def list(
+    def get_by_slug(self, slug: str) -> Article | None:
+        m = self._session.query(ArticleModel).filter_by(slug=slug).one_or_none()
+        return _model_to_article(m) if m else None
+
+    def save(self, article: Article) -> None:
+        m = self._session.get(ArticleModel, article.id)
+        if m is None:
+            raise ValueError(f"Article {article.id} not found in database")
+        m.title = article.title
+        m.slug = article.slug.value
+        m.body = article.body.value
+        m.status = article.status.value
+        m.publish_at = article.publish_at
+        m.updated_at = article.updated_at
+        m.slug_locked = article.slug_locked
+        m.spotify_url = article.spotify_url
+
+    def list_all(
         self,
         *,
         author_id: uuid.UUID | None = None,
@@ -61,6 +85,27 @@ class SqlArticleRepository:
         total = q.count()
         rows = (
             q.order_by(ArticleModel.created_at.desc())
+            .offset((page - 1) * page_size)
+            .limit(page_size)
+            .all()
+        )
+        return [_model_to_article(r) for r in rows], total
+
+    def list_published(
+        self,
+        *,
+        before: datetime,
+        page: int = 1,
+        page_size: int = 20,
+    ) -> tuple[list[Article], int]:
+        q = (
+            self._session.query(ArticleModel)
+            .filter(ArticleModel.status == "published")
+            .filter(ArticleModel.publish_at <= before)
+        )
+        total = q.count()
+        rows = (
+            q.order_by(ArticleModel.publish_at.desc())
             .offset((page - 1) * page_size)
             .limit(page_size)
             .all()
