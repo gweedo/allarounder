@@ -197,6 +197,29 @@ export default function EditArticlePage({ params }: Props) {
     }
   }
 
+  async function handlePreview() {
+    if (!article) return;
+    setSaving(true);
+    setError(null);
+    try {
+      const res = await fetch(`/api/admin/articles/${article.id}/preview-token`, {
+        method: "POST",
+        credentials: "include",
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        setError((data as { detail?: string }).detail ?? "Errore generazione anteprima.");
+        return;
+      }
+      const { preview_url } = (await res.json()) as { preview_url: string };
+      window.open(preview_url, "_blank", "noopener,noreferrer");
+    } catch {
+      setError("Errore di rete. Riprova.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
   if (loading) return <p>Caricamento...</p>;
   if (!article) return <p role="alert">{error ?? "Articolo non trovato."}</p>;
 
@@ -378,6 +401,9 @@ export default function EditArticlePage({ params }: Props) {
             Archivia
           </button>
         )}
+        <button type="button" onClick={handlePreview} disabled={saving}>
+          Anteprima
+        </button>
       </div>
     </main>
   );

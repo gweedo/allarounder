@@ -127,3 +127,18 @@ class UpdateArticle:
         article.updated_at = datetime.now(tz=UTC)
         self._repo.save(article)
         return article
+
+
+class GeneratePreviewToken:
+    def __init__(self, repo: ArticleRepository) -> None:
+        self._repo = repo
+
+    def execute(self, *, article_id: uuid.UUID) -> tuple[Article, str]:
+        article = self._repo.get_by_id(article_id)
+        if article is None:
+            raise ArticleNotFoundError(f"Article {article_id} not found")
+        article.preview_token = uuid.uuid4()
+        article.updated_at = datetime.now(tz=UTC)
+        self._repo.save(article)
+        preview_url = f"/preview/articles/{article.preview_token}"
+        return article, preview_url

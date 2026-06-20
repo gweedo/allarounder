@@ -36,6 +36,7 @@ class ArticleResponse(BaseModel):
     updated_at: datetime
     publish_at: datetime | None = None
     slug_locked: bool = False
+    preview_token: UUID | None = None
     spotify_url: str | None = None
     excerpt: str | None = None
     cover_image_url: str | None = None
@@ -44,6 +45,10 @@ class ArticleResponse(BaseModel):
     meta_description: str | None = None
     og_image_url: str | None = None
     reading_time: int | None = None
+
+
+class PreviewTokenResponse(BaseModel):
+    preview_url: str
 
 
 class ArticleListResponse(BaseModel):

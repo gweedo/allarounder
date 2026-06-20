@@ -10,7 +10,6 @@ from fastapi.testclient import TestClient
 from jose import jwt
 
 from app.domain.content.entities import Article
-from app.domain.content.exceptions import ArticleNotFoundError, SlugLockedError
 from app.domain.content.value_objects import Body, PublicationStatus, Slug
 from app.interfaces.api.admin.articles.router import get_article_repo as admin_get_repo
 from app.interfaces.api.public.articles.router import get_article_repo as public_get_repo

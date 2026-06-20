@@ -143,3 +143,9 @@ class TestArticleLifecycle:
         article = _make_article()
         article.archive(_now())
         assert article.status == PublicationStatus.archived
+
+    def test_publish_clears_preview_token(self) -> None:
+        article = _make_article()
+        article.preview_token = uuid.uuid4()
+        article.publish(_now())
+        assert article.preview_token is None

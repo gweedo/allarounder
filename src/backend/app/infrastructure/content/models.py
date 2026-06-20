@@ -32,6 +32,9 @@ class ArticleModel(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     slug_locked: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default="false")
+    preview_token: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True), unique=True, nullable=True
+    )
     spotify_url: Mapped[str | None] = mapped_column(String(2048), nullable=True)
     excerpt: Mapped[str | None] = mapped_column(String(300), nullable=True)
     cover_image_url: Mapped[str | None] = mapped_column(String(2048), nullable=True)

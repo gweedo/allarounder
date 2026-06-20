@@ -18,7 +18,9 @@ _SECRET = _settings.jwt_secret_key
 _ALGO = _settings.jwt_algorithm
 
 # Realistic magic bytes for various types
-_JPEG_MAGIC = b"\xff\xd8\xff\xe0\x00\x10JFIF\x00\x01\x01\x00\x00\x01\x00\x01\x00\x00" + b"\x00" * 490
+_JPEG_MAGIC = (
+    b"\xff\xd8\xff\xe0\x00\x10JFIF\x00\x01\x01\x00\x00\x01\x00\x01\x00\x00" + b"\x00" * 490
+)
 _PNG_MAGIC = b"\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR" + b"\x00" * 490
 _SVG_MAGIC = b"<svg xmlns='http://www.w3.org/2000/svg'>" + b"\x00" * 472
 _TEXT_MAGIC = b"hello world" + b"\x00" * 500

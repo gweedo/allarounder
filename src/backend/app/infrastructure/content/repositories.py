@@ -24,6 +24,7 @@ def _model_to_article(m: ArticleModel) -> Article:
         updated_at=m.updated_at,
         publish_at=m.publish_at,
         slug_locked=m.slug_locked,
+        preview_token=m.preview_token,
         spotify_url=m.spotify_url,
         excerpt=m.excerpt,
         cover_image_url=m.cover_image_url,
@@ -51,6 +52,7 @@ class SqlArticleRepository:
             created_at=article.created_at,
             updated_at=article.updated_at,
             slug_locked=article.slug_locked,
+            preview_token=article.preview_token,
             spotify_url=article.spotify_url,
             excerpt=article.excerpt,
             cover_image_url=article.cover_image_url,
@@ -70,6 +72,10 @@ class SqlArticleRepository:
         m = self._session.query(ArticleModel).filter_by(slug=slug).one_or_none()
         return _model_to_article(m) if m else None
 
+    def get_by_preview_token(self, token: uuid.UUID) -> Article | None:
+        m = self._session.query(ArticleModel).filter_by(preview_token=token).one_or_none()
+        return _model_to_article(m) if m else None
+
     def save(self, article: Article) -> None:
         m = self._session.get(ArticleModel, article.id)
         if m is None:
@@ -81,6 +87,7 @@ class SqlArticleRepository:
         m.publish_at = article.publish_at
         m.updated_at = article.updated_at
         m.slug_locked = article.slug_locked
+        m.preview_token = article.preview_token
         m.spotify_url = article.spotify_url
         m.excerpt = article.excerpt
         m.cover_image_url = article.cover_image_url

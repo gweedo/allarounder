@@ -8,6 +8,7 @@ from app.interfaces.api.admin.articles.router import router as articles_router
 from app.interfaces.api.admin.media.router import router as media_router
 from app.interfaces.api.auth.router import router as auth_router
 from app.interfaces.api.health import router as health_router
+from app.interfaces.api.preview.router import router as preview_router
 from app.interfaces.api.public.articles.router import router as public_articles_router
 from app.settings import get_settings
 
@@ -30,4 +31,5 @@ app.include_router(health_router)
 app.include_router(auth_router)
 app.include_router(articles_router)
 app.include_router(media_router)
+app.include_router(preview_router)
 app.include_router(public_articles_router)

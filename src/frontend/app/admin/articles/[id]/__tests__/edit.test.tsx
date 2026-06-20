@@ -150,4 +150,36 @@ describe("EditArticlePage", () => {
       expect(screen.getByRole("alert")).toBeInTheDocument();
     });
   });
+
+  it("shows Anteprima button for all articles", async () => {
+    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+      ok: true,
+      json: async () => DRAFT_ARTICLE,
+    });
+    render(<EditArticlePage params={mockParams("art-1")} />);
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: /anteprima/i })).toBeInTheDocument();
+    });
+  });
+
+  it("calls preview-token endpoint and opens new tab on click", async () => {
+    const openSpy = vi.spyOn(window, "open").mockImplementation(() => null);
+    (global.fetch as ReturnType<typeof vi.fn>)
+      .mockResolvedValueOnce({ ok: true, json: async () => DRAFT_ARTICLE })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ preview_url: "/preview/articles/some-token" }),
+      });
+    render(<EditArticlePage params={mockParams("art-1")} />);
+    await waitFor(() => screen.getByRole("button", { name: /anteprima/i }));
+    fireEvent.click(screen.getByRole("button", { name: /anteprima/i }));
+    await waitFor(() => {
+      expect(openSpy).toHaveBeenCalledWith(
+        "/preview/articles/some-token",
+        "_blank",
+        "noopener,noreferrer"
+      );
+    });
+    openSpy.mockRestore();
+  });
 });

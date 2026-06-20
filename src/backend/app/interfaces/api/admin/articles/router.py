@@ -9,6 +9,7 @@ from sqlalchemy.orm import Session
 from app.application.content.use_cases import (
     ArchiveArticle,
     CreateArticle,
+    GeneratePreviewToken,
     PublishArticle,
     UpdateArticle,
 )
@@ -20,6 +21,7 @@ from app.interfaces.api.admin.articles.schemas import (
     ArticleListResponse,
     ArticleResponse,
     CreateArticleRequest,
+    PreviewTokenResponse,
     UpdateArticleRequest,
 )
 from app.interfaces.api.auth.dependencies import (
@@ -49,6 +51,7 @@ def _to_response(article: Article) -> ArticleResponse:
         updated_at=article.updated_at,
         publish_at=article.publish_at,
         slug_locked=article.slug_locked,
+        preview_token=article.preview_token,
         spotify_url=article.spotify_url,
         excerpt=article.excerpt,
         cover_image_url=article.cover_image_url,
@@ -158,6 +161,20 @@ def publish_article(
     except ArticleNotFoundError:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Article not found")
     return _to_response(article)
+
+
+@router.post("/{article_id}/preview-token", response_model=PreviewTokenResponse)
+def generate_preview_token(
+    article_id: uuid.UUID,
+    current_user: Annotated[CurrentUser, Depends(require_editor)],
+    repo: Annotated[SqlArticleRepository, Depends(get_article_repo)],
+) -> PreviewTokenResponse:
+    use_case = GeneratePreviewToken(repo)
+    try:
+        _, preview_url = use_case.execute(article_id=article_id)
+    except ArticleNotFoundError:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Article not found")
+    return PreviewTokenResponse(preview_url=preview_url)
 
 
 @router.post("/{article_id}/archive", response_model=ArticleResponse)

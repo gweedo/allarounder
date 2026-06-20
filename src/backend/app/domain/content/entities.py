@@ -26,6 +26,7 @@ class Article:
     meta_description: str | None = field(default=None)
     og_image_url: str | None = field(default=None)
     reading_time: int | None = field(default=None)
+    preview_token: uuid.UUID | None = field(default=None)
 
     def set_slug(self, new_slug: Slug) -> None:
         if self.slug_locked:
@@ -35,6 +36,7 @@ class Article:
     def publish(self, now: datetime) -> None:
         self.status = PublicationStatus.published
         self.slug_locked = True
+        self.preview_token = None
         self.updated_at = now
         if self.publish_at is None:
             self.publish_at = now
