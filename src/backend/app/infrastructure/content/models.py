@@ -3,7 +3,7 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import Boolean, DateTime, Enum, ForeignKey, String, Text
+from sqlalchemy import Boolean, DateTime, Enum, ForeignKey, Integer, String, Text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -33,3 +33,10 @@ class ArticleModel(Base):
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     slug_locked: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default="false")
     spotify_url: Mapped[str | None] = mapped_column(String(2048), nullable=True)
+    excerpt: Mapped[str | None] = mapped_column(String(300), nullable=True)
+    cover_image_url: Mapped[str | None] = mapped_column(String(2048), nullable=True)
+    cover_image_alt: Mapped[str | None] = mapped_column(String(160), nullable=True)
+    meta_title: Mapped[str | None] = mapped_column(String(60), nullable=True)
+    meta_description: Mapped[str | None] = mapped_column(String(160), nullable=True)
+    og_image_url: Mapped[str | None] = mapped_column(String(2048), nullable=True)
+    reading_time: Mapped[int | None] = mapped_column(Integer, nullable=True)

@@ -33,6 +33,13 @@ def _to_response(article: Article) -> PublicArticleResponse:
         author_id=article.author_id,
         publish_at=article.publish_at,  # type: ignore[arg-type]
         spotify_url=article.spotify_url,
+        excerpt=article.excerpt,
+        cover_image_url=article.cover_image_url,
+        cover_image_alt=article.cover_image_alt,
+        meta_title=article.meta_title,
+        meta_description=article.meta_description,
+        og_image_url=article.og_image_url,
+        reading_time=article.reading_time,
     )
 
 

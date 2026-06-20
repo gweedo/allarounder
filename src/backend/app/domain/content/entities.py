@@ -19,6 +19,13 @@ class Article:
     publish_at: datetime | None = field(default=None)
     slug_locked: bool = field(default=False)
     spotify_url: str | None = field(default=None)
+    excerpt: str | None = field(default=None)
+    cover_image_url: str | None = field(default=None)
+    cover_image_alt: str | None = field(default=None)
+    meta_title: str | None = field(default=None)
+    meta_description: str | None = field(default=None)
+    og_image_url: str | None = field(default=None)
+    reading_time: int | None = field(default=None)
 
     def set_slug(self, new_slug: Slug) -> None:
         if self.slug_locked:

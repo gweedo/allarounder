@@ -3,6 +3,10 @@ import re
 import unicodedata
 from dataclasses import dataclass
 
+_SPOTIFY_PATTERN = re.compile(
+    r"^https://open\.spotify\.com/(episode|show|track)/[A-Za-z0-9]+$"
+)
+
 
 class PublicationStatus(enum.Enum):
     draft = "draft"
@@ -38,6 +42,22 @@ class Slug:
 @dataclass(frozen=True)
 class Body:
     value: str
+
+    def reading_time_minutes(self) -> int:
+        words = len(self.value.split())
+        return max(1, round(words / 200))
+
+    def __str__(self) -> str:
+        return self.value
+
+
+@dataclass(frozen=True)
+class SpotifyUrl:
+    value: str
+
+    def __post_init__(self) -> None:
+        if not _SPOTIFY_PATTERN.match(self.value):
+            raise ValueError(f"Invalid Spotify URL: {self.value!r}")
 
     def __str__(self) -> str:
         return self.value

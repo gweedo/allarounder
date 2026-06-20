@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
 interface Article {
@@ -12,11 +12,20 @@ interface Article {
   slug_locked: boolean;
   publish_at: string | null;
   spotify_url: string | null;
+  excerpt: string | null;
+  cover_image_url: string | null;
+  cover_image_alt: string | null;
+  meta_title: string | null;
+  meta_description: string | null;
+  og_image_url: string | null;
+  reading_time: number | null;
 }
 
 interface Props {
   params: Promise<{ id: string }>;
 }
+
+const MAX_FILE_SIZE = 10 * 1024 * 1024;
 
 export default function EditArticlePage({ params }: Props) {
   const router = useRouter();
@@ -25,9 +34,18 @@ export default function EditArticlePage({ params }: Props) {
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [slug, setSlug] = useState("");
+  const [excerpt, setExcerpt] = useState("");
+  const [spotifyUrl, setSpotifyUrl] = useState("");
+  const [coverImageUrl, setCoverImageUrl] = useState("");
+  const [coverImageAlt, setCoverImageAlt] = useState("");
+  const [metaTitle, setMetaTitle] = useState("");
+  const [metaDescription, setMetaDescription] = useState("");
+  const [ogImageUrl, setOgImageUrl] = useState("");
+  const [uploadProgress, setUploadProgress] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     params.then(({ id }) => setArticleId(id));
@@ -45,10 +63,59 @@ export default function EditArticlePage({ params }: Props) {
         setTitle(data.title);
         setBody(data.body);
         setSlug(data.slug);
+        setExcerpt(data.excerpt ?? "");
+        setSpotifyUrl(data.spotify_url ?? "");
+        setCoverImageUrl(data.cover_image_url ?? "");
+        setCoverImageAlt(data.cover_image_alt ?? "");
+        setMetaTitle(data.meta_title ?? "");
+        setMetaDescription(data.meta_description ?? "");
+        setOgImageUrl(data.og_image_url ?? "");
       })
       .catch((err: Error) => setError(err.message))
       .finally(() => setLoading(false));
   }, [articleId]);
+
+  const handleCoverImageUpload = useCallback(async (file: File) => {
+    if (file.size > MAX_FILE_SIZE) {
+      setError("L'immagine è troppo grande (max 10 MB).");
+      return;
+    }
+    setUploadProgress("Caricamento...");
+    setError(null);
+    try {
+      const previewBytes = await file.slice(0, 512).arrayBuffer();
+      const preview = btoa(String.fromCharCode(...new Uint8Array(previewBytes)));
+      const sasRes = await fetch("/api/admin/media/sas", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ filename: file.name, size: file.size, preview }),
+        credentials: "include",
+      });
+      if (!sasRes.ok) {
+        const data = await sasRes.json().catch(() => ({}));
+        setError((data as { detail?: string }).detail ?? "Tipo file non supportato.");
+        return;
+      }
+      const { sas_url, blob_url } = (await sasRes.json()) as {
+        sas_url: string;
+        blob_url: string;
+      };
+      const uploadRes = await fetch(sas_url, {
+        method: "PUT",
+        headers: { "x-ms-blob-type": "BlockBlob", "Content-Type": file.type },
+        body: file,
+      });
+      if (!uploadRes.ok) {
+        setError("Errore nel caricamento dell'immagine su Azure.");
+        return;
+      }
+      setCoverImageUrl(blob_url);
+      setUploadProgress(null);
+    } catch {
+      setError("Errore di rete durante il caricamento.");
+      setUploadProgress(null);
+    }
+  }, []);
 
   async function handleSave(e: FormEvent) {
     e.preventDefault();
@@ -63,6 +130,13 @@ export default function EditArticlePage({ params }: Props) {
           title,
           body,
           slug: article.slug_locked ? undefined : slug,
+          excerpt: excerpt || undefined,
+          spotify_url: spotifyUrl || undefined,
+          cover_image_url: coverImageUrl || undefined,
+          cover_image_alt: coverImageAlt || undefined,
+          meta_title: metaTitle || undefined,
+          meta_description: metaDescription || undefined,
+          og_image_url: ogImageUrl || undefined,
         }),
         credentials: "include",
       });
@@ -131,6 +205,11 @@ export default function EditArticlePage({ params }: Props) {
       <h1>Modifica articolo</h1>
       <p>
         Stato: <strong>{article.status}</strong>
+        {article.reading_time && (
+          <span style={{ marginLeft: "1rem", color: "#666" }}>
+            {article.reading_time} min di lettura
+          </span>
+        )}
       </p>
       {error && (
         <p role="alert" style={{ color: "red" }}>
@@ -173,6 +252,20 @@ export default function EditArticlePage({ params }: Props) {
           )}
         </div>
         <div style={{ marginTop: "1rem" }}>
+          <label htmlFor="excerpt">
+            Estratto ({excerpt.length}/300)
+          </label>
+          <br />
+          <textarea
+            id="excerpt"
+            rows={3}
+            maxLength={300}
+            value={excerpt}
+            onChange={(e) => setExcerpt(e.target.value)}
+            style={{ width: "100%", marginTop: "0.25rem" }}
+          />
+        </div>
+        <div style={{ marginTop: "1rem" }}>
           <label htmlFor="body">Testo (Markdown)</label>
           <br />
           <textarea
@@ -183,6 +276,93 @@ export default function EditArticlePage({ params }: Props) {
             style={{ width: "100%", marginTop: "0.25rem", fontFamily: "monospace" }}
           />
         </div>
+        <div style={{ marginTop: "1rem" }}>
+          <label htmlFor="cover-image">Immagine di copertina</label>
+          <br />
+          <input
+            id="cover-image"
+            ref={fileInputRef}
+            type="file"
+            accept="image/jpeg,image/png,image/webp,image/gif"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) void handleCoverImageUpload(file);
+            }}
+            style={{ marginTop: "0.25rem" }}
+          />
+          {uploadProgress && <span style={{ marginLeft: "0.5rem" }}>{uploadProgress}</span>}
+          {coverImageUrl && (
+            <div style={{ marginTop: "0.5rem" }}>
+              <img src={coverImageUrl} alt="Anteprima copertina" style={{ maxHeight: 120 }} />
+            </div>
+          )}
+        </div>
+        <div style={{ marginTop: "1rem" }}>
+          <label htmlFor="cover-alt">Alt testo copertina</label>
+          <br />
+          <input
+            id="cover-alt"
+            type="text"
+            maxLength={160}
+            value={coverImageAlt}
+            onChange={(e) => setCoverImageAlt(e.target.value)}
+            style={{ width: "100%", marginTop: "0.25rem" }}
+          />
+        </div>
+        <div style={{ marginTop: "1rem" }}>
+          <label htmlFor="spotify-url">URL Spotify (episodio)</label>
+          <br />
+          <input
+            id="spotify-url"
+            type="url"
+            value={spotifyUrl}
+            onChange={(e) => setSpotifyUrl(e.target.value)}
+            placeholder="https://open.spotify.com/episode/..."
+            style={{ width: "100%", marginTop: "0.25rem" }}
+          />
+        </div>
+        <fieldset style={{ marginTop: "1.5rem", border: "1px solid #ccc", padding: "1rem" }}>
+          <legend>SEO / Open Graph</legend>
+          <div>
+            <label htmlFor="meta-title">
+              Meta titolo ({metaTitle.length}/60)
+            </label>
+            <br />
+            <input
+              id="meta-title"
+              type="text"
+              maxLength={60}
+              value={metaTitle}
+              onChange={(e) => setMetaTitle(e.target.value)}
+              style={{ width: "100%", marginTop: "0.25rem" }}
+            />
+          </div>
+          <div style={{ marginTop: "0.75rem" }}>
+            <label htmlFor="meta-desc">
+              Meta descrizione ({metaDescription.length}/160)
+            </label>
+            <br />
+            <textarea
+              id="meta-desc"
+              rows={3}
+              maxLength={160}
+              value={metaDescription}
+              onChange={(e) => setMetaDescription(e.target.value)}
+              style={{ width: "100%", marginTop: "0.25rem" }}
+            />
+          </div>
+          <div style={{ marginTop: "0.75rem" }}>
+            <label htmlFor="og-image">OG Image URL</label>
+            <br />
+            <input
+              id="og-image"
+              type="url"
+              value={ogImageUrl}
+              onChange={(e) => setOgImageUrl(e.target.value)}
+              style={{ width: "100%", marginTop: "0.25rem" }}
+            />
+          </div>
+        </fieldset>
         <button type="submit" disabled={saving} style={{ marginTop: "1.5rem" }}>
           {saving ? "…" : "Salva"}
         </button>

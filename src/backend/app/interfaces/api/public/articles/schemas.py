@@ -12,6 +12,13 @@ class PublicArticleResponse(BaseModel):
     author_id: UUID
     publish_at: datetime
     spotify_url: str | None = None
+    excerpt: str | None = None
+    cover_image_url: str | None = None
+    cover_image_alt: str | None = None
+    meta_title: str | None = None
+    meta_description: str | None = None
+    og_image_url: str | None = None
+    reading_time: int | None = None
 
 
 class PublicArticleListResponse(BaseModel):

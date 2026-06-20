@@ -7,6 +7,8 @@ from pydantic import BaseModel
 class CreateArticleRequest(BaseModel):
     title: str
     body: str = ""
+    excerpt: str | None = None
+    spotify_url: str | None = None
 
 
 class UpdateArticleRequest(BaseModel):
@@ -15,6 +17,12 @@ class UpdateArticleRequest(BaseModel):
     slug: str | None = None
     publish_at: datetime | None = None
     spotify_url: str | None = None
+    excerpt: str | None = None
+    cover_image_url: str | None = None
+    cover_image_alt: str | None = None
+    meta_title: str | None = None
+    meta_description: str | None = None
+    og_image_url: str | None = None
 
 
 class ArticleResponse(BaseModel):
@@ -29,6 +37,13 @@ class ArticleResponse(BaseModel):
     publish_at: datetime | None = None
     slug_locked: bool = False
     spotify_url: str | None = None
+    excerpt: str | None = None
+    cover_image_url: str | None = None
+    cover_image_alt: str | None = None
+    meta_title: str | None = None
+    meta_description: str | None = None
+    og_image_url: str | None = None
+    reading_time: int | None = None
 
 
 class ArticleListResponse(BaseModel):

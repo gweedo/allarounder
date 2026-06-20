@@ -15,6 +15,13 @@ const DRAFT_ARTICLE = {
   slug_locked: false,
   publish_at: null,
   spotify_url: null,
+  excerpt: null,
+  cover_image_url: null,
+  cover_image_alt: null,
+  meta_title: null,
+  meta_description: null,
+  og_image_url: null,
+  reading_time: null,
 };
 
 const PUBLISHED_ARTICLE = {
@@ -42,7 +49,7 @@ describe("EditArticlePage", () => {
     render(<EditArticlePage params={mockParams("art-1")} />);
     expect(screen.getByText(/caricamento/i)).toBeInTheDocument();
     await waitFor(() => {
-      expect(screen.getByLabelText(/titolo/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/^titolo$/i)).toBeInTheDocument();
     });
   });
 

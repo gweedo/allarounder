@@ -25,6 +25,13 @@ def _model_to_article(m: ArticleModel) -> Article:
         publish_at=m.publish_at,
         slug_locked=m.slug_locked,
         spotify_url=m.spotify_url,
+        excerpt=m.excerpt,
+        cover_image_url=m.cover_image_url,
+        cover_image_alt=m.cover_image_alt,
+        meta_title=m.meta_title,
+        meta_description=m.meta_description,
+        og_image_url=m.og_image_url,
+        reading_time=m.reading_time,
     )
 
 
@@ -45,6 +52,13 @@ class SqlArticleRepository:
             updated_at=article.updated_at,
             slug_locked=article.slug_locked,
             spotify_url=article.spotify_url,
+            excerpt=article.excerpt,
+            cover_image_url=article.cover_image_url,
+            cover_image_alt=article.cover_image_alt,
+            meta_title=article.meta_title,
+            meta_description=article.meta_description,
+            og_image_url=article.og_image_url,
+            reading_time=article.reading_time,
         )
         self._session.add(m)
 
@@ -68,6 +82,13 @@ class SqlArticleRepository:
         m.updated_at = article.updated_at
         m.slug_locked = article.slug_locked
         m.spotify_url = article.spotify_url
+        m.excerpt = article.excerpt
+        m.cover_image_url = article.cover_image_url
+        m.cover_image_alt = article.cover_image_alt
+        m.meta_title = article.meta_title
+        m.meta_description = article.meta_description
+        m.og_image_url = article.og_image_url
+        m.reading_time = article.reading_time
 
     def list_all(
         self,

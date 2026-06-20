@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { remark } from "remark";
 import remarkRehype from "remark-rehype";
@@ -14,6 +15,13 @@ interface Article {
   author_id: string;
   publish_at: string;
   spotify_url: string | null;
+  excerpt: string | null;
+  cover_image_url: string | null;
+  cover_image_alt: string | null;
+  meta_title: string | null;
+  meta_description: string | null;
+  og_image_url: string | null;
+  reading_time: number | null;
 }
 
 async function getArticle(slug: string): Promise<Article | null> {
@@ -42,6 +50,29 @@ interface Props {
   params: Promise<{ slug: string }>;
 }
 
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params;
+  const article = await getArticle(slug);
+  if (!article) return {};
+
+  const title = article.meta_title ?? `${article.title} — Allarounder`;
+  const description = article.meta_description ?? article.excerpt ?? undefined;
+  const ogImage = article.og_image_url ?? article.cover_image_url ?? undefined;
+  const url = `https://allarounder.it/articoli/${article.slug}`;
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      images: ogImage ? [{ url: ogImage }] : undefined,
+      type: "article",
+      url,
+    },
+  };
+}
+
 export default async function ArticlePage({ params }: Props) {
   const { slug } = await params;
   const article = await getArticle(slug);
@@ -52,10 +83,27 @@ export default async function ArticlePage({ params }: Props) {
   return (
     <main style={{ maxWidth: 800, margin: "2rem auto", padding: "0 1rem" }}>
       <article>
+        {article.cover_image_url && (
+          <img
+            src={article.cover_image_url}
+            alt={article.cover_image_alt ?? `Copertina articolo: ${article.title}`}
+            style={{ width: "100%", borderRadius: "8px", marginBottom: "1.5rem" }}
+          />
+        )}
         <h1>{article.title}</h1>
         <time dateTime={article.publish_at}>
           {new Date(article.publish_at).toLocaleDateString("it-IT")}
         </time>
+        {article.reading_time && (
+          <span style={{ marginLeft: "1rem", color: "#666" }}>
+            {article.reading_time} min di lettura
+          </span>
+        )}
+        {article.excerpt && (
+          <p style={{ fontStyle: "italic", marginTop: "1rem", color: "#555" }}>
+            {article.excerpt}
+          </p>
+        )}
         <div
           className="article-body"
           dangerouslySetInnerHTML={{ __html: bodyHtml }}

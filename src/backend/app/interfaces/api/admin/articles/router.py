@@ -50,6 +50,13 @@ def _to_response(article: Article) -> ArticleResponse:
         publish_at=article.publish_at,
         slug_locked=article.slug_locked,
         spotify_url=article.spotify_url,
+        excerpt=article.excerpt,
+        cover_image_url=article.cover_image_url,
+        cover_image_alt=article.cover_image_alt,
+        meta_title=article.meta_title,
+        meta_description=article.meta_description,
+        og_image_url=article.og_image_url,
+        reading_time=article.reading_time,
     )
 
 
@@ -65,6 +72,8 @@ def create_article(
             title=body.title,
             author_id=uuid.UUID(current_user.user_id),
             body=body.body,
+            excerpt=body.excerpt,
+            spotify_url=body.spotify_url,
         )
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(e))
@@ -123,6 +132,12 @@ def update_article(
             slug=body.slug,
             publish_at=body.publish_at,
             spotify_url=body.spotify_url,
+            excerpt=body.excerpt,
+            cover_image_url=body.cover_image_url,
+            cover_image_alt=body.cover_image_alt,
+            meta_title=body.meta_title,
+            meta_description=body.meta_description,
+            og_image_url=body.og_image_url,
         )
     except ArticleNotFoundError:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Article not found")

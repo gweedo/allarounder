@@ -31,6 +31,13 @@ const BASE_ARTICLE = {
   author_id: "user-1",
   publish_at: "2026-06-01T00:00:00Z",
   spotify_url: null as string | null,
+  excerpt: null as string | null,
+  cover_image_url: null as string | null,
+  cover_image_alt: null as string | null,
+  meta_title: null as string | null,
+  meta_description: null as string | null,
+  og_image_url: null as string | null,
+  reading_time: null as number | null,
 };
 
 beforeEach(() => {
@@ -89,6 +96,18 @@ describe("ArticlePage", () => {
       "href",
       "https://open.spotify.com/episode/abc"
     );
+  });
+
+  it("renders cover image when cover_image_url is set", async () => {
+    await renderArticlePage({
+      ...BASE_ARTICLE,
+      cover_image_url: "https://cdn.allarounder.it/images/copertina.jpg",
+      cover_image_alt: "Copertina episodio sport",
+    });
+    const img = document.querySelector("img");
+    expect(img).toBeTruthy();
+    expect(img?.getAttribute("src")).toBe("https://cdn.allarounder.it/images/copertina.jpg");
+    expect(img?.getAttribute("alt")).toBe("Copertina episodio sport");
   });
 
   it("calls notFound when article fetch fails", async () => {
