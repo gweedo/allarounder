@@ -7,6 +7,17 @@ from app.domain.content.value_objects import Body, PublicationStatus, Slug
 
 
 @dataclass
+class StaticPage:
+    id: uuid.UUID
+    title: str
+    slug: Slug
+    body: str
+    updated_at: datetime
+    meta_title: str | None = field(default=None)
+    meta_description: str | None = field(default=None)
+
+
+@dataclass
 class Author:
     id: uuid.UUID
     name: str

@@ -8,17 +8,58 @@ from datetime import datetime
 from sqlalchemy import delete, insert, select
 from sqlalchemy.orm import Session
 
-from app.domain.content.entities import Article, Author, Category, Guest, Tag
+from app.domain.content.entities import Article, Author, Category, Guest, StaticPage, Tag
+from app.domain.content.exceptions import PageNotFoundError
 from app.domain.content.value_objects import Body, PublicationStatus, Slug
 from app.infrastructure.content.models import (
     ArticleModel,
     AuthorModel,
     CategoryModel,
     GuestModel,
+    StaticPageModel,
     TagModel,
     article_guests,
     article_tags,
 )
+
+
+def _model_to_page(m: StaticPageModel) -> StaticPage:
+    return StaticPage(
+        id=m.id,
+        title=m.title,
+        slug=Slug(m.slug),
+        body=m.body,
+        updated_at=m.updated_at,
+        meta_title=m.meta_title,
+        meta_description=m.meta_description,
+    )
+
+
+class SqlPageRepository:
+    def __init__(self, session: Session) -> None:
+        self._session = session
+
+    def get_by_id(self, page_id: uuid.UUID) -> StaticPage | None:
+        m = self._session.get(StaticPageModel, page_id)
+        return _model_to_page(m) if m else None
+
+    def get_by_slug(self, slug: str) -> StaticPage | None:
+        m = self._session.query(StaticPageModel).filter_by(slug=slug).one_or_none()
+        return _model_to_page(m) if m else None
+
+    def list_all(self) -> list[StaticPage]:
+        rows = self._session.query(StaticPageModel).order_by(StaticPageModel.title).all()
+        return [_model_to_page(r) for r in rows]
+
+    def save(self, page: StaticPage) -> None:
+        m = self._session.get(StaticPageModel, page.id)
+        if m is None:
+            raise PageNotFoundError(f"StaticPage {page.id} not found in database")
+        m.title = page.title
+        m.body = page.body
+        m.meta_title = page.meta_title
+        m.meta_description = page.meta_description
+        m.updated_at = page.updated_at
 
 
 def _model_to_guest(m: GuestModel) -> Guest:

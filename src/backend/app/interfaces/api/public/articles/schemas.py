@@ -35,6 +35,7 @@ class PublicArticleResponse(BaseModel):
     body: str
     author_id: UUID
     publish_at: datetime
+    updated_at: datetime
     spotify_url: str | None = None
     excerpt: str | None = None
     cover_image_url: str | None = None

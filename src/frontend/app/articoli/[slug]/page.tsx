@@ -38,6 +38,7 @@ interface Article {
   body: string;
   author_id: string;
   publish_at: string;
+  updated_at: string;
   spotify_url: string | null;
   excerpt: string | null;
   cover_image_url: string | null;
@@ -91,6 +92,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title,
     description,
+    alternates: { canonical: url },
     openGraph: {
       title,
       description,
@@ -107,9 +109,32 @@ export default async function ArticlePage({ params }: Props) {
   if (!article) notFound();
 
   const bodyHtml = await renderMarkdown(article.body);
+  const url = `https://allarounder.it/articoli/${article.slug}`;
+
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: article.title,
+    datePublished: article.publish_at,
+    dateModified: article.updated_at,
+    url,
+    ...(article.author_profile
+      ? { author: { "@type": "Person", name: article.author_profile.name } }
+      : {}),
+    ...(article.cover_image_url ? { image: article.cover_image_url } : {}),
+    publisher: {
+      "@type": "Organization",
+      name: "Allarounder",
+      url: "https://allarounder.it",
+    },
+  };
 
   return (
     <main style={{ maxWidth: 800, margin: "2rem auto", padding: "0 1rem" }}>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <article>
         {article.cover_image_url && (
           <img

@@ -34,6 +34,7 @@ def get_preview_article(
         body=article.body.value,
         author_id=article.author_id,
         publish_at=article.publish_at or article.updated_at,
+        updated_at=article.updated_at,
         spotify_url=article.spotify_url,
         excerpt=article.excerpt,
         cover_image_url=article.cover_image_url,

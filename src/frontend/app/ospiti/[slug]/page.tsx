@@ -51,6 +51,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: `${data.name} — Allarounder`,
     description: data.bio ?? `Articoli con ${data.name} su Allarounder`,
+    alternates: { canonical: `https://allarounder.it/ospiti/${data.slug}` },
   };
 }
 

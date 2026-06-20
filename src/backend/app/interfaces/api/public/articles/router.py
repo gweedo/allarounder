@@ -87,6 +87,7 @@ def _to_response(
         body=article.body.value,
         author_id=article.author_id,
         publish_at=article.publish_at,  # type: ignore[arg-type]
+        updated_at=article.updated_at,
         spotify_url=article.spotify_url,
         excerpt=article.excerpt,
         cover_image_url=article.cover_image_url,
@@ -107,6 +108,7 @@ def _to_response(
 def list_public_articles(
     repo: Annotated[SqlArticleRepository, Depends(get_article_repo)],
     category_repo: Annotated[SqlCategoryRepository, Depends(get_category_repo)],
+    author_repo: Annotated[SqlAuthorRepository, Depends(get_author_repo)],
     page: int = 1,
     page_size: int = 20,
     category: str | None = None,
@@ -122,6 +124,7 @@ def list_public_articles(
         before=now, category_id=category_id, page=page, page_size=page_size
     )
     cat_cache: dict[uuid.UUID, Category | None] = {}
+    author_cache: dict[uuid.UUID, Author | None] = {}
     responses = []
     for a in articles:
         cat_obj: Category | None = None
@@ -129,7 +132,12 @@ def list_public_articles(
             if a.category_id not in cat_cache:
                 cat_cache[a.category_id] = category_repo.get_by_id(a.category_id)
             cat_obj = cat_cache[a.category_id]
-        responses.append(_to_response(a, cat_obj))
+        author_obj: Author | None = None
+        if a.author_profile_id is not None:
+            if a.author_profile_id not in author_cache:
+                author_cache[a.author_profile_id] = author_repo.get_by_id(a.author_profile_id)
+            author_obj = author_cache[a.author_profile_id]
+        responses.append(_to_response(a, cat_obj, author=author_obj))
     return PublicArticleListResponse(
         items=responses,
         total=total,

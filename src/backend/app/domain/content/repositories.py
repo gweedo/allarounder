@@ -4,8 +4,15 @@ import uuid
 from datetime import datetime
 from typing import Protocol
 
-from app.domain.content.entities import Article, Author, Category, Guest, Tag
+from app.domain.content.entities import Article, Author, Category, Guest, StaticPage, Tag
 from app.domain.content.value_objects import PublicationStatus
+
+
+class PageRepository(Protocol):
+    def get_by_id(self, page_id: uuid.UUID) -> StaticPage | None: ...
+    def get_by_slug(self, slug: str) -> StaticPage | None: ...
+    def list_all(self) -> list[StaticPage]: ...
+    def save(self, page: StaticPage) -> None: ...
 
 
 class AuthorRepository(Protocol):

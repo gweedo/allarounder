@@ -48,6 +48,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: `${data.name} — Allarounder`,
     description: `Articoli con il tag "${data.name}"`,
+    alternates: { canonical: `https://allarounder.it/tag/${data.slug}` },
   };
 }
 

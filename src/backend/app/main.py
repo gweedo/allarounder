@@ -9,6 +9,7 @@ from app.interfaces.api.admin.authors.router import router as admin_authors_rout
 from app.interfaces.api.admin.categories.router import router as admin_categories_router
 from app.interfaces.api.admin.guests.router import router as admin_guests_router
 from app.interfaces.api.admin.media.router import router as media_router
+from app.interfaces.api.admin.pages.router import router as admin_pages_router
 from app.interfaces.api.admin.tags.router import router as admin_tags_router
 from app.interfaces.api.auth.router import router as auth_router
 from app.interfaces.api.health import router as health_router
@@ -17,6 +18,7 @@ from app.interfaces.api.public.articles.router import router as public_articles_
 from app.interfaces.api.public.authors.router import router as public_authors_router
 from app.interfaces.api.public.categories.router import router as public_categories_router
 from app.interfaces.api.public.guests.router import router as public_guests_router
+from app.interfaces.api.public.pages.router import router as public_pages_router
 from app.interfaces.api.public.tags.router import router as public_tags_router
 from app.settings import get_settings
 
@@ -44,8 +46,10 @@ app.include_router(admin_guests_router)
 app.include_router(admin_tags_router)
 app.include_router(media_router)
 app.include_router(preview_router)
+app.include_router(admin_pages_router)
 app.include_router(public_articles_router)
 app.include_router(public_authors_router)
 app.include_router(public_categories_router)
 app.include_router(public_guests_router)
+app.include_router(public_pages_router)
 app.include_router(public_tags_router)

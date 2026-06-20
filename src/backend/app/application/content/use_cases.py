@@ -1,13 +1,14 @@
 import uuid
 from datetime import UTC, datetime
 
-from app.domain.content.entities import Article, Author, Category, Guest, Tag
-from app.domain.content.exceptions import ArticleNotFoundError
+from app.domain.content.entities import Article, Author, Category, Guest, StaticPage, Tag
+from app.domain.content.exceptions import ArticleNotFoundError, PageNotFoundError
 from app.domain.content.repositories import (
     ArticleRepository,
     AuthorRepository,
     CategoryRepository,
     GuestRepository,
+    PageRepository,
     TagRepository,
 )
 from app.domain.content.value_objects import Body, PublicationStatus, Slug, SpotifyUrl
@@ -27,6 +28,46 @@ class CategoryNotFoundError(Exception):
 
 class TagNotFoundError(Exception):
     pass
+
+
+class GetPage:
+    def __init__(self, repo: PageRepository) -> None:
+        self._repo = repo
+
+    def execute(self, *, slug: str) -> StaticPage:
+        page = self._repo.get_by_slug(slug)
+        if page is None:
+            raise PageNotFoundError(f"Page '{slug}' not found")
+        return page
+
+
+class UpdatePage:
+    def __init__(self, repo: PageRepository) -> None:
+        self._repo = repo
+
+    def execute(
+        self,
+        *,
+        page_id: uuid.UUID,
+        title: str | None = None,
+        body: str | None = None,
+        meta_title: str | None = None,
+        meta_description: str | None = None,
+    ) -> StaticPage:
+        page = self._repo.get_by_id(page_id)
+        if page is None:
+            raise PageNotFoundError(f"Page {page_id} not found")
+        if title is not None:
+            page.title = title
+        if body is not None:
+            page.body = body
+        if meta_title is not None:
+            page.meta_title = meta_title
+        if meta_description is not None:
+            page.meta_description = meta_description
+        page.updated_at = datetime.now(tz=UTC)
+        self._repo.save(page)
+        return page
 
 
 class CreateAuthor:

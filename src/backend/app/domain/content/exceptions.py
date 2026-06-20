@@ -8,3 +8,7 @@ class SlugLockedError(ContentError):
 
 class ArticleNotFoundError(ContentError):
     pass
+
+
+class PageNotFoundError(ContentError):
+    pass
