@@ -26,6 +26,11 @@ node_modules/
 .next/
 out/
 npm-debug.log*
+coverage/
+tsconfig.tsbuildinfo
+
+# Bicep compiled ARM output
+infra/main.json
 
 # Environment
 .env

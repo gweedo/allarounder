@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { FormEvent, useEffect, useState } from "react";
 
 interface Author {
@@ -101,7 +102,7 @@ export default function AdminAuthorsPage() {
                 </span>
               </div>
               <div style={{ display: "flex", gap: "0.5rem" }}>
-                <a href={`/admin/authors/${author.id}`}>Modifica</a>
+                <Link href={`/admin/authors/${author.id}`}>Modifica</Link>
                 <button
                   type="button"
                   onClick={() => void handleDelete(author.id)}

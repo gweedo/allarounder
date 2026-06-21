@@ -1,8 +1,6 @@
 param location string
 param serverName string
 param databaseName string = 'allarounder'
-param entraAdminName string
-param entraAdminObjectId string
 param skuName string = 'Standard_B1ms'
 param skuTier string = 'Burstable'
 param storageSizeGB int = 32
@@ -41,17 +39,6 @@ resource database 'Microsoft.DBforPostgreSQL/flexibleServers/databases@2024-08-0
   properties: {
     charset: 'UTF8'
     collation: 'en_US.utf8'
-  }
-}
-
-// Entra admin for the PostgreSQL server (service principal used by CI/CD and admins)
-resource entraAdmin 'Microsoft.DBforPostgreSQL/flexibleServers/administrators@2024-08-01' = {
-  parent: postgres
-  name: entraAdminObjectId
-  properties: {
-    principalType: 'ServicePrincipal'
-    principalName: entraAdminName
-    tenantId: subscription().tenantId
   }
 }
 

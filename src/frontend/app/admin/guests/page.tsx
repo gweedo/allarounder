@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { FormEvent, useEffect, useState } from "react";
 
 interface Guest {
@@ -100,7 +101,7 @@ export default function AdminGuestsPage() {
                 </span>
               </div>
               <div style={{ display: "flex", gap: "0.5rem" }}>
-                <a href={`/admin/guests/${guest.id}`}>Modifica</a>
+                <Link href={`/admin/guests/${guest.id}`}>Modifica</Link>
                 <button
                   type="button"
                   onClick={() => void handleDelete(guest.id)}

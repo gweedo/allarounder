@@ -9,17 +9,17 @@ param deployAcr = true
 
 // Key Vault name: 3-24 chars, globally unique
 // Update <suffix> with the last 5 chars of your resource group ID for uniqueness
-param keyVaultName = 'alla-stg-kv-<suffix>'
+param keyVaultName = 'alla-stg-kv-fc2a7'
 
 // PostgreSQL server name: globally unique, lowercase alphanumeric and hyphens
-param postgresServerName = 'allarounder-stg-pg-<suffix>'
+param postgresServerName = 'allarounder-stg-pg-fc2a7'
 
 // Storage account: 3-24 chars, lowercase alphanumeric, globally unique
-param storageAccountName = 'allastg<suffix>'
+param storageAccountName = 'allastgfc2a7'
 
 // Entra admin for PostgreSQL — set to the Object ID of the GitHub CI service principal
 // az ad sp show --id <client-id> --query id -o tsv
-param postgresEntraAdminObjectId = '<github-ci-sp-object-id>'
+param postgresEntraAdminObjectId = 'fabc8249-dce9-4d86-a12b-48a67539a9f2'
 param postgresEntraAdminName = 'allarounder-ci-stg'
 
 // Images: updated by CI/CD on each deploy; use placeholder for first provision

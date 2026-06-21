@@ -17,6 +17,9 @@ param acrName string
 @description('Whether to deploy ACR (true for staging; false for production when reusing staging ACR)')
 param deployAcr bool = true
 
+@description('Resource group that holds the ACR when reusing an existing one (production reuses staging ACR)')
+param acrResourceGroup string = 'allarounder-staging'
+
 @description('Key Vault name (3-24 chars, globally unique)')
 param keyVaultName string
 
@@ -70,13 +73,13 @@ module acr './modules/acr.bicep' = if (deployAcr) {
   }
 }
 
-// When reusing the staging ACR in production, reference it as existing
+// When reusing the staging ACR in production, reference it as existing in its source RG
 resource acrExisting 'Microsoft.ContainerRegistry/registries@2023-07-01' existing = if (!deployAcr) {
   name: acrName
+  scope: resourceGroup(acrResourceGroup)
 }
 
-var acrLoginServer = deployAcr ? acr.outputs.acrLoginServer : acrExisting.properties.loginServer
-var acrId = deployAcr ? acr.outputs.acrId : acrExisting.id
+var acrLoginServer = deployAcr ? acr!.outputs.acrLoginServer : acrExisting!.properties.loginServer
 
 // ── Key Vault ─────────────────────────────────────────────────────────────────
 
@@ -88,12 +91,32 @@ module keyvault './modules/keyvault.bicep' = {
   }
 }
 
+// ── Managed Identities ───────────────────────────────────────────────────────
+
+module identity './modules/identity.bicep' = {
+  name: 'identity'
+  params: {
+    env: env
+    location: location
+  }
+}
+
 // ── PostgreSQL ────────────────────────────────────────────────────────────────
 
 module postgres './modules/postgres.bicep' = {
   name: 'postgres'
   params: {
     location: location
+    serverName: postgresServerName
+  }
+}
+
+// Deployed as a separate module so ARM fully completes the postgres server PUT
+// (server returns to Ready) before attempting the Entra auth operation.
+module postgresAdmin './modules/postgres-admin.bicep' = {
+  name: 'postgres-admin'
+  dependsOn: [postgres]
+  params: {
     serverName: postgresServerName
     entraAdminObjectId: postgresEntraAdminObjectId
     entraAdminName: postgresEntraAdminName
@@ -110,18 +133,31 @@ module storage './modules/storage.bicep' = {
   }
 }
 
+// ── ACR pull role assignments ─────────────────────────────────────────────────
+// Runs BEFORE container-apps so the managed identities already have AcrPull
+// when the Container Apps start and try to authenticate with the registry.
+
+module acrPullAssignments './modules/acr-pull-assignments.bicep' = {
+  name: 'acr-pull-assignments'
+  scope: resourceGroup(acrResourceGroup)
+  params: {
+    acrName: acrName
+    backendIdentityPrincipalId: identity.outputs.backendIdentityPrincipalId
+    frontendIdentityPrincipalId: identity.outputs.frontendIdentityPrincipalId
+  }
+}
+
 // ── Container Apps ────────────────────────────────────────────────────────────
 
 module containerApps './modules/container-apps.bicep' = {
   name: 'container-apps'
+  dependsOn: [acrPullAssignments]
   params: {
     env: env
     location: location
-    logAnalyticsWorkspaceId: monitoring.outputs.logAnalyticsWorkspaceId
     logAnalyticsCustomerId: monitoring.outputs.logAnalyticsCustomerId
     logAnalyticsSharedKey: monitoring.outputs.logAnalyticsSharedKey
     acrLoginServer: acrLoginServer
-    acrId: acrId
     storageAccountName: storage.outputs.storageAccountName
     storageContainerName: storage.outputs.containerName
     keyVaultUri: keyvault.outputs.keyVaultUri
@@ -133,6 +169,11 @@ module containerApps './modules/container-apps.bicep' = {
     frontendImage: frontendImage
     corsAllowedOrigins: corsAllowedOrigins
     cdnBaseUrl: cdnBaseUrl
+    backendIdentityId: identity.outputs.backendIdentityId
+    backendIdentityName: identity.outputs.backendIdentityName
+    backendIdentityPrincipalId: identity.outputs.backendIdentityPrincipalId
+    backendIdentityClientId: identity.outputs.backendIdentityClientId
+    frontendIdentityId: identity.outputs.frontendIdentityId
   }
 }
 
