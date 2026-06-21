@@ -28,7 +28,8 @@ Before proposing architecture or implementation, read the relevant file rather t
 - **`docs/architecture/adr/`** — Architecture Decision Records (0001–0010), one decision per file, with full rationale, options considered, and consequences. `DECISIONS.md` summarizes; the ADRs are the deep source. See `adr/README.md` for the index.
 - **`docs/architecture/TECH-SPEC.md`** — how the system is built and operated: architecture diagram, backend layering, data-model summary, API surfaces, Azure infra table, CI/CD, testing strategy.
 - **`docs/architecture/SITE-STRUCTURE.md`** — sitemap/URL structure, full field-level data models, complete API endpoint list, article page layout, SEO fields.
-- **`docs/product/content-team-questionnaire.md`** — open product questions being collected from the non-technical content team; the PRD will land at `docs/product/PRD.md` once answered. Does not block engineering.
+- **`docs/product/PRD.md`** — the Product Requirements Document (Draft v1, 2026-06-17): vision, goals, audience, v1 scope, user stories, data model, API surface, build sequence, and testing decisions. The authoritative *what* and *why*.
+- **`docs/product/content-team-questionnaire.md`** — the content-team answers that informed the PRD.
 - **`podcast-blog-website.plugin`** (project root, outside `docs/`) — a zip bundle of Claude Code skills used during planning (decision-tracker, site-structure-designer, content-guidelines, tech-stack-advisor); not application code.
 
 When a decision changes, **add a new ADR that supersedes the old one** and update `docs/DECISIONS.md` — do not rewrite decision history.
