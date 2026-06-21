@@ -91,12 +91,32 @@ module keyvault './modules/keyvault.bicep' = {
   }
 }
 
+// ── Managed Identities ───────────────────────────────────────────────────────
+
+module identity './modules/identity.bicep' = {
+  name: 'identity'
+  params: {
+    env: env
+    location: location
+  }
+}
+
 // ── PostgreSQL ────────────────────────────────────────────────────────────────
 
 module postgres './modules/postgres.bicep' = {
   name: 'postgres'
   params: {
     location: location
+    serverName: postgresServerName
+  }
+}
+
+// Deployed as a separate module so ARM fully completes the postgres server PUT
+// (server returns to Ready) before attempting the Entra auth operation.
+module postgresAdmin './modules/postgres-admin.bicep' = {
+  name: 'postgres-admin'
+  dependsOn: [postgres]
+  params: {
     serverName: postgresServerName
     entraAdminObjectId: postgresEntraAdminObjectId
     entraAdminName: postgresEntraAdminName
@@ -113,10 +133,25 @@ module storage './modules/storage.bicep' = {
   }
 }
 
+// ── ACR pull role assignments ─────────────────────────────────────────────────
+// Runs BEFORE container-apps so the managed identities already have AcrPull
+// when the Container Apps start and try to authenticate with the registry.
+
+module acrPullAssignments './modules/acr-pull-assignments.bicep' = {
+  name: 'acr-pull-assignments'
+  scope: resourceGroup(acrResourceGroup)
+  params: {
+    acrName: acrName
+    backendIdentityPrincipalId: identity.outputs.backendIdentityPrincipalId
+    frontendIdentityPrincipalId: identity.outputs.frontendIdentityPrincipalId
+  }
+}
+
 // ── Container Apps ────────────────────────────────────────────────────────────
 
 module containerApps './modules/container-apps.bicep' = {
   name: 'container-apps'
+  dependsOn: [acrPullAssignments]
   params: {
     env: env
     location: location
@@ -134,18 +169,11 @@ module containerApps './modules/container-apps.bicep' = {
     frontendImage: frontendImage
     corsAllowedOrigins: corsAllowedOrigins
     cdnBaseUrl: cdnBaseUrl
-  }
-}
-
-// ── ACR pull role assignments (runs in ACR's RG to support cross-RG in production) ──
-
-module acrPullAssignments './modules/acr-pull-assignments.bicep' = {
-  name: 'acr-pull-assignments'
-  scope: resourceGroup(acrResourceGroup)
-  params: {
-    acrName: acrName
-    backendIdentityPrincipalId: containerApps.outputs.backendIdentityPrincipalId
-    frontendIdentityPrincipalId: containerApps.outputs.frontendIdentityPrincipalId
+    backendIdentityId: identity.outputs.backendIdentityId
+    backendIdentityName: identity.outputs.backendIdentityName
+    backendIdentityPrincipalId: identity.outputs.backendIdentityPrincipalId
+    backendIdentityClientId: identity.outputs.backendIdentityClientId
+    frontendIdentityId: identity.outputs.frontendIdentityId
   }
 }
 

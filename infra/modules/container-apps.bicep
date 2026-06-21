@@ -16,19 +16,16 @@ param frontendImage string = 'mcr.microsoft.com/azuredocs/containerapps-hellowor
 param corsAllowedOrigins string
 param cdnBaseUrl string
 
+// Identity params — created by identity.bicep before this module runs
+param backendIdentityId string
+param backendIdentityName string
+param backendIdentityPrincipalId string
+param backendIdentityClientId string
+param frontendIdentityId string
+
 // Built-in role IDs
 var storageBlobDataContributorRoleId = 'ba92f5b4-2d11-453d-a403-e96b0029c9fe'
 var keyVaultSecretsUserRoleId = '4633458b-17de-408a-b874-0445c86b69e6'
-
-resource backendIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
-  name: 'allarounder-${env}-backend-id'
-  location: location
-}
-
-resource frontendIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
-  name: 'allarounder-${env}-frontend-id'
-  location: location
-}
 
 // Blob Storage access for backend
 resource storageRef 'Microsoft.Storage/storageAccounts@2023-05-01' existing = {
@@ -36,11 +33,11 @@ resource storageRef 'Microsoft.Storage/storageAccounts@2023-05-01' existing = {
 }
 
 resource backendBlobAccess 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(storageRef.id, backendIdentity.id, storageBlobDataContributorRoleId)
+  name: guid(storageRef.id, backendIdentityId, storageBlobDataContributorRoleId)
   scope: storageRef
   properties: {
     roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', storageBlobDataContributorRoleId)
-    principalId: backendIdentity.properties.principalId
+    principalId: backendIdentityPrincipalId
     principalType: 'ServicePrincipal'
   }
 }
@@ -51,11 +48,11 @@ resource kvRef 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
 }
 
 resource backendKvAccess 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(keyVaultId, backendIdentity.id, keyVaultSecretsUserRoleId)
+  name: guid(keyVaultId, backendIdentityId, keyVaultSecretsUserRoleId)
   scope: kvRef
   properties: {
     roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', keyVaultSecretsUserRoleId)
-    principalId: backendIdentity.properties.principalId
+    principalId: backendIdentityPrincipalId
     principalType: 'ServicePrincipal'
   }
 }
@@ -86,7 +83,7 @@ resource backendApp 'Microsoft.App/containerApps@2024-03-01' = {
   identity: {
     type: 'UserAssigned'
     userAssignedIdentities: {
-      '${backendIdentity.id}': {}
+      '${backendIdentityId}': {}
     }
   }
   properties: {
@@ -103,14 +100,14 @@ resource backendApp 'Microsoft.App/containerApps@2024-03-01' = {
       registries: [
         {
           server: acrLoginServer
-          identity: backendIdentity.id
+          identity: backendIdentityId
         }
       ]
       secrets: [
         {
           name: 'jwt-signing-key'
           keyVaultUrl: '${keyVaultUri}secrets/jwt-signing-key'
-          identity: backendIdentity.id
+          identity: backendIdentityId
         }
       ]
     }
@@ -127,10 +124,10 @@ resource backendApp 'Microsoft.App/containerApps@2024-03-01' = {
             { name: 'APP_ENV', value: env }
             { name: 'LOG_LEVEL', value: 'INFO' }
             { name: 'AZURE_USE_MANAGED_IDENTITY', value: 'true' }
-            { name: 'AZURE_CLIENT_ID', value: backendIdentity.properties.clientId }
+            { name: 'AZURE_CLIENT_ID', value: backendIdentityClientId }
             {
               name: 'DATABASE_URL'
-              value: 'postgresql+psycopg://${backendIdentity.name}@${postgresHost}/${databaseName}?sslmode=require'
+              value: 'postgresql+psycopg://${backendIdentityName}@${postgresHost}/${databaseName}?sslmode=require'
             }
             { name: 'AZURE_STORAGE_ACCOUNT_NAME', value: storageAccountName }
             { name: 'AZURE_STORAGE_CONTAINER_NAME', value: storageContainerName }
@@ -186,7 +183,7 @@ resource frontendApp 'Microsoft.App/containerApps@2024-03-01' = {
   identity: {
     type: 'UserAssigned'
     userAssignedIdentities: {
-      '${frontendIdentity.id}': {}
+      '${frontendIdentityId}': {}
     }
   }
   properties: {
@@ -203,7 +200,7 @@ resource frontendApp 'Microsoft.App/containerApps@2024-03-01' = {
       registries: [
         {
           server: acrLoginServer
-          identity: frontendIdentity.id
+          identity: frontendIdentityId
         }
       ]
     }
@@ -259,7 +256,6 @@ resource frontendApp 'Microsoft.App/containerApps@2024-03-01' = {
       }
     }
   }
-  dependsOn: []
 }
 
 // One-off migration job run before each deployment
@@ -269,7 +265,7 @@ resource migrationJob 'Microsoft.App/jobs@2024-03-01' = {
   identity: {
     type: 'UserAssigned'
     userAssignedIdentities: {
-      '${backendIdentity.id}': {}
+      '${backendIdentityId}': {}
     }
   }
   properties: {
@@ -282,7 +278,7 @@ resource migrationJob 'Microsoft.App/jobs@2024-03-01' = {
       registries: [
         {
           server: acrLoginServer
-          identity: backendIdentity.id
+          identity: backendIdentityId
         }
       ]
     }
@@ -298,10 +294,10 @@ resource migrationJob 'Microsoft.App/jobs@2024-03-01' = {
           }
           env: [
             { name: 'AZURE_USE_MANAGED_IDENTITY', value: 'true' }
-            { name: 'AZURE_CLIENT_ID', value: backendIdentity.properties.clientId }
+            { name: 'AZURE_CLIENT_ID', value: backendIdentityClientId }
             {
               name: 'DATABASE_URL'
-              value: 'postgresql+psycopg://${backendIdentity.name}@${postgresHost}/${databaseName}?sslmode=require'
+              value: 'postgresql+psycopg://${backendIdentityName}@${postgresHost}/${databaseName}?sslmode=require'
             }
           ]
         }
@@ -310,7 +306,6 @@ resource migrationJob 'Microsoft.App/jobs@2024-03-01' = {
   }
 }
 
-
 output backendAppName string = backendApp.name
 output frontendAppName string = frontendApp.name
 output migrationJobName string = migrationJob.name
@@ -318,6 +313,3 @@ output caeId string = cae.id
 output caeName string = cae.name
 output backendFqdn string = backendApp.properties.configuration.ingress.fqdn
 output frontendFqdn string = frontendApp.properties.configuration.ingress.fqdn
-output backendIdentityPrincipalId string = backendIdentity.properties.principalId
-output frontendIdentityPrincipalId string = frontendIdentity.properties.principalId
-output backendIdentityClientId string = backendIdentity.properties.clientId
