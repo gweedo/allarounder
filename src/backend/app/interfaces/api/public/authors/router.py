@@ -57,6 +57,7 @@ def _article_response(a: Article) -> PublicArticleResponse:
         meta_title=a.meta_title,
         meta_description=a.meta_description,
         og_image_url=a.og_image_url,
+        updated_at=a.updated_at,
         reading_time=a.reading_time,
         category_id=a.category_id,
     )
