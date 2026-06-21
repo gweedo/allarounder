@@ -2,6 +2,7 @@
 
 import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { uploadImage, UploadError } from "../../../../lib/upload";
 
@@ -336,7 +337,7 @@ export default function EditArticlePage({ params }: Props) {
           {uploadProgress && <span style={{ marginLeft: "0.5rem" }}>{uploadProgress}</span>}
           {coverImageUrl && (
             <div style={{ marginTop: "0.5rem" }}>
-              <img src={coverImageUrl} alt="Anteprima copertina" style={{ maxHeight: 120 }} />
+              <Image src={coverImageUrl} alt="Anteprima copertina" width={200} height={120} style={{ objectFit: "contain", maxHeight: 120 }} unoptimized />
             </div>
           )}
         </div>

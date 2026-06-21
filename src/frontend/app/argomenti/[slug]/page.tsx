@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 
 export const revalidate = 60;
@@ -76,11 +77,14 @@ export default async function CategoryPage({ params }: Props) {
           {data.articles.map((article) => (
             <li key={article.id} style={{ borderBottom: "1px solid #eee", paddingBottom: "1.5rem" }}>
               {article.cover_image_url && (
-                <img
-                  src={article.cover_image_url}
-                  alt={article.cover_image_alt ?? `Copertina: ${article.title}`}
-                  style={{ width: "100%", maxHeight: 200, objectFit: "cover", borderRadius: 6 }}
-                />
+                <div style={{ position: "relative", width: "100%", height: 200 }}>
+                  <Image
+                    src={article.cover_image_url}
+                    alt={article.cover_image_alt ?? `Copertina: ${article.title}`}
+                    fill
+                    style={{ objectFit: "cover", borderRadius: 6 }}
+                  />
+                </div>
               )}
               <h2 style={{ marginTop: "0.75rem" }}>
                 <a
