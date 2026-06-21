@@ -17,15 +17,7 @@ Both were attempted via `gh api` and returned `HTTP 403 — Upgrade to GitHub Pr
 
 ## Decision
 
-**GitHub server-side branch protection cannot be applied on this account** (GitHub Free, private repo).
-
-Protection is provided by two complementary controls:
-
-1. **Claude Code git guardrails** — a `PreToolUse` hook at `.claude/hooks/block-dangerous-git.sh` intercepts and blocks the following commands before Claude executes them in any session: `git push`, `git reset --hard`, `git clean -f`/`-fd`, `git branch -D`, `git checkout .`, `git restore .`, and `push --force`. Wired in `.claude/settings.json`.
-
-2. **Convention** — all code changes go through a pull request. The CI workflows run their full check suite on every PR; merging a PR with failing checks is visible and requires a deliberate override.
-
-**Deferred:** if the repo is made public or the account upgrades to GitHub Pro, apply the prepared ruleset immediately:
+The repo was made **public** (2026-06-21), which unlocks GitHub rulesets on GitHub Free. A ruleset was applied immediately:
 
 ```bash
 gh api repos/gweedo/allarounder/rulesets \
@@ -33,21 +25,30 @@ gh api repos/gweedo/allarounder/rulesets \
   --input docs/architecture/github-ruleset-main.json
 ```
 
-The ruleset JSON (`docs/architecture/github-ruleset-main.json`) is committed and ready. It enforces: no deletion, no force-push, require PR, require all 6 CI status checks (`Backend CI/CD / lint-and-typecheck`, `test`, `security`; `Frontend CI/CD / lint-and-typecheck`, `test`, `security`), 0 required approving reviews (solo developer), admin bypass actor for non-code PRs.
+**Active ruleset id 17948951** enforces on `refs/heads/main`: no deletion, no force-push, require PR, require all 6 CI status checks to pass (`Backend CI/CD / Lint & type-check`, `Test (pytest)`, `Security scan`; `Frontend CI/CD / Lint & type-check`, `Test (Vitest)`, `Security scan`), 0 required approving reviews (solo developer).
+
+Protection is supplemented by:
+
+1. **Claude Code git guardrails** — a `PreToolUse` hook at `.claude/hooks/block-dangerous-git.sh` intercepts and blocks destructive commands before Claude executes them: `git push`, `git reset --hard`, `git clean -f`/`-fd`, `git branch -D`, `git checkout .`, `git restore .`, `push --force`. Wired in `.claude/settings.json`.
+
+2. **Convention** — all code changes go through a pull request. CI workflows run their full check suite on every PR.
+
+To add an admin bypass actor for non-code PRs that don't trigger path-filtered workflows: **GitHub UI → Settings → Rules → Rulesets → Protect main → Bypass list**.
 
 ## Options Considered
 
-1. **GitHub Pro upgrade** (~$4/month) — enables rulesets on private repos. Deferred; not warranted for a project in early build.
-2. **Make the repo public** — enables rulesets for free; rejected for now (code not ready for public visibility during active build).
-3. **Claude Code hooks only (chosen)** — covers the primary risk of destructive commands during AI-assisted sessions. CI gates remain the quality check on every PR.
+1. **GitHub Pro upgrade** (~$4/month) — enables rulesets on private repos. Not chosen; making the repo public was free.
+2. **Make the repo public + GitHub Ruleset (chosen)** — unlocks rulesets on GitHub Free; applied 2026-06-21 (id 17948951).
+3. **Claude Code hooks only** — covers the primary risk of destructive commands during AI-assisted sessions but provides no server-side enforcement. Used as a supplementary layer.
 
 ## Trade-off Analysis
 
-The Claude Code guardrail covers the actual risk profile: this is a one-developer project where the main source of accidental destructive git commands is the AI assistant, not a rogue team member. Server-side branch protection would add a safety net for direct pushes from the CLI, but that risk is low given the team size and workflow discipline. The ruleset JSON is ready to apply the moment the plan/account changes.
+Making the repo public and activating the ruleset gives server-side enforcement (direct pushes, force-pushes, and merge-without-CI are blocked by GitHub) in addition to the Claude Code guardrails. The main cost is public visibility of the codebase during active build, which was accepted.
 
 ## Consequences
 
-- Direct pushes to `main` from the terminal are not blocked at the server level.
-- Destructive git commands executed *through Claude Code* are blocked by the hook.
-- CI checks run on every PR and block on failure; merging without them requires a deliberate manual step.
-- The prepared ruleset in `docs/architecture/github-ruleset-main.json` can be applied with a single `gh api` call if the account is upgraded or the repo is made public.
+- Direct pushes to `main` are blocked server-side by the active GitHub Ruleset (id 17948951).
+- Force-pushes and deletion of `main` are also blocked.
+- PRs cannot be merged until all 6 required CI checks pass.
+- Destructive git commands executed *through Claude Code* are blocked by the hook as an additional local layer.
+- The ruleset JSON at `docs/architecture/github-ruleset-main.json` matches the active ruleset and can be used to re-apply it if ever deleted.

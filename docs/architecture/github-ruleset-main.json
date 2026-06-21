@@ -26,12 +26,12 @@
       "parameters": {
         "strict_required_status_checks_policy": false,
         "required_status_checks": [
-          { "context": "Backend CI/CD / lint-and-typecheck" },
-          { "context": "Backend CI/CD / test" },
-          { "context": "Backend CI/CD / security" },
-          { "context": "Frontend CI/CD / lint-and-typecheck" },
-          { "context": "Frontend CI/CD / test" },
-          { "context": "Frontend CI/CD / security" }
+          { "context": "Backend CI/CD / Lint & type-check" },
+          { "context": "Backend CI/CD / Test (pytest)" },
+          { "context": "Backend CI/CD / Security scan" },
+          { "context": "Frontend CI/CD / Lint & type-check" },
+          { "context": "Frontend CI/CD / Test (Vitest)" },
+          { "context": "Frontend CI/CD / Security scan" }
         ]
       }
     }
