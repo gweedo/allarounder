@@ -33,7 +33,7 @@ Protection is supplemented by:
 
 2. **Convention** — all code changes go through a pull request. CI workflows run their full check suite on every PR.
 
-To add an admin bypass actor for non-code PRs that don't trigger path-filtered workflows: **GitHub UI → Settings → Rules → Rulesets → Protect main → Bypass list**.
+**Bypass actor:** `gweedo` (user id 38251368, `bypass_mode: always`) is configured in the ruleset. This allows doc-only PRs — which don't touch `src/backend/**` or `src/frontend/**` and therefore never trigger the path-filtered workflows — to be merged using `gh pr merge --admin` without waiting for checks that will never run.
 
 ## Options Considered
 
