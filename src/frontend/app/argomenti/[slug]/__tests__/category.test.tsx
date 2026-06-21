@@ -103,3 +103,33 @@ describe("CategoryPage", () => {
     expect(result).toBe("notFound");
   });
 });
+
+describe("generateMetadata", () => {
+  it("returns title and description for existing category", async () => {
+    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+      ok: true,
+      json: async () => BASE_CATEGORY,
+    });
+    const { generateMetadata } = await import("../page");
+    const meta = await generateMetadata({ params: Promise.resolve({ slug: "interviste" }) });
+    expect(meta.title).toBe("Interviste — Allarounder");
+    expect(meta.description).toBe("Conversazioni con esperti.");
+  });
+
+  it("returns undefined description when category description is null", async () => {
+    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ ...BASE_CATEGORY, description: null }),
+    });
+    const { generateMetadata } = await import("../page");
+    const meta = await generateMetadata({ params: Promise.resolve({ slug: "interviste" }) });
+    expect(meta.description).toBeUndefined();
+  });
+
+  it("returns empty object when category not found", async () => {
+    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({ ok: false });
+    const { generateMetadata } = await import("../page");
+    const meta = await generateMetadata({ params: Promise.resolve({ slug: "missing" }) });
+    expect(meta).toEqual({});
+  });
+});

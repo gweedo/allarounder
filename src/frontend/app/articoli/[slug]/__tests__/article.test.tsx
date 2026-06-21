@@ -155,3 +155,46 @@ describe("ArticlePage", () => {
     expect(result).toBe("notFound");
   });
 });
+
+describe("generateMetadata", () => {
+  it("returns meta_title when set", async () => {
+    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ ...BASE_ARTICLE, meta_title: "Titolo SEO Personalizzato" }),
+    });
+    const { generateMetadata } = await import("../page");
+    const meta = await generateMetadata({ params: Promise.resolve({ slug: "titolo-articolo" }) });
+    expect(meta.title).toBe("Titolo SEO Personalizzato");
+  });
+
+  it("returns fallback title from article title when meta_title is null", async () => {
+    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ ...BASE_ARTICLE, meta_title: null }),
+    });
+    const { generateMetadata } = await import("../page");
+    const meta = await generateMetadata({ params: Promise.resolve({ slug: "titolo-articolo" }) });
+    expect(meta.title).toBe("Titolo Articolo — Allarounder");
+  });
+
+  it("populates openGraph images when og_image_url is set", async () => {
+    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        ...BASE_ARTICLE,
+        og_image_url: "https://cdn.allarounder.it/og/articolo.jpg",
+      }),
+    });
+    const { generateMetadata } = await import("../page");
+    const meta = await generateMetadata({ params: Promise.resolve({ slug: "titolo-articolo" }) });
+    const og = meta.openGraph as { images?: { url: string }[] };
+    expect(og?.images).toEqual([{ url: "https://cdn.allarounder.it/og/articolo.jpg" }]);
+  });
+
+  it("returns empty object when article not found", async () => {
+    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({ ok: false });
+    const { generateMetadata } = await import("../page");
+    const meta = await generateMetadata({ params: Promise.resolve({ slug: "missing" }) });
+    expect(meta).toEqual({});
+  });
+});

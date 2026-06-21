@@ -98,3 +98,23 @@ describe("TagPage", () => {
     expect(result).toBe("notFound");
   });
 });
+
+describe("generateMetadata", () => {
+  it("returns title and description for existing tag", async () => {
+    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+      ok: true,
+      json: async () => BASE_TAG,
+    });
+    const { generateMetadata } = await import("../page");
+    const meta = await generateMetadata({ params: Promise.resolve({ slug: "calcio" }) });
+    expect(meta.title).toBe("calcio — Allarounder");
+    expect(meta.description).toBe('Articoli con il tag "calcio"');
+  });
+
+  it("returns empty object when tag not found", async () => {
+    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({ ok: false });
+    const { generateMetadata } = await import("../page");
+    const meta = await generateMetadata({ params: Promise.resolve({ slug: "missing" }) });
+    expect(meta).toEqual({});
+  });
+});

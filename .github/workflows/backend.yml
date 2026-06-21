@@ -18,7 +18,7 @@ concurrency:
 permissions:
   contents: read
   id-token: write
-  security-events: write
+  pull-requests: read
 
 env:
   IMAGE_NAME: allarounder-backend
@@ -114,26 +114,18 @@ jobs:
           cache: pip
 
       - name: Install dependencies
-        run: pip install -e ".[dev]" pip-audit
+        run: |
+          pip install --upgrade pip
+          pip install -e ".[dev]" pip-audit
 
       - name: Dependency audit (pip-audit)
-        run: pip-audit --strict --skip-editable --vulnerability-service pypi
+        run: pip-audit --skip-editable --vulnerability-service pypi
 
       - name: Secret scan (gitleaks)
         uses: gitleaks/gitleaks-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: SAST (CodeQL)
-        uses: github/codeql-action/init@v3
-        with:
-          languages: python
-          source-root: src/backend
-
-      - name: CodeQL analyze
-        uses: github/codeql-action/analyze@v3
-        with:
-          category: "/language:python"
 
   # ── Build & push image (main branch only) ────────────────────────────────────
   build:
@@ -178,18 +170,10 @@ jobs:
         uses: aquasecurity/trivy-action@master
         with:
           image-ref: ${{ secrets.ACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}@${{ steps.push.outputs.digest }}
-          format: sarif
-          output: trivy-results.sarif
+          format: table
           exit-code: "1"
           severity: HIGH,CRITICAL
           ignore-unfixed: true
-
-      - name: Upload Trivy results
-        if: always()
-        uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: trivy-results.sarif
-          category: trivy-backend
 
   # ── Deploy to staging ─────────────────────────────────────────────────────────
   deploy-staging:

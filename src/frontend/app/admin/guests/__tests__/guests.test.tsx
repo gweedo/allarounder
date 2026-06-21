@@ -75,4 +75,33 @@ describe("AdminGuestsPage", () => {
     fireEvent.click(screen.getByRole("button", { name: /crea ospite/i }));
     await waitFor(() => expect(screen.getByText("Nuovo Ospite")).toBeInTheDocument());
   });
+
+  it("shows create error when POST fails", async () => {
+    (global.fetch as ReturnType<typeof vi.fn>)
+      .mockResolvedValueOnce({ ok: true, json: async () => ({ items: [] }) })
+      .mockResolvedValueOnce({
+        ok: false,
+        json: async () => ({ detail: "Nome non valido" }),
+      });
+    await renderGuestsPage();
+    await waitFor(() => expect(screen.getByLabelText(/nome \*/i)).toBeInTheDocument());
+    fireEvent.change(screen.getByLabelText(/nome \*/i), {
+      target: { value: "X" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: /crea ospite/i }));
+    await waitFor(() => {
+      const alerts = screen.getAllByRole("alert");
+      expect(alerts.some((el) => el.textContent?.includes("Nome non valido"))).toBe(true);
+    });
+  });
+
+  it("removes a guest from the list after delete", async () => {
+    (global.fetch as ReturnType<typeof vi.fn>)
+      .mockResolvedValueOnce({ ok: true, json: async () => ({ items: [GUEST] }) })
+      .mockResolvedValueOnce({ ok: true });
+    await renderGuestsPage();
+    await waitFor(() => expect(screen.getByText("Mario Bianchi")).toBeInTheDocument());
+    fireEvent.click(screen.getByRole("button", { name: /elimina/i }));
+    await waitFor(() => expect(screen.queryByText("Mario Bianchi")).not.toBeInTheDocument());
+  });
 });
