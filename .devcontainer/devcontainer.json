@@ -6,9 +6,9 @@
 
   // --- Tooling layered in via devcontainer features -----------------------
   "features": {
-    // Node 20 LTS + corepack (pnpm enabled in postCreate).
+    // Node 22 LTS + corepack (pnpm enabled in postCreate). Matches CI.
     "ghcr.io/devcontainers/features/node:1": {
-      "version": "20"
+      "version": "22"
     },
     // Docker-in-Docker so testcontainers can launch ephemeral containers
     // (e.g. throwaway Postgres for integration tests) from inside `app`.
