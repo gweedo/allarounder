@@ -25,7 +25,7 @@ gh api repos/gweedo/allarounder/rulesets \
   --input docs/architecture/github-ruleset-main.json
 ```
 
-**Active ruleset id 17948951** enforces on `refs/heads/main`: no deletion, no force-push, require PR, require all 6 CI status checks to pass (`Backend CI/CD / Lint & type-check`, `Test (pytest)`, `Security scan`; `Frontend CI/CD / Lint & type-check`, `Test (Vitest)`, `Security scan`), 0 required approving reviews (solo developer).
+**Active ruleset id 17948951** enforces on `refs/heads/main`: no deletion, no force-push, require PR, require 4 CI status checks to pass (`Lint & type-check`, `Test (pytest)`, `Test (Vitest)`, `Security scan`), 0 required approving reviews (solo developer). Note: GitHub Rulesets match check runs by bare name (not `{workflow} / {job}` — that format only works in classic branch protection). Each bare name covers both backend and frontend jobs.
 
 Protection is supplemented by:
 
@@ -49,6 +49,6 @@ Making the repo public and activating the ruleset gives server-side enforcement 
 
 - Direct pushes to `main` are blocked server-side by the active GitHub Ruleset (id 17948951).
 - Force-pushes and deletion of `main` are also blocked.
-- PRs cannot be merged until all 6 required CI checks pass.
+- PRs cannot be merged until all 4 required CI checks pass (`Lint & type-check`, `Test (pytest)`, `Test (Vitest)`, `Security scan`).
 - Destructive git commands executed *through Claude Code* are blocked by the hook as an additional local layer.
 - The ruleset JSON at `docs/architecture/github-ruleset-main.json` matches the active ruleset and can be used to re-apply it if ever deleted.
