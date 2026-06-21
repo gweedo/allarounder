@@ -17,6 +17,7 @@ This directory records the significant architectural decisions for the Allaround
 | [0011](0011-author-user-separation.md) | Author and User as separate entities (optional 1:1 link) | Accepted | 2026-06-14 |
 | [0012](0012-cicd-pipeline-and-deployment-strategy.md) | CI/CD pipeline & deployment strategy | Accepted | 2026-06-14 |
 | [0013](0013-security-architecture.md) | Security architecture | Accepted | 2026-06-18 |
+| [0014](0014-github-branch-protection.md) | GitHub branch protection for `main` | Accepted | 2026-06-21 |
 
 ## Conventions
 
