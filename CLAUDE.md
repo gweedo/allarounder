@@ -70,6 +70,10 @@ Both CI workflows run their test suite with a **coverage gate before** building/
 - **Phase 2 (deferred):** newsletter (signup/subscribers backend) and comments. An external embedded form is the interim option for email capture.
 - **Out of scope entirely:** hosting/streaming audio, RSS feed, i18n/multilingual, public user accounts.
 
+## Git workflow
+
+**Never push directly to `main`.** Always create a feature branch and open a PR. Branch protection is enforced — direct pushes will be rejected, but don't attempt them regardless.
+
 ## Commands
 
 No build, test, or run commands exist yet — there is no `src/`, `package.json`, `pyproject.toml`, or `Makefile`. Fill this section in once the backend (pytest, alembic, uvicorn) and frontend (Next.js, vitest, playwright) are scaffolded.
