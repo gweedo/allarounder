@@ -90,3 +90,45 @@ describe("StaticPageRoute", () => {
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Cookie Policy");
   });
 });
+
+describe("generateStaticParams", () => {
+  it("returns the 4 known slugs", async () => {
+    const { generateStaticParams } = await import("../page");
+    const params = await generateStaticParams();
+    expect(params).toEqual([
+      { slug: "chi-siamo" },
+      { slug: "contatti" },
+      { slug: "privacy-policy" },
+      { slug: "cookie-policy" },
+    ]);
+  });
+});
+
+describe("generateMetadata", () => {
+  it("returns meta_title when set", async () => {
+    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+      ok: true,
+      json: async () => BASE_PAGE,
+    });
+    const { generateMetadata } = await import("../page");
+    const meta = await generateMetadata({ params: Promise.resolve({ slug: "chi-siamo" }) });
+    expect(meta.title).toBe("Chi siamo — Allarounder");
+  });
+
+  it("returns fallback title from page title when meta_title is null", async () => {
+    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ ...BASE_PAGE, meta_title: null }),
+    });
+    const { generateMetadata } = await import("../page");
+    const meta = await generateMetadata({ params: Promise.resolve({ slug: "chi-siamo" }) });
+    expect(meta.title).toBe("Chi siamo — Allarounder");
+  });
+
+  it("returns empty object when page not found", async () => {
+    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({ ok: false });
+    const { generateMetadata } = await import("../page");
+    const meta = await generateMetadata({ params: Promise.resolve({ slug: "missing" }) });
+    expect(meta).toEqual({});
+  });
+});

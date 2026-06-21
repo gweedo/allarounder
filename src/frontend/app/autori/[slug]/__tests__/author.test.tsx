@@ -119,3 +119,33 @@ describe("AuthorPage", () => {
     expect(result).toBe("notFound");
   });
 });
+
+describe("generateMetadata", () => {
+  it("returns title and bio as description when bio is set", async () => {
+    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+      ok: true,
+      json: async () => BASE_AUTHOR,
+    });
+    const { generateMetadata } = await import("../page");
+    const meta = await generateMetadata({ params: Promise.resolve({ slug: "marco-rossi" }) });
+    expect(meta.title).toBe("Marco Rossi — Allarounder");
+    expect(meta.description).toBe("Giornalista sportivo.");
+  });
+
+  it("returns fallback description when bio is null", async () => {
+    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ ...BASE_AUTHOR, bio: null }),
+    });
+    const { generateMetadata } = await import("../page");
+    const meta = await generateMetadata({ params: Promise.resolve({ slug: "marco-rossi" }) });
+    expect(meta.description).toBe("Articoli di Marco Rossi su Allarounder");
+  });
+
+  it("returns empty object when author not found", async () => {
+    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({ ok: false });
+    const { generateMetadata } = await import("../page");
+    const meta = await generateMetadata({ params: Promise.resolve({ slug: "missing" }) });
+    expect(meta).toEqual({});
+  });
+});

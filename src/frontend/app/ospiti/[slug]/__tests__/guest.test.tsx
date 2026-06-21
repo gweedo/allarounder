@@ -119,3 +119,33 @@ describe("GuestPage", () => {
     expect(result).toBe("notFound");
   });
 });
+
+describe("generateMetadata", () => {
+  it("returns title and bio as description when bio is set", async () => {
+    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+      ok: true,
+      json: async () => BASE_GUEST,
+    });
+    const { generateMetadata } = await import("../page");
+    const meta = await generateMetadata({ params: Promise.resolve({ slug: "mario-bianchi" }) });
+    expect(meta.title).toBe("Mario Bianchi — Allarounder");
+    expect(meta.description).toBe("Ospite del podcast.");
+  });
+
+  it("returns fallback description when bio is null", async () => {
+    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ ...BASE_GUEST, bio: null }),
+    });
+    const { generateMetadata } = await import("../page");
+    const meta = await generateMetadata({ params: Promise.resolve({ slug: "mario-bianchi" }) });
+    expect(meta.description).toBe("Articoli con Mario Bianchi su Allarounder");
+  });
+
+  it("returns empty object when guest not found", async () => {
+    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({ ok: false });
+    const { generateMetadata } = await import("../page");
+    const meta = await generateMetadata({ params: Promise.resolve({ slug: "missing" }) });
+    expect(meta).toEqual({});
+  });
+});

@@ -1,8 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, fireEvent } from "@testing-library/react";
+
+let mockPush: ReturnType<typeof vi.fn>;
 
 vi.mock("next/navigation", () => ({
-  useRouter: () => ({ push: vi.fn() }),
+  useRouter: () => ({ push: mockPush }),
   notFound: () => {
     throw new Error("NEXT_NOT_FOUND");
   },
@@ -43,6 +45,7 @@ const PAGES = [
 ];
 
 beforeEach(() => {
+  mockPush = vi.fn();
   global.fetch = vi.fn();
   vi.resetModules();
 });
@@ -127,5 +130,51 @@ describe("EditStaticPagePage", () => {
     await waitFor(() =>
       expect(screen.getByRole("button", { name: /salva/i })).toBeInTheDocument(),
     );
+  });
+
+  it("shows error alert when GET returns ok: false", async () => {
+    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+      ok: false,
+      json: async () => ({}),
+    });
+    const { default: EditStaticPagePage } = await import("../[id]/page");
+    render(<EditStaticPagePage params={Promise.resolve({ id: "some-id" })} />);
+    await waitFor(() => expect(screen.getByRole("alert")).toBeInTheDocument());
+    expect(screen.getByRole("alert")).toHaveTextContent("Pagina non trovata.");
+  });
+
+  it("redirects to /admin/pages on save success", async () => {
+    (global.fetch as ReturnType<typeof vi.fn>)
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => PAGE_DATA,
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => PAGE_DATA,
+      });
+    const { default: EditStaticPagePage } = await import("../[id]/page");
+    render(<EditStaticPagePage params={Promise.resolve({ id: PAGE_DATA.id })} />);
+    await waitFor(() => screen.getByRole("button", { name: /salva/i }));
+    fireEvent.click(screen.getByRole("button", { name: /salva/i }));
+    await waitFor(() => expect(mockPush).toHaveBeenCalledWith("/admin/pages"));
+  });
+
+  it("shows save error alert when PUT returns ok: false", async () => {
+    (global.fetch as ReturnType<typeof vi.fn>)
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => PAGE_DATA,
+      })
+      .mockResolvedValueOnce({
+        ok: false,
+        json: async () => ({ detail: "Errore salvataggio" }),
+      });
+    const { default: EditStaticPagePage } = await import("../[id]/page");
+    render(<EditStaticPagePage params={Promise.resolve({ id: PAGE_DATA.id })} />);
+    await waitFor(() => screen.getByRole("button", { name: /salva/i }));
+    fireEvent.click(screen.getByRole("button", { name: /salva/i }));
+    await waitFor(() => expect(screen.getByRole("alert")).toBeInTheDocument());
+    expect(screen.getByRole("alert")).toHaveTextContent("Errore salvataggio");
   });
 });

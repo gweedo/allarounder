@@ -71,4 +71,41 @@ describe("AdminCategoriesPage", () => {
       expect(screen.getByRole("alert")).toHaveTextContent("Accesso negato");
     });
   });
+
+  it("shows error when initial fetch fails", async () => {
+    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+      ok: false,
+      json: async () => ({}),
+    });
+    render(<AdminCategoriesPage />);
+    await waitFor(() => {
+      expect(screen.getByRole("alert")).toBeInTheDocument();
+    });
+  });
+
+  it("deletes a category and removes it from the list", async () => {
+    vi.spyOn(window, "confirm").mockReturnValueOnce(true);
+    (global.fetch as ReturnType<typeof vi.fn>)
+      .mockResolvedValueOnce({ ok: true, json: async () => ({ items: CATEGORIES }) })
+      .mockResolvedValueOnce({ ok: true, json: async () => ({}) });
+    render(<AdminCategoriesPage />);
+    await waitFor(() => screen.getByText("Interviste"));
+    fireEvent.click(screen.getAllByRole("button", { name: /elimina/i })[0]);
+    await waitFor(() => {
+      expect(screen.queryByText("Interviste")).not.toBeInTheDocument();
+    });
+  });
+
+  it("shows error when delete fails", async () => {
+    vi.spyOn(window, "confirm").mockReturnValueOnce(true);
+    (global.fetch as ReturnType<typeof vi.fn>)
+      .mockResolvedValueOnce({ ok: true, json: async () => ({ items: CATEGORIES }) })
+      .mockResolvedValueOnce({ ok: false, json: async () => ({ detail: "Errore server" }) });
+    render(<AdminCategoriesPage />);
+    await waitFor(() => screen.getByText("Interviste"));
+    fireEvent.click(screen.getAllByRole("button", { name: /elimina/i })[0]);
+    await waitFor(() => {
+      expect(screen.getByRole("alert")).toHaveTextContent("Errore server");
+    });
+  });
 });
