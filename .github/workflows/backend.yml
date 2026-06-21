@@ -19,6 +19,7 @@ permissions:
   contents: read
   id-token: write
   security-events: write
+  pull-requests: read
 
 env:
   IMAGE_NAME: allarounder-backend
