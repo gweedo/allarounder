@@ -218,6 +218,7 @@ Secrets are never committed; the apps read them from Key Vault (or Container App
 ## 7. CI/CD (see ADR-0012)
 
 - **Source control & branching:** GitHub, single **monorepo** (ADR-0006), **GitHub Flow** — `main` plus short-lived feature branches via PR; `main` is always deployable.
+- **Branch protection (ADR-0014):** a GitHub Ruleset (`enforcement: active`, id 17948951) on `refs/heads/main` blocks direct pushes, force-pushes, and deletion; requires a PR with all 6 CI status checks passing before merge. Supplemented by **Claude Code git guardrails** (`.claude/hooks/block-dangerous-git.sh`). Add admin as bypass actor via GitHub UI (`Settings → Rules → Rulesets → Protect main → Bypass list`) for non-code PRs.
 - **Triggers:** PR → checks only (no deploy); merge to `main` → deploy **staging**; **production via manual approval** (GitHub Environment protection rule), restricted to `main`/release tags.
 - **Pipelines:** GitHub Actions, two **path-filtered** workflows (`src/backend/**`, `src/frontend/**`), each running:
   1. **Lint & type-check** — Ruff + Black + mypy (backend); ESLint + Prettier + `tsc`/`next build` (frontend).

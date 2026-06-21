@@ -132,6 +132,13 @@ Last updated: 2026-06-14
 - **Status**: ✅ Final
 - **Decided by**: Team
 
+### GitHub branch protection for `main`
+- **Date**: 2026-06-21
+- **Decision**: Repo is **public**. A GitHub Ruleset (`enforcement: active`, id 17948951) on `refs/heads/main` blocks direct pushes, force-pushes, and deletion; requires a PR; requires all 6 CI status checks to pass before merge (`Backend CI/CD / lint-and-typecheck`, `test`, `security`; `Frontend CI/CD / lint-and-typecheck`, `test`, `security`). 0 required approving reviews (solo developer). **Claude Code git guardrails** (`.claude/hooks/block-dangerous-git.sh`) provide an additional local layer. Add admin as bypass actor via GitHub UI for non-code PRs that don't trigger path-filtered workflows.
+- **Rationale**: Making the repo public unlocked GitHub rulesets for free. Server-side protection + Claude Code guardrails gives defence in depth.
+- **Status**: ✅ Final (see ADR-0014)
+- **Decided by**: Team
+
 ### CI/CD: GitHub Actions
 - **Date**: 2026-06-14
 - **Decision**: Build and deployment run through **GitHub Actions**, deploying to **Azure Container Apps**. Pipeline builds the Docker image(s), pushes to a registry (Azure Container Registry), and deploys to Container Apps.
