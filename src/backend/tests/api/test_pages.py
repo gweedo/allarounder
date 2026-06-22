@@ -57,7 +57,7 @@ def mock_page_repo() -> MagicMock:
 
 
 @pytest.fixture()
-def client(mock_page_repo: MagicMock) -> Generator[TestClient, None, None]:
+def client(mock_page_repo: MagicMock) -> Generator[TestClient]:
     app.dependency_overrides[admin_get_page_repo] = lambda: mock_page_repo
     app.dependency_overrides[public_get_page_repo] = lambda: mock_page_repo
     with TestClient(app, raise_server_exceptions=False) as c:

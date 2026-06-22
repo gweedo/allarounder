@@ -114,8 +114,8 @@ def list_articles(
     current_user: Annotated[CurrentUser, Depends(require_editor)],
     repo: Annotated[SqlArticleRepository, Depends(get_article_repo)],
     article_status: Annotated[str | None, Query(alias="status")] = None,
-    page: int = 1,
-    page_size: int = 20,
+    page: int = Query(default=1, ge=1),
+    page_size: int = Query(default=20, ge=1, le=100),
 ) -> ArticleListResponse:
     filter_status: PublicationStatus | None = None
     if article_status is not None:

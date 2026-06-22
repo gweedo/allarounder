@@ -4,7 +4,7 @@ import uuid
 from datetime import UTC, datetime
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
 from app.domain.content.entities import Article, Author, Category, Guest, Tag
@@ -109,8 +109,8 @@ def list_public_articles(
     repo: Annotated[SqlArticleRepository, Depends(get_article_repo)],
     category_repo: Annotated[SqlCategoryRepository, Depends(get_category_repo)],
     author_repo: Annotated[SqlAuthorRepository, Depends(get_author_repo)],
-    page: int = 1,
-    page_size: int = 20,
+    page: int = Query(default=1, ge=1),
+    page_size: int = Query(default=20, ge=1, le=100),
     category: str | None = None,
 ) -> PublicArticleListResponse:
     now = datetime.now(tz=UTC)

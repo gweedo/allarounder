@@ -68,7 +68,7 @@ def mock_tag_repo() -> MagicMock:
 
 
 @pytest.fixture()
-def client(mock_repo: MagicMock, mock_tag_repo: MagicMock) -> Generator[TestClient, None, None]:
+def client(mock_repo: MagicMock, mock_tag_repo: MagicMock) -> Generator[TestClient]:
     mock_guest_repo = MagicMock()
     mock_guest_repo.get_by_article.return_value = []
     app.dependency_overrides[admin_get_repo] = lambda: mock_repo

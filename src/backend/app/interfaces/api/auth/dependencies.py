@@ -20,7 +20,7 @@ _hasher = Argon2PasswordHasher()
 _hibp = HibpBreachedPasswordChecker()
 
 
-def get_db_session() -> Generator[Session, None, None]:
+def get_db_session() -> Generator[Session]:
     factory = get_session_factory()
     session = factory()
     try:
@@ -82,11 +82,16 @@ def get_current_user(
     settings: Annotated[Settings, Depends(get_settings)],
 ) -> CurrentUser:
     payload = _decode_token(token, settings)
-    return CurrentUser(
-        user_id=str(payload["sub"]),
-        email=str(payload["email"]),
-        role=str(payload["role"]),
-    )
+    try:
+        return CurrentUser(
+            user_id=str(payload["sub"]),
+            email=str(payload["email"]),
+            role=str(payload["role"]),
+        )
+    except KeyError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token claims"
+        )
 
 
 def require_admin(

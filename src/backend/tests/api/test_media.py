@@ -39,7 +39,7 @@ def _make_token(role: str = "editor") -> str:
 
 
 @pytest.fixture()
-def client() -> Generator[TestClient, None, None]:
+def client() -> Generator[TestClient]:
     with TestClient(app, raise_server_exceptions=False) as c:
         yield c
 

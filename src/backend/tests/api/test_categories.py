@@ -52,7 +52,7 @@ def mock_art_repo() -> MagicMock:
 
 
 @pytest.fixture()
-def client(mock_cat_repo: MagicMock, mock_art_repo: MagicMock) -> Generator[TestClient, None, None]:
+def client(mock_cat_repo: MagicMock, mock_art_repo: MagicMock) -> Generator[TestClient]:
     app.dependency_overrides[admin_get_cat_repo] = lambda: mock_cat_repo
     app.dependency_overrides[public_get_cat_repo] = lambda: mock_cat_repo
     app.dependency_overrides[public_get_art_repo] = lambda: mock_art_repo
