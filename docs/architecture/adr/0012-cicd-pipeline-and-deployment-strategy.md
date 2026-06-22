@@ -22,7 +22,7 @@ Adopt a **GitHub Flow** branching model with **path-filtered GitHub Actions** wo
 | Runtime secrets | **Key Vault references via managed identity** — each Container App reads secrets directly from Key Vault using its Azure identity; values never pass through CI. |
 | Migrations | **Dedicated pipeline job before traffic shift** running `alembic upgrade head`, rehearsed on staging; **expand/contract** (backward-compatible) schema changes with **roll-forward** (no down-migrations). |
 | Deployment strategy | **Blue-green** via Container Apps revision traffic weights: deploy "green" at 0%, verify, shift 100%; rollback = revert traffic to warm "blue". **Canary is phase 2.** |
-| Post-deploy verification | Production flip gated by **health/readiness probe + smoke tests** against green at 0% (full E2E already ran on staging). |
+| Post-deploy verification | Production flip gated by **health/readiness probe + smoke tests** against green at 0% (full E2E already ran on staging). **Backend health is validated by the Container Apps readiness probe** (the backend has `external: false` ingress — its FQDN is internal-only and unreachable from CI runners; the platform's `Running` revision state is used as the health gate instead of an external curl). |
 | Rollback | **Automated rollback** on health/error-rate/latency thresholds, reverting traffic to blue; thresholds start conservative and fall back to manual alert-driven revert until metric baselines exist. |
 | Pipeline hygiene | Dependency + Docker layer caching; **concurrency** cancellation of superseded runs; failure/deploy notifications (GitHub + email, extensible to a chat tool). |
 
