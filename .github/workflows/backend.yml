@@ -228,7 +228,9 @@ jobs:
 
           echo "Migration execution: $EXECUTION"
 
-          # Poll until the job completes
+          # Poll until the job completes; tolerate up to 3 consecutive Unknown
+          # statuses (transient Azure state between Running and Failed/Succeeded).
+          unknown_streak=0
           for i in $(seq 1 60); do
             STATUS=$(az containerapp job execution show \
               --name "${{ vars.MIGRATION_JOB_NAME }}" \
@@ -239,9 +241,17 @@ jobs:
             if [[ "$STATUS" == "Succeeded" ]]; then
               echo "Migrations succeeded."
               break
-            elif [[ "$STATUS" == "Failed" || "$STATUS" == "Unknown" ]]; then
-              echo "Migration failed: $STATUS"
+            elif [[ "$STATUS" == "Failed" ]]; then
+              echo "Migration failed."
               exit 1
+            elif [[ "$STATUS" == "Unknown" ]]; then
+              unknown_streak=$((unknown_streak + 1))
+              if [[ $unknown_streak -ge 3 ]]; then
+                echo "Migration status Unknown for 3 consecutive polls — treating as failure."
+                exit 1
+              fi
+            else
+              unknown_streak=0
             fi
             sleep 10
           done
@@ -349,6 +359,7 @@ jobs:
             --resource-group "${{ vars.RESOURCE_GROUP }}" \
             --query "name" -o tsv)
 
+          unknown_streak=0
           for i in $(seq 1 60); do
             STATUS=$(az containerapp job execution show \
               --name "${{ vars.MIGRATION_JOB_NAME }}" \
@@ -357,9 +368,17 @@ jobs:
               --query "properties.status" -o tsv)
             echo "  Status ($i/60): $STATUS"
             if [[ "$STATUS" == "Succeeded" ]]; then break; fi
-            if [[ "$STATUS" == "Failed" || "$STATUS" == "Unknown" ]]; then
-              echo "Migration failed: $STATUS"
+            if [[ "$STATUS" == "Failed" ]]; then
+              echo "Migration failed."
               exit 1
+            elif [[ "$STATUS" == "Unknown" ]]; then
+              unknown_streak=$((unknown_streak + 1))
+              if [[ $unknown_streak -ge 3 ]]; then
+                echo "Migration status Unknown for 3 consecutive polls — treating as failure."
+                exit 1
+              fi
+            else
+              unknown_streak=0
             fi
             sleep 10
           done
