@@ -36,3 +36,6 @@ infra/main.json
 .env
 .env.local
 .env.*.local
+
+# Local incident / session notes
+deploy-incident-*.md
