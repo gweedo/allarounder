@@ -30,9 +30,9 @@ echo "==> Detecting public IP and opening temporary firewall rule..."
 MY_IP=$(curl -sf https://api.ipify.org)
 echo "    Public IP: ${MY_IP}"
 az postgres flexible-server firewall-rule create \
-  --name "$PG_SERVER" \
+  --server-name "$PG_SERVER" \
   --resource-group "$RESOURCE_GROUP" \
-  --rule-name "$FIREWALL_RULE_NAME" \
+  --name "$FIREWALL_RULE_NAME" \
   --start-ip-address "$MY_IP" \
   --end-ip-address "$MY_IP" \
   --output none
@@ -41,9 +41,9 @@ az postgres flexible-server firewall-rule create \
 cleanup() {
   echo "==> Removing temporary firewall rule..."
   az postgres flexible-server firewall-rule delete \
-    --name "$PG_SERVER" \
+    --server-name "$PG_SERVER" \
     --resource-group "$RESOURCE_GROUP" \
-    --rule-name "$FIREWALL_RULE_NAME" \
+    --name "$FIREWALL_RULE_NAME" \
     --yes \
     --output none
   echo "    Firewall rule removed."
