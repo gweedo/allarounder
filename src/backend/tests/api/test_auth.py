@@ -32,7 +32,7 @@ def mock_auth_service() -> MagicMock:
 
 
 @pytest.fixture()
-def client(mock_auth_service: MagicMock) -> Generator[TestClient, None, None]:
+def client(mock_auth_service: MagicMock) -> Generator[TestClient]:
     app.dependency_overrides[get_auth_service] = lambda: mock_auth_service
     with TestClient(app, raise_server_exceptions=False) as c:
         yield c

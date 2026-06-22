@@ -40,7 +40,13 @@ def _get_real_ip(request: Request) -> str:
 
 
 limiter = Limiter(key_func=_get_real_ip, default_limits=[])
-app = FastAPI(title="Allarounder API", version="0.1.0")
+app = FastAPI(
+    title="Allarounder API",
+    version="0.1.0",
+    docs_url="/docs" if settings.app_env == "development" else None,
+    redoc_url="/redoc" if settings.app_env == "development" else None,
+    openapi_url="/openapi.json" if settings.app_env == "development" else None,
+)
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)  # type: ignore[arg-type]
 

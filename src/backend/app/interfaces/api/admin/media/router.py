@@ -25,10 +25,10 @@ def request_sas(
 
     try:
         sas_url, blob_url = generate_sas(filename=body.filename, settings=settings)
-    except Exception as exc:
+    except Exception:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail=f"Storage unavailable: {exc}",
+            detail="Storage service temporarily unavailable",
         )
 
     return SasResponse(sas_url=sas_url, blob_url=blob_url)
