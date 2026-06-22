@@ -24,6 +24,31 @@ PG_SERVER="${2:?Usage: $0 <env> <pg-server-name>}"
 RESOURCE_GROUP="allarounder-${ENV}"
 BACKEND_IDENTITY_NAME="allarounder-${ENV}-backend-id"
 DATABASE="allarounder"
+FIREWALL_RULE_NAME="temp-local-setup-$(date +%s)"
+
+echo "==> Detecting public IP and opening temporary firewall rule..."
+MY_IP=$(curl -sf https://api.ipify.org)
+echo "    Public IP: ${MY_IP}"
+az postgres flexible-server firewall-rule create \
+  --name "$PG_SERVER" \
+  --resource-group "$RESOURCE_GROUP" \
+  --rule-name "$FIREWALL_RULE_NAME" \
+  --start-ip-address "$MY_IP" \
+  --end-ip-address "$MY_IP" \
+  --output none
+
+# Remove the firewall rule on exit, whether the script succeeds or fails
+cleanup() {
+  echo "==> Removing temporary firewall rule..."
+  az postgres flexible-server firewall-rule delete \
+    --name "$PG_SERVER" \
+    --resource-group "$RESOURCE_GROUP" \
+    --rule-name "$FIREWALL_RULE_NAME" \
+    --yes \
+    --output none
+  echo "    Firewall rule removed."
+}
+trap cleanup EXIT
 
 echo "==> Fetching backend managed identity IDs..."
 IDENTITY_CLIENT_ID=$(az identity show \
