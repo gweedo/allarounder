@@ -24,6 +24,31 @@ PG_SERVER="${2:?Usage: $0 <env> <pg-server-name>}"
 RESOURCE_GROUP="allarounder-${ENV}"
 BACKEND_IDENTITY_NAME="allarounder-${ENV}-backend-id"
 DATABASE="allarounder"
+FIREWALL_RULE_NAME="temp-local-setup-$(date +%s)"
+
+echo "==> Detecting public IP and opening temporary firewall rule..."
+MY_IP=$(curl -sf https://api.ipify.org)
+echo "    Public IP: ${MY_IP}"
+az postgres flexible-server firewall-rule create \
+  --server-name "$PG_SERVER" \
+  --resource-group "$RESOURCE_GROUP" \
+  --name "$FIREWALL_RULE_NAME" \
+  --start-ip-address "$MY_IP" \
+  --end-ip-address "$MY_IP" \
+  --output none
+
+# Remove the firewall rule on exit, whether the script succeeds or fails
+cleanup() {
+  echo "==> Removing temporary firewall rule..."
+  az postgres flexible-server firewall-rule delete \
+    --server-name "$PG_SERVER" \
+    --resource-group "$RESOURCE_GROUP" \
+    --name "$FIREWALL_RULE_NAME" \
+    --yes \
+    --output none
+  echo "    Firewall rule removed."
+}
+trap cleanup EXIT
 
 echo "==> Fetching backend managed identity IDs..."
 IDENTITY_CLIENT_ID=$(az identity show \
@@ -63,6 +88,9 @@ PGPASSWORD="$PG_TOKEN" PGSSLMODE=require psql \
   --dbname="$DATABASE" \
   <<SQL
 GRANT ALL PRIVILEGES ON DATABASE "${DATABASE}" TO "${BACKEND_IDENTITY_NAME}";
+-- PostgreSQL 15+ no longer grants CREATE on public schema to all users by default.
+-- Explicit schema privileges are required so Alembic can create tables.
+GRANT USAGE, CREATE ON SCHEMA public TO "${BACKEND_IDENTITY_NAME}";
 GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO "${BACKEND_IDENTITY_NAME}";
 GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO "${BACKEND_IDENTITY_NAME}";
 ALTER DEFAULT PRIVILEGES IN SCHEMA public
