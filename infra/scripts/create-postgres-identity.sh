@@ -63,6 +63,9 @@ PGPASSWORD="$PG_TOKEN" PGSSLMODE=require psql \
   --dbname="$DATABASE" \
   <<SQL
 GRANT ALL PRIVILEGES ON DATABASE "${DATABASE}" TO "${BACKEND_IDENTITY_NAME}";
+-- PostgreSQL 15+ no longer grants CREATE on public schema to all users by default.
+-- Explicit schema privileges are required so Alembic can create tables.
+GRANT USAGE, CREATE ON SCHEMA public TO "${BACKEND_IDENTITY_NAME}";
 GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO "${BACKEND_IDENTITY_NAME}";
 GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO "${BACKEND_IDENTITY_NAME}";
 ALTER DEFAULT PRIVILEGES IN SCHEMA public
