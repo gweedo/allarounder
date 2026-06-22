@@ -36,26 +36,48 @@ def validate_image(*, size: int, preview: bytes) -> str:
 
 
 def generate_sas(*, filename: str, settings: Settings) -> tuple[str, str]:
-    """Return (sas_url, blob_url) for a direct browser upload."""
+    """Return (sas_url, blob_url) for a direct browser upload.
+
+    Uses User Delegation SAS when azure_use_managed_identity=True (production),
+    account-key SAS otherwise (local dev with Azurite or azure_storage_account_key set).
+    """
     blob_name = f"{uuid.uuid4()}-{filename}"
-    expiry = datetime.now(tz=UTC) + timedelta(minutes=5)
-
-    client = BlobServiceClient(
-        account_url=f"https://{settings.azure_storage_account_name}.blob.core.windows.net",
-    )
-    account_key: str = client.credential.account_key
-
-    sas_token = generate_blob_sas(
-        account_name=settings.azure_storage_account_name,
-        container_name=settings.azure_storage_container_name,
-        blob_name=blob_name,
-        account_key=account_key,
-        permission=BlobSasPermissions(write=True, create=True),
-        expiry=expiry,
-    )
-    sas_url = (
+    now = datetime.now(tz=UTC)
+    expiry = now + timedelta(minutes=5)
+    account_url = (
         f"https://{settings.azure_storage_account_name}.blob.core.windows.net"
-        f"/{settings.azure_storage_container_name}/{blob_name}?{sas_token}"
     )
+
+    if settings.azure_use_managed_identity:
+        from azure.identity import DefaultAzureCredential
+
+        client = BlobServiceClient(account_url=account_url, credential=DefaultAzureCredential())
+        delegation_key = client.get_user_delegation_key(
+            key_start_time=now,
+            key_expiry_time=expiry,
+        )
+        sas_token = generate_blob_sas(
+            account_name=settings.azure_storage_account_name,
+            container_name=settings.azure_storage_container_name,
+            blob_name=blob_name,
+            user_delegation_key=delegation_key,
+            permission=BlobSasPermissions(write=True, create=True),
+            expiry=expiry,
+        )
+    else:
+        if not settings.azure_storage_account_key:
+            raise ValueError(
+                "AZURE_STORAGE_ACCOUNT_KEY must be set when not using managed identity"
+            )
+        sas_token = generate_blob_sas(
+            account_name=settings.azure_storage_account_name,
+            container_name=settings.azure_storage_container_name,
+            blob_name=blob_name,
+            account_key=settings.azure_storage_account_key,
+            permission=BlobSasPermissions(write=True, create=True),
+            expiry=expiry,
+        )
+
+    sas_url = f"{account_url}/{settings.azure_storage_container_name}/{blob_name}?{sas_token}"
     blob_url = f"{settings.azure_cdn_base_url}/{blob_name}"
     return sas_url, blob_url
