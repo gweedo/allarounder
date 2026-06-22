@@ -219,8 +219,8 @@ Secrets are never committed; the apps read them from Key Vault (or Container App
 
 - **Source control & branching:** GitHub, single **monorepo** (ADR-0006), **GitHub Flow** — `main` plus short-lived feature branches via PR; `main` is always deployable.
 - **Branch protection (ADR-0014):** a GitHub Ruleset (`enforcement: active`, id 17948951) on `refs/heads/main` blocks direct pushes, force-pushes, and deletion; requires a PR with all 6 CI status checks passing before merge. Supplemented by **Claude Code git guardrails** (`.claude/hooks/block-dangerous-git.sh`). Add admin as bypass actor via GitHub UI (`Settings → Rules → Rulesets → Protect main → Bypass list`) for non-code PRs.
-- **Triggers:** PR → checks only (no deploy); merge to `main` → deploy **staging**; **production via manual approval** (GitHub Environment protection rule), restricted to `main`/release tags.
-- **Pipelines:** GitHub Actions, two **path-filtered** workflows (`src/backend/**`, `src/frontend/**`), each running:
+- **Triggers:** `pull_request` (no path filter) → checks only on every PR, both workflows always run; `push` to `main` (path-filtered to `src/backend/**` / `src/frontend/**`) → build + deploy the changed app only. This ensures required checks always report on every PR — no "Expected" states — while keeping push deploys scoped to the app that changed.
+- **Pipelines:** GitHub Actions, two workflows (`backend.yml`, `frontend.yml`), each running:
   1. **Lint & type-check** — Ruff + Black + mypy (backend); ESLint + Prettier + `tsc`/`next build` (frontend).
   2. **Test (tiered)** — unit + application + frontend-unit + **integration** (testcontainers; hosted runners include Docker) with an **80% coverage gate** (domain/application near 100%) **before** the image builds. **Playwright E2E** runs post-deploy on staging as the promotion gate.
   3. **Security scans** — dependency audit (pip-audit, npm audit, Dependabot) + secret scanning (gitleaks + push protection) + container image scan (Trivy) + SAST (CodeQL); **block on high/critical**.

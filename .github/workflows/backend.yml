@@ -7,9 +7,6 @@ on:
       - "src/backend/**"
       - ".github/workflows/backend.yml"
   pull_request:
-    paths:
-      - "src/backend/**"
-      - ".github/workflows/backend.yml"
 
 concurrency:
   group: backend-${{ github.ref }}
