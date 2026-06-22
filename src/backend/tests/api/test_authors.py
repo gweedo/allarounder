@@ -5,9 +5,9 @@ from collections.abc import Generator
 from datetime import UTC, datetime, timedelta
 from unittest.mock import MagicMock
 
+import jwt
 import pytest
 from fastapi.testclient import TestClient
-from jose import jwt
 
 from app.domain.content.entities import Author
 from app.domain.content.value_objects import Slug
