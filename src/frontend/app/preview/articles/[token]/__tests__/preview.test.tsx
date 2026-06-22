@@ -104,7 +104,7 @@ describe("PreviewArticlePage", () => {
       cover_image_alt: "Alt testo",
     });
     const img = document.querySelector("img");
-    expect(img?.getAttribute("src")).toBe("https://cdn.allarounder.it/img/cover.jpg");
+    expect(img?.getAttribute("src")).toContain(encodeURIComponent("https://cdn.allarounder.it/img/cover.jpg"));
     expect(img?.getAttribute("alt")).toBe("Alt testo");
   });
 

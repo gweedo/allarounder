@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { remark } from "remark";
 import remarkRehype from "remark-rehype";
@@ -137,11 +138,15 @@ export default async function ArticlePage({ params }: Props) {
       />
       <article>
         {article.cover_image_url && (
-          <img
-            src={article.cover_image_url}
-            alt={article.cover_image_alt ?? `Copertina articolo: ${article.title}`}
-            style={{ width: "100%", borderRadius: "8px", marginBottom: "1.5rem" }}
-          />
+          <div style={{ position: "relative", width: "100%", aspectRatio: "16/9", marginBottom: "1.5rem" }}>
+            <Image
+              src={article.cover_image_url}
+              alt={article.cover_image_alt ?? `Copertina articolo: ${article.title}`}
+              fill
+              style={{ objectFit: "cover", borderRadius: "8px" }}
+              priority
+            />
+          </div>
         )}
         <h1>{article.title}</h1>
         <div style={{ color: "#666", marginTop: "0.25rem" }}>

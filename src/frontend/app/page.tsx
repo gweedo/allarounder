@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 
 export const revalidate = 60;
@@ -88,18 +89,15 @@ export default async function HomePage({ searchParams }: Props) {
           aria-label="Articolo in evidenza"
         >
           {hero.cover_image_url ? (
-            <img
-              src={hero.cover_image_url}
-              alt={hero.cover_image_alt ?? `Copertina: ${hero.title}`}
-              style={{
-                width: "100%",
-                maxHeight: 400,
-                objectFit: "cover",
-                borderRadius: 8,
-                marginBottom: "1.5rem",
-                display: "block",
-              }}
-            />
+            <div style={{ position: "relative", width: "100%", height: 400, marginBottom: "1.5rem" }}>
+              <Image
+                src={hero.cover_image_url}
+                alt={hero.cover_image_alt ?? `Copertina: ${hero.title}`}
+                fill
+                style={{ objectFit: "cover", borderRadius: 8 }}
+                priority
+              />
+            </div>
           ) : (
             <div
               aria-hidden="true"
@@ -189,18 +187,14 @@ export default async function HomePage({ searchParams }: Props) {
             {grid.map((article) => (
               <li key={article.id}>
                 {article.cover_image_url ? (
-                  <img
-                    src={article.cover_image_url}
-                    alt={article.cover_image_alt ?? `Copertina: ${article.title}`}
-                    style={{
-                      width: "100%",
-                      height: 180,
-                      objectFit: "cover",
-                      borderRadius: 6,
-                      display: "block",
-                      marginBottom: "0.75rem",
-                    }}
-                  />
+                  <div style={{ position: "relative", width: "100%", height: 180, marginBottom: "0.75rem" }}>
+                    <Image
+                      src={article.cover_image_url}
+                      alt={article.cover_image_alt ?? `Copertina: ${article.title}`}
+                      fill
+                      style={{ objectFit: "cover", borderRadius: 6 }}
+                    />
+                  </div>
                 ) : (
                   <div
                     aria-hidden="true"

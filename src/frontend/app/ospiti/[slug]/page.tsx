@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 
 export const revalidate = 60;
@@ -64,10 +65,12 @@ export default async function GuestPage({ params }: Props) {
     <main style={{ maxWidth: 900, margin: "2rem auto", padding: "0 1rem" }}>
       <header style={{ display: "flex", gap: "1.5rem", alignItems: "flex-start", marginBottom: "2rem" }}>
         {data.photo_url && (
-          <img
+          <Image
             src={data.photo_url}
             alt={`Foto di ${data.name}`}
-            style={{ width: 120, height: 120, borderRadius: "50%", objectFit: "cover" }}
+            width={120}
+            height={120}
+            style={{ borderRadius: "50%", objectFit: "cover" }}
           />
         )}
         <div>
@@ -103,11 +106,14 @@ export default async function GuestPage({ params }: Props) {
               style={{ borderBottom: "1px solid #eee", paddingBottom: "1.5rem" }}
             >
               {article.cover_image_url && (
-                <img
-                  src={article.cover_image_url}
-                  alt={article.cover_image_alt ?? `Copertina: ${article.title}`}
-                  style={{ width: "100%", maxHeight: 200, objectFit: "cover", borderRadius: 6 }}
-                />
+                <div style={{ position: "relative", width: "100%", height: 200 }}>
+                  <Image
+                    src={article.cover_image_url}
+                    alt={article.cover_image_alt ?? `Copertina: ${article.title}`}
+                    fill
+                    style={{ objectFit: "cover", borderRadius: 6 }}
+                  />
+                </div>
               )}
               <h2 style={{ marginTop: "0.75rem" }}>
                 <a
