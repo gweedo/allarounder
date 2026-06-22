@@ -14,7 +14,9 @@ class Settings(BaseSettings):
     jwt_access_token_expire_minutes: int = 30
     jwt_refresh_token_expire_days: int = 14
     azure_storage_account_name: str = ""
+    azure_storage_account_key: str = ""
     azure_storage_container_name: str = "images"
+    trust_forwarded_for: bool = False
     azure_cdn_base_url: str = "https://cdn.allarounder.it/images"
     cors_allowed_origins: str = "http://localhost:3000"
     log_level: str = "DEBUG"

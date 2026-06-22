@@ -6,9 +6,9 @@ from collections.abc import Generator
 from datetime import UTC, datetime, timedelta
 from unittest.mock import patch
 
+import jwt
 import pytest
 from fastapi.testclient import TestClient
-from jose import jwt
 
 from app.main import app
 from app.settings import get_settings

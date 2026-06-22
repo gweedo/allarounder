@@ -127,9 +127,11 @@ module postgresAdmin './modules/postgres-admin.bicep' = {
 
 module storage './modules/storage.bicep' = {
   name: 'storage'
+  dependsOn: [identity]
   params: {
     location: location
     storageAccountName: storageAccountName
+    backendIdentityPrincipalId: identity.outputs.backendIdentityPrincipalId
   }
 }
 

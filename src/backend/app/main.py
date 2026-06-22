@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
@@ -24,7 +24,22 @@ from app.settings import get_settings
 
 settings = get_settings()
 
-limiter = Limiter(key_func=get_remote_address, default_limits=[])
+
+def _get_real_ip(request: Request) -> str:
+    """Resolve real client IP from X-Forwarded-For when behind a trusted proxy.
+
+    Only active when TRUST_FORWARDED_FOR=true (set in production behind Front Door).
+    Safe because the backend Container App ingress is internal-only; external
+    traffic cannot reach it directly and spoof the header.
+    """
+    if settings.trust_forwarded_for:
+        forwarded_for = request.headers.get("X-Forwarded-For", "")
+        if forwarded_for:
+            return forwarded_for.split(",")[0].strip()
+    return get_remote_address(request)
+
+
+limiter = Limiter(key_func=_get_real_ip, default_limits=[])
 app = FastAPI(title="Allarounder API", version="0.1.0")
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)  # type: ignore[arg-type]

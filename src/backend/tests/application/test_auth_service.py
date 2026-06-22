@@ -78,17 +78,14 @@ class FakeBreachedChecker:
 
 
 class FakeTokenIssuer:
-    """Encodes JWTs using jose directly — kept in test infra, not app layer."""
-
     def __init__(self) -> None:
         self._secret = "test-secret"
         self._algo = "HS256"
 
     def encode(self, payload: dict[str, object]) -> str:
-        from jose import jwt
+        import jwt
 
-        token: str = jwt.encode(payload, self._secret, algorithm=self._algo)
-        return token
+        return jwt.encode(payload, self._secret, algorithm=self._algo)
 
 
 # ── Fixtures ─────────────────────────────────────────────────────────────────

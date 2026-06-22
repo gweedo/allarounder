@@ -3,10 +3,10 @@
 from datetime import UTC, datetime, timedelta
 from typing import Annotated
 
+import jwt
 import pytest
 from fastapi import Depends, FastAPI
 from fastapi.testclient import TestClient
-from jose import jwt
 
 from app.interfaces.api.auth.dependencies import (
     CurrentUser,
