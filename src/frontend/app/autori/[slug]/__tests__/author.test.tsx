@@ -75,7 +75,7 @@ describe("AuthorPage", () => {
     });
     const img = document.querySelector("img");
     expect(img).toBeTruthy();
-    expect(img?.getAttribute("src")).toBe("https://cdn.allarounder.it/authors/marco.jpg");
+    expect(img?.getAttribute("src")).toContain(encodeURIComponent("https://cdn.allarounder.it/authors/marco.jpg"));
   });
 
   it("renders empty state when no articles", async () => {

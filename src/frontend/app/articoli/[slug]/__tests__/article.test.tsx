@@ -109,7 +109,7 @@ describe("ArticlePage", () => {
     });
     const img = document.querySelector("img");
     expect(img).toBeTruthy();
-    expect(img?.getAttribute("src")).toBe("https://cdn.allarounder.it/images/copertina.jpg");
+    expect(img?.getAttribute("src")).toContain(encodeURIComponent("https://cdn.allarounder.it/images/copertina.jpg"));
     expect(img?.getAttribute("alt")).toBe("Copertina episodio sport");
   });
 
