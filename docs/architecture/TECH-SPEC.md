@@ -272,6 +272,7 @@ Development follows **Test-Driven Development** (red → green → refactor); te
 **Auth**
 - JWT stored in **`httpOnly`, `Secure`, `SameSite=Strict` cookies** — JS never reads the token.
 - **30-min access token + 14-day rotating refresh token** (`refresh_tokens` table); revoked on logout, password change, or by admin.
+- Backend JWT library: **`PyJWT>=2.8.0`** (Python). Frontend Next.js middleware uses the JavaScript **`jose`** library.
 - Passwords hashed with **argon2**; **12-char minimum**, HaveIBeenPwned breach check, soft lockout after 10 failures (5-min cooldown).
 
 **Authorization**
@@ -282,7 +283,7 @@ Development follows **Test-Driven Development** (red → green → refactor); te
 **Network**
 - HTTPS everywhere (Front Door managed certs for both domains; HSTS at Front Door).
 - **CORS** — explicit allowlist (`allarounder.it` + staging); `allow_credentials=True`; no wildcard.
-- **Rate limiting** — WAF (1 000 req/min/IP) + `slowapi` per-endpoint: login 10/min, refresh 20/min, search 60/min, upload 10/min/user.
+- **Rate limiting** — WAF (1 000 req/min/IP) + `slowapi` per-endpoint: login 10/min, refresh 20/min, search 60/min, upload 10/min/user. When deployed behind Azure Front Door, `slowapi` is configured to read the real client IP from the `X-Forwarded-For` / `X-Azure-ClientIP` header; the middleware only trusts that header when the request arrives from known Front Door peer IPs (not from arbitrary callers).
 - **WAF** — `Microsoft_DefaultRuleSet_2.1` (OWASP Top 10); Detection mode at launch → Prevention after burn-in; provisioned in Bicep.
 
 **Content safety**
@@ -294,6 +295,9 @@ Development follows **Test-Driven Development** (red → green → refactor); te
 - Postgres and Blob Storage accessed via **managed identity** (`DefaultAzureCredential`) — no passwords or storage keys in Key Vault.
 - Key Vault holds only the **JWT signing key**. CI uses OIDC federated credentials (ADR-0012) — no long-lived secrets in GitHub.
 - **Blob Storage container is private**; images served exclusively through Front Door (`cdn.allarounder.it/...`).
+- **SAS token strategy (image upload):** the backend issues a short-lived SAS token so the browser can upload directly to Blob Storage. Two paths depending on environment:
+  - **Dev / CI** (`azure_use_managed_identity=false`): account-key SAS generated from the storage account key.
+  - **Production** (`azure_use_managed_identity=true`): **User Delegation SAS** — the backend exchanges its managed identity credential for a user delegation key and signs the SAS with it; no account key is needed or stored. The backend's managed identity must hold the **`Storage Blob Delegator`** role on the storage account.
 
 **Deferred**
 - Content-Security-Policy (post-launch hardening pass).
@@ -306,7 +310,7 @@ Development follows **Test-Driven Development** (red → green → refactor); te
 - **Levels:** INFO+ in production, DEBUG in development (config-driven).
 - **Privacy (GDPR):** redact secrets/tokens/passwords, full request bodies, and PII (subscriber emails, unneeded IPs) at the logging boundary. Tests assert no secrets/PII are emitted (ADR-0009).
 - **DDD:** logging lives in `application`/`interfaces`/`infrastructure` via middleware + a logging port; the `domain` layer stays logging-free.
-- **Health:** liveness/readiness endpoints back Container Apps probes.
+- **Health endpoint contract:** `GET /api/health` runs a DB liveness probe on every call. `200 {"status":"ok"}` means both the app and the database are reachable; `503 {"status":"unavailable"}` means the database is unreachable. This endpoint is the readiness probe target in Bicep and the CI blue-green deploy gate — the platform only marks a revision `Running` after it passes (see §7 for the internal-ingress constraint).
 - **Retention:** Log Analytics retention set to a defined window (default 30–90 days), provisioned via Bicep.
 
 ### SEO (product-critical)
