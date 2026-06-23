@@ -23,6 +23,9 @@
     "remark": "^15.0.1",
     "remark-rehype": "^11.1.2"
   },
+  "overrides": {
+    "postcss": "^8.5.10"
+  },
   "devDependencies": {
     "@playwright/test": "^1.47.0",
     "@testing-library/jest-dom": "^6.5.0",
