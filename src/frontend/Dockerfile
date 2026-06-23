@@ -1,4 +1,4 @@
-FROM node:22-slim AS base
+FROM node:22-alpine AS base
 WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1
 
