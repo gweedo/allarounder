@@ -2,18 +2,18 @@ import { test, expect } from "@playwright/test";
 
 test.describe("Homepage", () => {
   test("renders the site heading", async ({ page }) => {
-    await page.route("**/api/articles*", (route) =>
-      route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify({ items: [], total: 0, page: 1, page_size: 13 }),
-      }),
-    );
     await page.goto("/");
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
   });
 
+  // page.route() intercepts only browser-side requests; Next.js RSC fetches articles
+  // server-side, so the stub cannot inject mock data into a remote staging deployment.
   test("hero article title is visible → click → arrive at article page", async ({ page }) => {
+    test.skip(
+      !!process.env.PLAYWRIGHT_BASE_URL,
+      "page.route() cannot intercept SSR data fetches against a remote staging server",
+    );
+
     const article = {
       id: "art-1",
       title: "Campionati del Mondo 2026",

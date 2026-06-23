@@ -93,7 +93,7 @@ describe("HomePage", () => {
     });
     const heroSection = screen.getByRole("region", { name: /articolo in evidenza/i });
     expect(heroSection).toBeInTheDocument();
-    expect(heroSection.querySelector("h1")).toHaveTextContent("Articolo principale");
+    expect(heroSection.querySelector("h2")).toHaveTextContent("Articolo principale");
   });
 
   it("renders Leggi link in hero pointing to article", async () => {

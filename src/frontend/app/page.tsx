@@ -73,11 +73,11 @@ export default async function HomePage({ searchParams }: Props) {
 
   return (
     <main style={{ maxWidth: 1100, margin: "2rem auto", padding: "0 1rem" }}>
-      <p style={{ marginBottom: "2rem", fontSize: "1.25rem", fontWeight: "bold" }}>
+      <h1 style={{ marginBottom: "2rem", fontSize: "1.25rem", fontWeight: "bold" }}>
         <Link href="/" style={{ textDecoration: "none", color: "inherit" }}>
           Allarounder
         </Link>
-      </p>
+      </h1>
 
       {hero && (
         <section
@@ -127,14 +127,14 @@ export default async function HomePage({ searchParams }: Props) {
               {hero.category.name}
             </Link>
           )}
-          <h1 style={{ fontSize: "2rem", margin: "0 0 0.5rem" }}>
+          <h2 style={{ fontSize: "2rem", margin: "0 0 0.5rem" }}>
             <Link
               href={`/articoli/${hero.slug}`}
               style={{ textDecoration: "none", color: "inherit" }}
             >
               {hero.title}
             </Link>
-          </h1>
+          </h2>
           {hero.excerpt && (
             <p style={{ color: "#555", fontSize: "1.1rem", margin: "0.5rem 0 1rem" }}>
               {hero.excerpt}
