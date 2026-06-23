@@ -15,6 +15,8 @@ RUN npm run build
 # ---- production ----
 FROM base AS runner
 ENV NODE_ENV=production
+# Remove npm (not needed at runtime) to eliminate npm-bundled CVEs from the image
+RUN npm uninstall -g npm
 RUN addgroup --system --gid 1001 nodejs && adduser --system --uid 1001 nextjs
 COPY --from=builder /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
