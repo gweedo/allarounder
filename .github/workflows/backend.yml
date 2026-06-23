@@ -33,7 +33,7 @@ jobs:
         working-directory: src/backend
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: actions/setup-python@v5
         with:
@@ -73,7 +73,7 @@ jobs:
           --health-retries 5
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: actions/setup-python@v5
         with:
@@ -104,7 +104,7 @@ jobs:
         working-directory: src/backend
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
@@ -122,7 +122,7 @@ jobs:
         run: pip-audit --skip-editable --vulnerability-service pypi
 
       - name: Secret scan (gitleaks)
-        uses: gitleaks/gitleaks-action@v2
+        uses: gitleaks/gitleaks-action@v3
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -138,7 +138,7 @@ jobs:
       image-tag: ${{ github.sha }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Azure login (OIDC)
         uses: azure/login@v2
@@ -209,7 +209,9 @@ jobs:
 
           echo "Migration execution: $EXECUTION"
 
-          # Poll until the job completes
+          # Poll until the job completes; tolerate up to 3 consecutive Unknown
+          # statuses (transient Azure state between Running and Failed/Succeeded)
+          unknown_streak=0
           for i in $(seq 1 60); do
             STATUS=$(az containerapp job execution show \
               --name "${{ vars.MIGRATION_JOB_NAME }}" \
@@ -220,9 +222,17 @@ jobs:
             if [[ "$STATUS" == "Succeeded" ]]; then
               echo "Migrations succeeded."
               break
-            elif [[ "$STATUS" == "Failed" || "$STATUS" == "Unknown" ]]; then
-              echo "Migration failed: $STATUS"
+            elif [[ "$STATUS" == "Failed" ]]; then
+              echo "Migration failed."
               exit 1
+            elif [[ "$STATUS" == "Unknown" ]]; then
+              unknown_streak=$((unknown_streak + 1))
+              if [[ $unknown_streak -ge 3 ]]; then
+                echo "Migration status Unknown for 3 consecutive polls — treating as failure."
+                exit 1
+              fi
+            else
+              unknown_streak=0
             fi
             sleep 10
           done
@@ -330,6 +340,7 @@ jobs:
             --resource-group "${{ vars.RESOURCE_GROUP }}" \
             --query "name" -o tsv)
 
+          unknown_streak=0
           for i in $(seq 1 60); do
             STATUS=$(az containerapp job execution show \
               --name "${{ vars.MIGRATION_JOB_NAME }}" \
@@ -338,9 +349,17 @@ jobs:
               --query "properties.status" -o tsv)
             echo "  Status ($i/60): $STATUS"
             if [[ "$STATUS" == "Succeeded" ]]; then break; fi
-            if [[ "$STATUS" == "Failed" || "$STATUS" == "Unknown" ]]; then
-              echo "Migration failed: $STATUS"
+            if [[ "$STATUS" == "Failed" ]]; then
+              echo "Migration failed."
               exit 1
+            elif [[ "$STATUS" == "Unknown" ]]; then
+              unknown_streak=$((unknown_streak + 1))
+              if [[ $unknown_streak -ge 3 ]]; then
+                echo "Migration status Unknown for 3 consecutive polls — treating as failure."
+                exit 1
+              fi
+            else
+              unknown_streak=0
             fi
             sleep 10
           done
