@@ -12,7 +12,7 @@ from datetime import timedelta
 from sqlalchemy.orm import Session, sessionmaker
 
 from app.application.identity.services import AuthService
-from app.infrastructure.database import get_engine
+from app.infrastructure.database import get_migration_engine
 from app.infrastructure.identity.hibp import HibpBreachedPasswordChecker
 from app.infrastructure.identity.password import Argon2PasswordHasher
 from app.infrastructure.identity.repositories import SqlRefreshTokenRepository, SqlUserRepository
@@ -23,7 +23,7 @@ from app.settings import get_settings
 def _build_service() -> tuple[AuthService, Session]:
     settings = get_settings()
     SessionFactory: sessionmaker[Session] = sessionmaker(
-        bind=get_engine(), expire_on_commit=False
+        bind=get_migration_engine(), expire_on_commit=False
     )
     session: Session = SessionFactory()
 

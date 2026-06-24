@@ -8,7 +8,7 @@ config = context.config
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-from app.infrastructure.database import Base, get_engine  # noqa: E402
+from app.infrastructure.database import Base, get_migration_engine  # noqa: E402
 
 target_metadata = Base.metadata
 
@@ -32,10 +32,11 @@ def run_migrations_offline() -> None:
 
 
 def run_migrations_online() -> None:
-    # Use get_engine() so the Azure AD token do_connect listener is registered
-    # when AZURE_USE_MANAGED_IDENTITY=true (engine_from_config bypasses it,
-    # causing "no password supplied" against AD-only PostgreSQL).
-    connectable = get_engine()
+    # Use get_migration_engine() so the Azure AD token do_connect listener is
+    # registered when AZURE_USE_MANAGED_IDENTITY=true (engine_from_config bypasses
+    # it, causing "no password supplied" against AD-only PostgreSQL). NullPool keeps
+    # this one-shot process to a single connection instead of a 5-connection pool.
+    connectable = get_migration_engine()
     with connectable.connect() as connection:
         context.configure(connection=connection, target_metadata=target_metadata)
         with context.begin_transaction():

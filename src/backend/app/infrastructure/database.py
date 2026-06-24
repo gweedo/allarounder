@@ -1,7 +1,7 @@
 from functools import lru_cache
 from typing import Any
 
-from sqlalchemy import Engine, create_engine, event
+from sqlalchemy import Engine, create_engine, event, pool
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 
 from app.settings import get_settings
@@ -26,10 +26,19 @@ def _get_entra_pg_token() -> str:
     )
 
 
-def get_engine() -> Engine:
+def _make_engine(null_pool: bool = False) -> Engine:
     settings = get_settings()
-    engine = create_engine(settings.database_url, echo=settings.app_env == "development")
-
+    kwargs: dict[str, Any] = {"echo": settings.app_env == "development"}
+    if null_pool:
+        kwargs["poolclass"] = pool.NullPool
+    else:
+        # The pooled engine is long-lived; Azure PostgreSQL drops idle
+        # connections, so validate on checkout and recycle before the server
+        # would. pre_ping reconnects transparently, re-firing the do_connect
+        # token listener.
+        kwargs["pool_pre_ping"] = True
+        kwargs["pool_recycle"] = 1800
+    engine = create_engine(settings.database_url, **kwargs)
     if settings.azure_use_managed_identity:
         # Inject a fresh Entra token on every new psycopg connection.
         # Azure Identity caches tokens internally and refreshes before expiry.
@@ -38,8 +47,22 @@ def get_engine() -> Engine:
             dialect: Any, conn_rec: Any, cargs: Any, cparams: Any
         ) -> None:
             cparams["password"] = _get_entra_pg_token()
-
     return engine
+
+
+@lru_cache(maxsize=1)
+def get_engine() -> Engine:
+    """Shared pooled engine for the web app — cached so the pool is never recreated."""
+    return _make_engine(null_pool=False)
+
+
+def get_migration_engine() -> Engine:
+    """NullPool engine for one-shot processes (Alembic, bootstrap CLI).
+
+    Uses exactly one connection and releases it immediately — safe to call
+    when max_connections is under pressure.
+    """
+    return _make_engine(null_pool=True)
 
 
 def get_session_factory() -> sessionmaker[Session]:
