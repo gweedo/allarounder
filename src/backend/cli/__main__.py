@@ -5,6 +5,7 @@ Usage:
 """
 
 import argparse
+import getpass
 import sys
 from datetime import timedelta
 
@@ -38,7 +39,9 @@ def _build_service() -> tuple[AuthService, Session]:
     return svc, session
 
 
-def cmd_create_admin(email: str, password: str) -> None:
+def cmd_create_admin(email: str, password: str | None) -> None:
+    if password is None:
+        password = getpass.getpass("Password: ")
     svc, session = _build_service()
     try:
         user = svc.create_admin(email, password)
@@ -61,7 +64,7 @@ def main() -> None:
     )
     create_parser.add_argument("--email", required=True, help="Admin email address")
     create_parser.add_argument(
-        "--password", required=True, help="Admin password (min 12 chars)"
+        "--password", default=None, help="Admin password (min 12 chars); prompted if omitted"
     )
 
     args = parser.parse_args()
