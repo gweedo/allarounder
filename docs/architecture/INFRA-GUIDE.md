@@ -503,6 +503,35 @@ curl -I https://allarounder.eu/ | grep -i location
 
 ## Day-2 operations
 
+### Bootstrap the first admin user
+
+After the first successful deploy to an environment, the database contains no users. Run the bootstrap CLI from inside the backend container using `az containerapp exec`. The CLI prompts for the password interactively — it is never echoed to the terminal and never appears in shell history, `az` activity logs, or the container process list.
+
+```bash
+# Staging
+az containerapp exec \
+  --name allarounder-staging-backend \
+  --resource-group allarounder-staging \
+  --command "python -m cli create-admin --email <your-email>"
+# Password: ▌  ← type here, input is hidden
+
+# Production (repeat after the production deploy is approved)
+az containerapp exec \
+  --name allarounder-production-backend \
+  --resource-group allarounder-production \
+  --command "python -m cli create-admin --email <your-email>"
+```
+
+**Password requirements** (enforced by the domain policy):
+- Minimum 12 characters
+- Must not appear in the HaveIBeenPwned breached-passwords database
+
+The CLI uses `get_engine()` internally, so it inherits the Entra token injection — no database password needs to be supplied.
+
+Running the command a second time with the same email raises an error and leaves the existing user unchanged.
+
+---
+
 ### Rolling back a deploy
 
 Container Apps keeps old revisions warm. Instant rollback:
@@ -604,6 +633,7 @@ Application Insights traces are available at:
 | `az login` fails in workflow | OIDC federated credential subject doesn't match | Verify the `--subject` includes the correct environment name |
 | Backend starts but returns 500 | `jwt-signing-key` secret not in Key Vault yet | Run step 6 |
 | Backend can't connect to Postgres | Managed identity not granted PostgreSQL role | Re-run `create-postgres-identity.sh` |
+| Admin login returns 401 on first deploy | No admin user exists yet | Run the bootstrap CLI (see Day-2 § Bootstrap the first admin user) |
 | Trivy scan blocks the build | High/critical CVE in base image | Rebuild `FROM python:3.12-slim` after `docker pull python:3.12-slim` picks up a patched layer; or add to `.trivyignore` if confirmed false positive |
 | Front Door returns 421 on custom domain | DNS CNAME not propagated / TXT verification pending | Wait 30 min; check with `dig CNAME allarounder.it` |
 | WAF blocks legitimate traffic | Managed rule false positive | Identify rule ID in Front Door logs, add rule exclusion in `frontdoor.bicep` |

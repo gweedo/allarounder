@@ -5,13 +5,14 @@ Usage:
 """
 
 import argparse
+import getpass
 import sys
 from datetime import timedelta
 
-from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 
 from app.application.identity.services import AuthService
+from app.infrastructure.database import get_engine
 from app.infrastructure.identity.hibp import HibpBreachedPasswordChecker
 from app.infrastructure.identity.password import Argon2PasswordHasher
 from app.infrastructure.identity.repositories import SqlRefreshTokenRepository, SqlUserRepository
@@ -21,9 +22,8 @@ from app.settings import get_settings
 
 def _build_service() -> tuple[AuthService, Session]:
     settings = get_settings()
-    engine = create_engine(settings.database_url)
     SessionFactory: sessionmaker[Session] = sessionmaker(
-        bind=engine, expire_on_commit=False
+        bind=get_engine(), expire_on_commit=False
     )
     session: Session = SessionFactory()
 
@@ -39,7 +39,9 @@ def _build_service() -> tuple[AuthService, Session]:
     return svc, session
 
 
-def cmd_create_admin(email: str, password: str) -> None:
+def cmd_create_admin(email: str, password: str | None) -> None:
+    if password is None:
+        password = getpass.getpass("Password: ")
     svc, session = _build_service()
     try:
         user = svc.create_admin(email, password)
@@ -62,7 +64,7 @@ def main() -> None:
     )
     create_parser.add_argument("--email", required=True, help="Admin email address")
     create_parser.add_argument(
-        "--password", required=True, help="Admin password (min 12 chars)"
+        "--password", default=None, help="Admin password (min 12 chars); prompted if omitted"
     )
 
     args = parser.parse_args()
