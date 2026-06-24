@@ -16,7 +16,7 @@ from app.infrastructure.database import get_engine
 from app.infrastructure.identity.hibp import HibpBreachedPasswordChecker
 from app.infrastructure.identity.password import Argon2PasswordHasher
 from app.infrastructure.identity.repositories import SqlRefreshTokenRepository, SqlUserRepository
-from app.infrastructure.identity.tokens import JoseTokenIssuer
+from app.infrastructure.identity.tokens import JwtTokenIssuer
 from app.settings import get_settings
 
 
@@ -32,7 +32,7 @@ def _build_service() -> tuple[AuthService, Session]:
         token_repo=SqlRefreshTokenRepository(session),
         password_hasher=Argon2PasswordHasher(),
         breached_checker=HibpBreachedPasswordChecker(),
-        token_issuer=JoseTokenIssuer(settings.jwt_secret_key, settings.jwt_algorithm),
+        token_issuer=JwtTokenIssuer(settings.jwt_secret_key, settings.jwt_algorithm),
         access_token_ttl=timedelta(minutes=settings.jwt_access_token_expire_minutes),
         refresh_token_ttl=timedelta(days=settings.jwt_refresh_token_expire_days),
     )
