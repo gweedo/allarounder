@@ -239,3 +239,88 @@ for new projects that put auth-aware middleware in front of an SSR app.
 > **If a new project adopts only one thing from this:** a CI test that runs the real migration
 > chain against a real database, plus the rule that every deploy step verifies its outcome rather
 > than its exit code. Those two alone would have collapsed this six-link chain to zero.
+
+---
+
+## 6. The admin-login marathon — anatomy of a debugging cascade
+
+Failure #7 (admin login) deserves its own chapter, because *fixing* it took far longer than it
+should have — not because the bug was hard, but because the **diagnosis kept chasing the wrong
+thing**. The real root cause was one line; reaching it cost an afternoon of detours. The detours
+are the lesson.
+
+### What was actually wrong (in order of discovery)
+1. **No API proxy** — the browser POSTs to `/api/admin/auth/login` on the frontend origin; the
+   backend is internal-only and Front Door routes `/*` to the frontend, so it must be proxied by the
+   SSR app.
+2. **Wrong env-var name** — code reads `API_URL`; bicep set `NEXT_PUBLIC_API_URL`. (This also
+   silently emptied every server-rendered page.)
+3. **Missing JWT secret** on the frontend container (the middleware verifies the cookie).
+4. **`acr-pull-assignments` idempotency bug** — blocked the full Bicep redeploy, forcing surgical
+   `az` CLI changes instead.
+5. **Multiple-revision traffic pinning** — `az containerapp update` created new revisions at **0%
+   traffic**; every probe hit an *older* revision, so each fix looked like it did nothing.
+6. **Build-time-baked rewrite (the real root cause)** — the `next.config` rewrite froze its
+   destination to the `http://backend:8000` fallback at **build** time, because `API_URL` was unset
+   during the CI build. Runtime env could never change it. Fixed with a runtime route handler.
+
+### The detours, and why each happened
+- **Cert red herring (twice).** "Internal HTTPS must be a TLS-trust problem" felt obvious, so two
+  rounds went into cert theory and a `NODE_TLS_REJECT_UNAUTHORIZED=0` test — which *also* failed,
+  because the request wasn't even using the HTTPS URL (it was the baked `http://backend:8000`). We
+  theorized about the hop before confirming which hop was being made.
+- **Traffic pinning corrupted the signal.** Because new revisions got 0% traffic, several "the fix
+  didn't work" conclusions were actually "the fix isn't serving." Hours of test results were invalid
+  because they hit the wrong revision.
+- **The breakthrough was a log line, not a theory.** Pulling the *serving* revision's logs showed
+  `Failed to proxy http://backend:8000/... ENOTFOUND backend`, which instantly collapsed the cert,
+  connectivity, and env theories at once. One real error beat a day of inference.
+
+### Meta-lessons (the expensive ones)
+- **Get the real error before changing anything.** Every detour came from acting on a hypothesis
+  instead of an observation. Rule: when a fix doesn't move the symptom, the next step is a new
+  *observation* (a log line, the exact error, the actual served bytes) — never another blind change.
+- **Confirm which artifact is actually live.** In any blue-green / multi-revision system, "I changed
+  X" ≠ "the running thing has X." Verify which revision/image/commit serves traffic *before*
+  interpreting a test. Prefer single-revision mode (or always pin traffic to latest) unless you
+  specifically need weighted rollouts.
+- **Know what's frozen at build vs read at runtime.** `next.config` rewrites, `NEXT_PUBLIC_*` vars,
+  and anything bundled are **build-time**; route handlers, server components, and `process.env`
+  reads are **runtime**. A value that varies per environment (an internal backend URL) must live on
+  the runtime side. This one distinction would have prevented the whole marathon.
+- **Diagnose from inside the box.** "Does the internal HTTPS hop work?" was answered in seconds by
+  running the exact call (`node -e "fetch(...)"`) from inside the frontend container — after a day of
+  guessing from outside. Replicate the failing call in the failing environment.
+- **Make failures self-diagnosing.** The route handler now returns a `502` with the real fetch error
+  and cause instead of an opaque `500`. Opaque error surfaces are how a one-line bug becomes a day.
+- **Surgical CLI changes are a bridge, not a fix.** We applied the frontend KV role / secret / env
+  via `az` because the Bicep deploy was blocked. It works, but it's drift waiting to happen — and it
+  makes the thing blocking the IaC deploy (the `acr-pull-assignments` bug) a priority, because it
+  will block every future deploy and the production promotion.
+
+### Controls a scaffold/orchestrator should add from this chapter
+1. **A login smoke test in CI/CD** that performs a real `POST /login` against the deployed stack and
+   asserts `200` + `Set-Cookie` — not "the login page renders." Catches the proxy, env name, secret,
+   and cookie forwarding in one shot.
+2. **A "which revision serves traffic?" assertion** in the deploy step, and single-revision mode by
+   default unless weighted traffic is explicitly required.
+3. **A build-vs-runtime config check**: flag env vars referenced in `next.config`
+   rewrites/redirects (build-time) that are expected to vary per environment.
+4. **Idempotent role-assignment modules** (deterministic `guid()` names, tolerate pre-existing) so a
+   second `az deployment group create` never fails on `RoleAssignmentExists`.
+
+---
+
+## 7. The single most important takeaway
+
+Across **both** halves of this session — the migration chain and the admin-login marathon — the same
+two disciplines would have prevented essentially all of it:
+
+1. **End-to-end smoke tests of the real critical paths** (migrate → tables exist; login → 200 +
+   cookie) against **real** infrastructure, wired into the deploy. Mocks and "page renders" checks
+   hid every single bug.
+2. **Verify the outcome, never the exit code — and confirm which artifact is live before believing a
+   test.** "Job succeeded," "I set the env," "I deployed the fix" were all true and all irrelevant,
+   because the *effect* wasn't verified and the *serving* artifact wasn't confirmed.
+
+Everything else in this document is an instance of one of those two.
