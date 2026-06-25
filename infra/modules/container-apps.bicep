@@ -22,6 +22,7 @@ param backendIdentityName string
 param backendIdentityPrincipalId string
 param backendIdentityClientId string
 param frontendIdentityId string
+param frontendIdentityPrincipalId string
 
 // Built-in role IDs
 var storageBlobDataContributorRoleId = 'ba92f5b4-2d11-453d-a403-e96b0029c9fe'
@@ -53,6 +54,18 @@ resource backendKvAccess 'Microsoft.Authorization/roleAssignments@2022-04-01' = 
   properties: {
     roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', keyVaultSecretsUserRoleId)
     principalId: backendIdentityPrincipalId
+    principalType: 'ServicePrincipal'
+  }
+}
+
+// Key Vault access for frontend (JWT signing key — the /admin middleware
+// verifies the access-token cookie with the same HS256 secret as the backend)
+resource frontendKvAccess 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(keyVaultId, frontendIdentityId, keyVaultSecretsUserRoleId)
+  scope: kvRef
+  properties: {
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', keyVaultSecretsUserRoleId)
+    principalId: frontendIdentityPrincipalId
     principalType: 'ServicePrincipal'
   }
 }
@@ -203,6 +216,13 @@ resource frontendApp 'Microsoft.App/containerApps@2024-03-01' = {
           identity: frontendIdentityId
         }
       ]
+      secrets: [
+        {
+          name: 'jwt-signing-key'
+          keyVaultUrl: '${keyVaultUri}secrets/jwt-signing-key'
+          identity: frontendIdentityId
+        }
+      ]
     }
     template: {
       containers: [
@@ -215,7 +235,10 @@ resource frontendApp 'Microsoft.App/containerApps@2024-03-01' = {
           }
           env: [
             { name: 'NODE_ENV', value: 'production' }
-            { name: 'NEXT_PUBLIC_API_URL', value: 'https://${backendApp.properties.configuration.ingress.fqdn}' }
+            // Server-side base URL for SSR fetches and the /api/* rewrite proxy.
+            // Must be API_URL (not NEXT_PUBLIC_*) — that is what the app code reads.
+            { name: 'API_URL', value: 'https://${backendApp.properties.configuration.ingress.fqdn}' }
+            { name: 'JWT_SECRET_KEY', secretRef: 'jwt-signing-key' }
             { name: 'APPLICATIONINSIGHTS_CONNECTION_STRING', value: appInsightsConnectionString }
           ]
           probes: [
