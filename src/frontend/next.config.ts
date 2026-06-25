@@ -8,14 +8,11 @@ const nextConfig: NextConfig = {
       { protocol: "http", hostname: "localhost" },
     ],
   },
-  // The backend has internal-only ingress and Front Door routes all traffic to
-  // the frontend, so browser → backend calls (e.g. admin login) must be proxied
-  // through Next.js. Server-side fetches use API_URL directly; this rewrite
-  // covers client-side requests to relative /api/* paths.
-  rewrites: async () => {
-    const apiUrl = process.env.API_URL ?? "http://backend:8000";
-    return [{ source: "/api/:path*", destination: `${apiUrl}/api/:path*` }];
-  },
+  // NOTE: browser → backend /api/* calls are proxied at runtime by the route
+  // handler at app/api/[...path]/route.ts — NOT by a next.config rewrite.
+  // Rewrites bake their destination at build time (process.env.API_URL is unset
+  // during the CI build), which froze the proxy target to the unreachable
+  // http://backend:8000 fallback regardless of the runtime API_URL.
   headers: async () => [
     {
       source: "/(.*)",
