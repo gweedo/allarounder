@@ -176,6 +176,7 @@ module containerApps './modules/container-apps.bicep' = {
     backendIdentityPrincipalId: identity.outputs.backendIdentityPrincipalId
     backendIdentityClientId: identity.outputs.backendIdentityClientId
     frontendIdentityId: identity.outputs.frontendIdentityId
+    frontendIdentityPrincipalId: identity.outputs.frontendIdentityPrincipalId
   }
 }
 
