@@ -5,21 +5,25 @@ param storageContainerName string
 param canonicalDomain string = 'allarounder.it'
 param redirectDomain string = 'allarounder.eu'
 
-// Front Door Premium is required for managed rules with per-ruleSet action override
+// Front Door Standard: custom WAF rules (rate limiting) are supported on this tier.
+// Microsoft-managed rule sets and Private Link to origins are Premium-only and are
+// intentionally not used (see ADR-0015, which amends ADR-0013 §11).
 resource frontDoorProfile 'Microsoft.Cdn/profiles@2024-02-01' = {
   name: 'allarounder-${env}-afd'
   location: 'global'
   sku: {
-    name: 'Premium_AzureFrontDoor'
+    name: 'Standard_AzureFrontDoor'
   }
 }
 
-// WAF policy: managed rules in Detection (ruleSetAction: Log), custom rate-limit in Prevention (action: Block)
+// WAF policy: custom rate-limit rule in Prevention (action: Block).
+// Standard tier supports custom rules only; managed rule sets are Premium-only
+// and are not configured here (a managedRules block is rejected on Standard).
 resource wafPolicy 'Microsoft.Network/FrontDoorWebApplicationFirewallPolicies@2024-02-01' = {
   name: 'allarounder${env}waf'
   location: 'global'
   sku: {
-    name: 'Premium_AzureFrontDoor'
+    name: 'Standard_AzureFrontDoor'
   }
   properties: {
     policySettings: {
@@ -45,15 +49,6 @@ resource wafPolicy 'Microsoft.Network/FrontDoorWebApplicationFirewallPolicies@20
             }
           ]
           action: 'Block'
-        }
-      ]
-    }
-    managedRules: {
-      managedRuleSets: [
-        {
-          ruleSetType: 'Microsoft_DefaultRuleSet'
-          ruleSetVersion: '2.1'
-          ruleSetAction: 'Log'
         }
       ]
     }

@@ -30,7 +30,7 @@ az deployment group create \
 | `modules/postgres.bicep` | PostgreSQL Flexible Server 16 (Entra-only auth, no password) |
 | `modules/storage.bicep` | Blob Storage account + private `images` container |
 | `modules/container-apps.bicep` | CAE + backend app + frontend app + migration job + managed identities + role assignments |
-| `modules/frontdoor.bicep` | Front Door Premium + WAF + HSTS rule + .eu→.it redirect + CDN route |
+| `modules/frontdoor.bicep` | Front Door Standard + custom-rule WAF (rate limit) + HSTS rule + .eu→.it redirect + CDN route |
 
 ## Environments
 
