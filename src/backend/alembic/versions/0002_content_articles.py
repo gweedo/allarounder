@@ -20,7 +20,13 @@ depends_on: str | Sequence[str] | None = None
 
 
 def upgrade() -> None:
-    op.execute("CREATE TYPE publicationstatus AS ENUM ('draft', 'published', 'archived')")
+    # create_type=False is only honoured by postgresql.ENUM, not the generic
+    # sa.Enum. Create the type explicitly and idempotently, then reuse the same
+    # object as the column type so create_table does not re-create it.
+    status_enum = postgresql.ENUM(
+        "draft", "published", "archived", name="publicationstatus", create_type=False
+    )
+    status_enum.create(op.get_bind(), checkfirst=True)
 
     op.create_table(
         "articles",
@@ -30,7 +36,7 @@ def upgrade() -> None:
         sa.Column("body", sa.Text(), nullable=False, server_default=""),
         sa.Column(
             "status",
-            sa.Enum("draft", "published", "archived", name="publicationstatus", create_type=False),
+            status_enum,
             nullable=False,
             server_default="draft",
         ),
@@ -49,4 +55,4 @@ def upgrade() -> None:
 
 def downgrade() -> None:
     op.drop_table("articles")
-    op.execute("DROP TYPE publicationstatus")
+    postgresql.ENUM(name="publicationstatus").drop(op.get_bind(), checkfirst=True)
