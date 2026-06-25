@@ -555,26 +555,11 @@ az containerapp ingress traffic set \
 
 Do the same for the frontend app. Total rollback time: **under 30 seconds**.
 
-### Switching WAF to Prevention mode (post burn-in)
+### WAF rules (Front Door Standard)
 
-Once you're confident the managed rules aren't producing false positives (typically 2–4 weeks after launch):
+Front Door runs on the **Standard** tier (see [ADR-0015](adr/0015-front-door-standard-tier.md)). Standard supports **custom WAF rules only** — the active control is the custom per-IP volumetric rate-limit rule (`RateLimitPerIp`, 1,000 req/min, Block), which runs in Prevention mode from day one. There is no managed rule set and no Detection→Prevention burn-in to perform.
 
-```bash
-# Find the WAF policy name
-WAF_POLICY=$(az network front-door waf-policy list \
-  --resource-group allarounder-production \
-  --query "[0].name" -o tsv)
-
-# Change managed rules from Log to Block
-az network front-door waf-policy managed-rules override \
-  --policy-name "$WAF_POLICY" \
-  --resource-group allarounder-production \
-  --type Microsoft_DefaultRuleSet \
-  --version 2.1 \
-  --action Block
-```
-
-Or redeploy with an updated parameter: change `ruleSetAction` from `'Log'` to `'Block'` in `infra/modules/frontdoor.bicep` and re-run the Bicep deployment.
+Microsoft-managed rule sets (`Microsoft_DefaultRuleSet`) and bot protection require the **Premium** tier and are intentionally not provisioned. If edge logs later show application-layer attack traffic the app controls don't catch, upgrade is a one-line SKU revert (`Standard_AzureFrontDoor` → `Premium_AzureFrontDoor` on both the profile and the WAF policy) plus re-adding a `managedRules` block — a non-breaking upgrade.
 
 ### Scaling Container Apps
 
@@ -636,7 +621,7 @@ Application Insights traces are available at:
 | Admin login returns 401 on first deploy | No admin user exists yet | Run the bootstrap CLI (see Day-2 § Bootstrap the first admin user) |
 | Trivy scan blocks the build | High/critical CVE in base image | Rebuild `FROM python:3.12-slim` after `docker pull python:3.12-slim` picks up a patched layer; or add to `.trivyignore` if confirmed false positive |
 | Front Door returns 421 on custom domain | DNS CNAME not propagated / TXT verification pending | Wait 30 min; check with `dig CNAME allarounder.it` |
-| WAF blocks legitimate traffic | Managed rule false positive | Identify rule ID in Front Door logs, add rule exclusion in `frontdoor.bicep` |
+| WAF blocks legitimate traffic | Custom rate-limit threshold too low | Check `RateLimitPerIp` hits in Front Door logs; raise `rateLimitThreshold` in `frontdoor.bicep` |
 
 ---
 

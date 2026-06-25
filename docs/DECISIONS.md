@@ -217,10 +217,19 @@ Last updated: 2026-06-14
   - **Markdown rendering** — `remark-rehype` (no raw HTML) → `rehype-sanitize`; raw HTML in article bodies is not supported.
   - **HTTP headers** — `nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy`, `Permissions-Policy` in `next.config.js`; HSTS at Front Door. CSP deferred to post-launch hardening.
   - **Blob Storage** — private container; all image URLs through Front Door (`cdn.allarounder.it/...`); raw Blob URLs never exposed.
-  - **WAF** — `Microsoft_DefaultRuleSet_2.1` provisioned in Bicep; Detection mode at launch → Prevention after burn-in.
+  - **WAF** — custom per-IP volumetric rate-limit rule (Prevention) on Front Door **Standard** tier. _(Amended by ADR-0015: the managed `Microsoft_DefaultRuleSet_2.1` was withdrawn — managed rule sets are Premium-only — to drop the ~$295/month Premium base fee; see "Front Door Standard tier" below.)_
   - **Secrets** — managed identity for Postgres and Blob (no passwords in Key Vault); JWT signing key is the only Key Vault secret.
   - **Audit logging** — deferred to phase 2.
 - **Status**: ✅ Final (see ADR-0013)
+- **Decided by**: Team
+
+### Front Door Standard tier (ADR-0015)
+- **Date**: 2026-06-25
+- **Decision**: Move Azure Front Door (profile + WAF policy) from **Premium** to **Standard** tier and remove the Microsoft-managed `Microsoft_DefaultRuleSet_2.1`. Managed rule sets, bot protection, and Private Link origins are Premium-only; the custom per-IP rate-limit rule (Prevention) and all other edge features (TLS, HSTS, `.eu → .it` redirect, image CDN, managed-cert custom domains) are retained on Standard.
+- **Rationale**: The managed rule set was the only feature requiring Premium and was running in Detection (log-only) mode — paying the ~$330/month Premium base fee (vs ~$35 on Standard) for a not-yet-enforced, defence-in-depth layer. The attack classes it covered are handled at the app layer (parameterized queries, Markdown sanitization, magic-bytes upload checks, Pydantic validation), and the active edge control (volumetric rate limit) is a custom rule that Standard supports. Saves ~$295/month per environment.
+- **Trade-off**: Loses managed OWASP/bot rule sets and Private Link at the edge. Blob access is unaffected (private container via User Delegation SAS, not Private Link). Re-upgrading to Premium is a non-breaking one-line SKU revert if edge logs later justify it.
+- **Amends**: ADR-0013 §11 (WAF rules).
+- **Status**: ✅ Final (see ADR-0015)
 - **Decided by**: Team
 
 ### Logging & observability: OpenTelemetry → Azure Monitor

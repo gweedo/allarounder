@@ -128,6 +128,8 @@ The Azure Blob Storage container holding images is **private**. Azure Front Door
 
 ### 11. WAF rules (Azure Front Door)
 
+> **Amended in part by [ADR-0015](0015-front-door-standard-tier.md) (2026-06-25):** the managed `Microsoft_DefaultRuleSet_2.1` and its Detection→Prevention burn-in plan are withdrawn — Front Door moved to the Standard tier, where managed rule sets are unavailable. The custom volumetric rate-limit rule (below, and §6 Layer 1) is retained. The original text is preserved for history.
+
 Provisioned in Bicep, applied identically to staging and production:
 
 - **Managed rule set:** `Microsoft_DefaultRuleSet_2.1` (or latest at provision time) — covers OWASP Top 10 (SQLi, XSS, remote code execution, protocol attacks).

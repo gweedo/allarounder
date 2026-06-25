@@ -18,6 +18,7 @@ This directory records the significant architectural decisions for the Allaround
 | [0012](0012-cicd-pipeline-and-deployment-strategy.md) | CI/CD pipeline & deployment strategy | Accepted | 2026-06-14 |
 | [0013](0013-security-architecture.md) | Security architecture | Accepted | 2026-06-18 |
 | [0014](0014-github-branch-protection.md) | GitHub branch protection for `main` | Accepted | 2026-06-21 |
+| [0015](0015-front-door-standard-tier.md) | Front Door Standard tier (drop managed WAF rule set) — amends 0013 §11 | Accepted | 2026-06-25 |
 
 ## Conventions
 
