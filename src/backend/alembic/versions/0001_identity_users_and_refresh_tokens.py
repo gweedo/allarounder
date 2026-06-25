@@ -20,7 +20,12 @@ depends_on: str | Sequence[str] | None = None
 
 
 def upgrade() -> None:
-    op.execute("CREATE TYPE userrole AS ENUM ('admin', 'editor')")
+    # create_type=False is only honoured by postgresql.ENUM, not the generic
+    # sa.Enum (which silently ignores it and re-creates the type during
+    # create_table). Create the type explicitly and idempotently, then reuse
+    # the same object as the column type so create_table does not re-create it.
+    role_enum = postgresql.ENUM("admin", "editor", name="userrole", create_type=False)
+    role_enum.create(op.get_bind(), checkfirst=True)
 
     op.create_table(
         "users",
@@ -29,7 +34,7 @@ def upgrade() -> None:
         sa.Column("hashed_password", sa.String(512), nullable=False),
         sa.Column(
             "role",
-            sa.Enum("admin", "editor", name="userrole", create_type=False),
+            role_enum,
             nullable=False,
             server_default="editor",
         ),
@@ -62,4 +67,4 @@ def upgrade() -> None:
 def downgrade() -> None:
     op.drop_table("refresh_tokens")
     op.drop_table("users")
-    op.execute("DROP TYPE userrole")
+    postgresql.ENUM(name="userrole").drop(op.get_bind(), checkfirst=True)
