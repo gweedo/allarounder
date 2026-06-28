@@ -61,7 +61,9 @@ async function proxy(req: NextRequest, path: string[]): Promise<NextResponse> {
     resHeaders.append("set-cookie", cookie);
   }
 
-  return new NextResponse(await upstream.arrayBuffer(), {
+  // 204 / 304 must carry no body — passing even an empty ArrayBuffer throws.
+  const isBodyless = upstream.status === 204 || upstream.status === 304;
+  return new NextResponse(isBodyless ? null : await upstream.arrayBuffer(), {
     status: upstream.status,
     statusText: upstream.statusText,
     headers: resHeaders,
