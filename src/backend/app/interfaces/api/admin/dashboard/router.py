@@ -1,7 +1,7 @@
 """Admin dashboard endpoint: personalized article summary for the logged-in editor."""
 
 import uuid
-from typing import Annotated
+from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends
 from sqlalchemy import func, select
@@ -17,7 +17,7 @@ router = APIRouter(prefix="/api/admin/dashboard", tags=["dashboard"])
 _LIMIT = 5
 
 
-def _base_stmt():
+def _base_stmt() -> Any:
     return (
         select(
             ArticleModel.id,
@@ -31,7 +31,7 @@ def _base_stmt():
     )
 
 
-def _to_item(row) -> DashboardArticleItem:
+def _to_item(row: Any) -> DashboardArticleItem:
     return DashboardArticleItem(
         id=row.id,
         title=row.title,
