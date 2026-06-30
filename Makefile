@@ -1,4 +1,18 @@
-.PHONY: ci backend-ci frontend-ci install backend-install frontend-install
+.PHONY: ci backend-ci frontend-ci install backend-install frontend-install up down logs migrate
+
+# ── Local dev (Docker Compose) ────────────────────────────────────────────────
+
+up:
+	docker compose up --build -d
+
+down:
+	docker compose down
+
+logs:
+	docker compose logs -f
+
+migrate:
+	docker compose exec backend alembic upgrade head
 
 # ── Installation ──────────────────────────────────────────────────────────────
 
