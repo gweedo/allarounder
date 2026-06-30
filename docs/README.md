@@ -23,6 +23,7 @@ docs/
 
 | If you want to… | Read |
 |---|---|
+| **Run the project locally** | [local-dev.md](local-dev.md) |
 | Understand the product (vision, audience, goals, scope) | [product/PRD.md](product/PRD.md) |
 | Understand *what* was decided and *why* | [DECISIONS.md](DECISIONS.md) |
 | Understand *how* the system is built | [architecture/TECH-SPEC.md](architecture/TECH-SPEC.md) |
