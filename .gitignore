@@ -28,6 +28,7 @@ out/
 npm-debug.log*
 coverage/
 tsconfig.tsbuildinfo
+src/frontend/next-env.d.ts
 
 # Bicep compiled ARM output
 infra/main.json
