@@ -5,9 +5,9 @@ from slowapi.errors import RateLimitExceeded
 from slowapi.util import get_remote_address
 
 from app.interfaces.api.admin.articles.router import router as articles_router
-from app.interfaces.api.admin.dashboard.router import router as dashboard_router
 from app.interfaces.api.admin.authors.router import router as admin_authors_router
 from app.interfaces.api.admin.categories.router import router as admin_categories_router
+from app.interfaces.api.admin.dashboard.router import router as dashboard_router
 from app.interfaces.api.admin.guests.router import router as admin_guests_router
 from app.interfaces.api.admin.media.router import router as media_router
 from app.interfaces.api.admin.pages.router import router as admin_pages_router
