@@ -28,6 +28,7 @@ out/
 npm-debug.log*
 coverage/
 tsconfig.tsbuildinfo
+src/frontend/next-env.d.ts
 
 # Bicep compiled ARM output
 infra/main.json
@@ -39,3 +40,9 @@ infra/main.json
 
 # Local incident / session notes
 deploy-incident-*.md
+
+# E2E integration test artefacts
+playwright/.auth/
+.e2e-compose-started
+src/frontend/playwright-report/
+src/frontend/test-results/
