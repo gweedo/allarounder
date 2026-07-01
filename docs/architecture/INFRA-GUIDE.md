@@ -565,7 +565,7 @@ Microsoft-managed rule sets (`Microsoft_DefaultRuleSet`) and bot protection requ
 
 ### Scaling Container Apps
 
-The apps auto-scale by default (1–5 replicas, HTTP-based). To adjust:
+The apps auto-scale HTTP-based between `minReplicas` and 5 replicas. `minReplicas` is parameterized per environment (`infra/parameters/*.bicepparam`): staging scales to **0** (tolerates a cold start after idle), production stays at **1** (no cold starts for visitors). To adjust ad hoc:
 
 ```bash
 az containerapp update \

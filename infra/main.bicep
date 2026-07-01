@@ -56,6 +56,9 @@ param corsAllowedOrigins string
 @description('Whether to deploy Front Door + WAF (true for production; false for staging, which is reached directly on its Container App FQDN)')
 param enableFrontDoor bool = true
 
+@description('Minimum replica count for backend/frontend Container Apps (0 for staging scale-to-zero; 1 for production to avoid cold starts)')
+param minReplicas int = 1
+
 // ── Monitoring ───────────────────────────────────────────────────────────────
 
 module monitoring './modules/monitoring.bicep' = {
@@ -174,6 +177,7 @@ module containerApps './modules/container-apps.bicep' = {
     frontendImage: frontendImage
     corsAllowedOrigins: corsAllowedOrigins
     cdnBaseUrl: cdnBaseUrl
+    minReplicas: minReplicas
     backendIdentityId: identity.outputs.backendIdentityId
     backendIdentityName: identity.outputs.backendIdentityName
     backendIdentityPrincipalId: identity.outputs.backendIdentityPrincipalId

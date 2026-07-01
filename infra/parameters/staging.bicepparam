@@ -34,3 +34,7 @@ param corsAllowedOrigins = 'https://allarounder.it,https://www.allarounder.it'
 // Front Door is a production concern (custom domain TLS, .eu redirect, rate-limit WAF).
 // Staging is reached directly on the frontend Container App's *.azurecontainerapps.io FQDN.
 param enableFrontDoor = false
+
+// Scale to zero when idle — staging tolerates a cold start on the first request
+// after a period of no traffic (~$25-40/mo saved vs. an always-on replica per app).
+param minReplicas = 0

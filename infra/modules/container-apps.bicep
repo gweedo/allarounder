@@ -15,6 +15,7 @@ param backendImage string = 'mcr.microsoft.com/azuredocs/containerapps-helloworl
 param frontendImage string = 'mcr.microsoft.com/azuredocs/containerapps-helloworld:latest'
 param corsAllowedOrigins string
 param cdnBaseUrl string
+param minReplicas int = 1
 
 // Identity params — created by identity.bicep before this module runs
 param backendIdentityId string
@@ -172,7 +173,7 @@ resource backendApp 'Microsoft.App/containerApps@2024-03-01' = {
         }
       ]
       scale: {
-        minReplicas: 1
+        minReplicas: minReplicas
         maxReplicas: 5
         rules: [
           {
@@ -264,7 +265,7 @@ resource frontendApp 'Microsoft.App/containerApps@2024-03-01' = {
         }
       ]
       scale: {
-        minReplicas: 1
+        minReplicas: minReplicas
         maxReplicas: 5
         rules: [
           {
