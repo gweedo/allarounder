@@ -21,12 +21,12 @@ export default function NewArticlePage() {
         body: JSON.stringify({ title, body }),
         credentials: "include",
       });
+      const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
         setError((data as { detail?: string }).detail ?? "Errore nel salvataggio.");
         return;
       }
-      router.push("/admin/articles");
+      router.push(`/admin/articles/${(data as { id: string }).id}`);
     } catch {
       setError("Errore di rete. Riprova.");
     } finally {
