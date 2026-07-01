@@ -30,3 +30,7 @@ param canonicalDomain = 'allarounder.it'
 param redirectDomain = 'allarounder.eu'
 param cdnBaseUrl = 'https://cdn.allarounder.it/images'
 param corsAllowedOrigins = 'https://allarounder.it,https://www.allarounder.it'
+
+// Front Door is a production concern (custom domain TLS, .eu redirect, rate-limit WAF).
+// Staging is reached directly on the frontend Container App's *.azurecontainerapps.io FQDN.
+param enableFrontDoor = false

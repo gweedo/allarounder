@@ -53,6 +53,9 @@ param cdnBaseUrl string
 @description('CORS allowed origins (comma-separated)')
 param corsAllowedOrigins string
 
+@description('Whether to deploy Front Door + WAF (true for production; false for staging, which is reached directly on its Container App FQDN)')
+param enableFrontDoor bool = true
+
 // ── Monitoring ───────────────────────────────────────────────────────────────
 
 module monitoring './modules/monitoring.bicep' = {
@@ -182,7 +185,7 @@ module containerApps './modules/container-apps.bicep' = {
 
 // ── Front Door ────────────────────────────────────────────────────────────────
 
-module frontdoor './modules/frontdoor.bicep' = {
+module frontdoor './modules/frontdoor.bicep' = if (enableFrontDoor) {
   name: 'frontdoor'
   params: {
     env: env
@@ -203,7 +206,7 @@ output migrationJobName string = containerApps.outputs.migrationJobName
 output caeName string = containerApps.outputs.caeName
 output backendFqdn string = containerApps.outputs.backendFqdn
 output frontendFqdn string = containerApps.outputs.frontendFqdn
-output frontDoorEndpoint string = frontdoor.outputs.frontDoorEndpointHostname
+output frontDoorEndpoint string = enableFrontDoor ? frontdoor!.outputs.frontDoorEndpointHostname : ''
 output keyVaultUri string = keyvault.outputs.keyVaultUri
 output postgresHost string = postgres.outputs.postgresHost
 output appInsightsConnectionString string = monitoring.outputs.appInsightsConnectionString
