@@ -68,4 +68,7 @@ These are not confirmed problems — flagged for a follow-up cost pass with the 
 2. [ ] Add an "Est. monthly cost" line to the infra ADR template and backfill existing
    infra ADRs (0004 Container Apps, 0005 PostgreSQL, 0010 observability, 0013 §10–11).
 3. [ ] Configure an Azure Cost Management budget + alert for each environment.
-4. [ ] Run a one-pass cost review of the candidates above with the MVP-appropriate lens.
+   (Now tracked as issue #76 under the cost-optimization initiative, #71.)
+4. [x] Run a one-pass cost review of the candidates above with the MVP-appropriate lens.
+   Done 2026-06-29 — see `retrospective-infra-cost-review-2026-06-29.md`; resulting work
+   filed as issues #72–#76 under #71.
