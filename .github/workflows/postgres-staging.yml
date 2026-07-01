@@ -1,0 +1,65 @@
+name: Staging PostgreSQL stop/start
+
+# Pauses staging PostgreSQL compute nightly to cut idle cost (~$13/mo). Azure
+# auto-restarts a stopped Flexible Server after ~7 days, so the stop must be
+# re-applied on a recurring schedule rather than issued once.
+#
+# Never touches production: the job is pinned to the `staging` GitHub
+# Environment, so only staging credentials/resource names are ever in scope.
+
+on:
+  schedule:
+    - cron: "0 22 * * *" # 22:00 UTC nightly
+  workflow_dispatch:
+    inputs:
+      action:
+        description: "Action to perform on the staging PostgreSQL server"
+        required: true
+        type: choice
+        options:
+          - start
+          - stop
+        default: stop
+
+concurrency:
+  group: postgres-staging
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  postgres-action:
+    name: PostgreSQL ${{ github.event_name == 'schedule' && 'stop' || inputs.action }} (staging)
+    runs-on: ubuntu-latest
+    environment: staging
+
+    steps:
+      - name: Azure login (OIDC — staging)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Stop or start PostgreSQL
+        run: |
+          SERVER="${{ vars.POSTGRES_SERVER_NAME }}"
+          RG="${{ vars.RESOURCE_GROUP }}"
+          ACTION="${{ github.event_name == 'schedule' && 'stop' || inputs.action }}"
+
+          STATE=$(az postgres flexible-server show \
+            --name "$SERVER" --resource-group "$RG" \
+            --query "state" -o tsv)
+          echo "Requested action: $ACTION. Current state: $STATE"
+
+          if [[ "$ACTION" == "stop" && "$STATE" == "Ready" ]]; then
+            echo "Stopping $SERVER..."
+            az postgres flexible-server stop --name "$SERVER" --resource-group "$RG"
+          elif [[ "$ACTION" == "start" && "$STATE" == "Stopped" ]]; then
+            echo "Starting $SERVER..."
+            az postgres flexible-server start --name "$SERVER" --resource-group "$RG"
+          else
+            echo "No action needed — current state ($STATE) is not a valid source state for '$ACTION'."
+          fi

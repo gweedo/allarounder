@@ -206,6 +206,39 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
+      - name: Ensure PostgreSQL is running (staging)
+        run: |
+          SERVER="${{ vars.POSTGRES_SERVER_NAME }}"
+          RG="${{ vars.RESOURCE_GROUP }}"
+
+          STATE=$(az postgres flexible-server show \
+            --name "$SERVER" --resource-group "$RG" \
+            --query "state" -o tsv)
+          echo "Current PostgreSQL state: $STATE"
+
+          if [[ "$STATE" == "Stopped" ]]; then
+            echo "Starting $SERVER..."
+            az postgres flexible-server start --name "$SERVER" --resource-group "$RG"
+          fi
+
+          # Poll until the server reports Ready (covers both the start we just
+          # issued and the case where it was already starting/updating).
+          for i in $(seq 1 30); do
+            STATE=$(az postgres flexible-server show \
+              --name "$SERVER" --resource-group "$RG" \
+              --query "state" -o tsv)
+            echo "  Postgres state ($i/30): $STATE"
+            if [[ "$STATE" == "Ready" ]]; then
+              break
+            fi
+            sleep 10
+          done
+
+          if [[ "$STATE" != "Ready" ]]; then
+            echo "PostgreSQL did not reach Ready state in time (last state: $STATE)."
+            exit 1
+          fi
+
       - name: Run Alembic migrations
         run: |
           DIGEST="${{ needs.build.outputs.image-digest }}"
