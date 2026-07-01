@@ -1,7 +1,8 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { UploadError, uploadImage } from "../../../../lib/upload";
 
 interface LinkRow {
   label: string;
@@ -13,9 +14,11 @@ export default function NewGuestPage() {
   const [name, setName] = useState("");
   const [bio, setBio] = useState("");
   const [photoUrl, setPhotoUrl] = useState("");
+  const [photoUploading, setPhotoUploading] = useState(false);
   const [linkRows, setLinkRows] = useState<LinkRow[]>([]);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   function addLinkRow() {
     setLinkRows((prev) => [...prev, { label: "", url: "" }]);
@@ -29,6 +32,19 @@ export default function NewGuestPage() {
     setLinkRows((prev) =>
       prev.map((row, i) => (i === index ? { ...row, [field]: value } : row))
     );
+  }
+
+  async function handlePhotoUpload(file: File) {
+    setPhotoUploading(true);
+    setError(null);
+    try {
+      const url = await uploadImage(file);
+      setPhotoUrl(url);
+    } catch (err) {
+      setError(err instanceof UploadError ? err.message : "Errore nel caricamento della foto.");
+    } finally {
+      setPhotoUploading(false);
+    }
   }
 
   async function handleSubmit(e: FormEvent) {
@@ -101,16 +117,29 @@ export default function NewGuestPage() {
           />
         </div>
         <div style={{ marginTop: "1rem" }}>
-          <label htmlFor="guest-photo">URL foto</label>
+          <label htmlFor="guest-photo">Foto</label>
           <br />
           <input
             id="guest-photo"
-            type="url"
-            value={photoUrl}
-            onChange={(e) => setPhotoUrl(e.target.value)}
-            placeholder="https://..."
-            style={{ width: "100%", marginTop: "0.25rem" }}
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            style={{ marginTop: "0.25rem" }}
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) void handlePhotoUpload(file);
+            }}
           />
+          {photoUploading && (
+            <span style={{ marginLeft: "0.5rem", fontSize: "0.85rem", color: "#666" }}>
+              Caricamento…
+            </span>
+          )}
+          {photoUrl && !photoUploading && (
+            <span style={{ marginLeft: "0.5rem", fontSize: "0.85rem", color: "green" }}>
+              ✓ Foto caricata
+            </span>
+          )}
         </div>
         <div style={{ marginTop: "1rem" }}>
           <label>Link</label>
@@ -154,7 +183,7 @@ export default function NewGuestPage() {
           </button>
         </div>
         <div style={{ marginTop: "1.5rem", display: "flex", gap: "0.75rem" }}>
-          <button type="submit" disabled={saving}>
+          <button type="submit" disabled={saving || photoUploading}>
             {saving ? "…" : "Crea ospite"}
           </button>
           <button

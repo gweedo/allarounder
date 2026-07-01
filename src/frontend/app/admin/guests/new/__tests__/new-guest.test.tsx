@@ -1,6 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 
+vi.mock("../../../../lib/upload", () => ({
+  uploadImage: vi.fn(),
+  UploadError: class UploadError extends Error {},
+}));
+
 const mockPush = vi.fn();
 
 vi.mock("next/navigation", () => ({
@@ -22,7 +27,7 @@ describe("NewGuestPage", () => {
     await renderNewGuestPage();
     expect(screen.getByLabelText(/nome \*/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/bio/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/url foto/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/foto/i)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /crea ospite/i })).toBeInTheDocument();
   });
 
