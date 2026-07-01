@@ -365,6 +365,11 @@ gh variable set BACKEND_APP_NAME    --env staging --body "$STG_BACKEND_APP"
 gh variable set FRONTEND_APP_NAME   --env staging --body "$STG_FRONTEND_APP"
 gh variable set MIGRATION_JOB_NAME  --env staging --body "$STG_MIGRATE_JOB"
 gh variable set STAGING_URL         --env staging --body "https://${STG_FRONTEND_FQDN}"
+
+# Required by the postgres-staging.yml stop/start workflow and by
+# deploy-staging's pre-migration readiness check (see Day-2 § Staging
+# PostgreSQL stop/start). Set this before the next staging deploy runs.
+gh variable set POSTGRES_SERVER_NAME --env staging --body "allarounder-stg-pg-fc2a7"
 ```
 
 ### 7d — Production environment secrets and variables
@@ -578,6 +583,19 @@ az containerapp update \
   --scale-rule-http-concurrency 30
 ```
 
+### Staging PostgreSQL stop/start
+
+Staging's PostgreSQL Flexible Server is stopped nightly to cut idle compute cost (~$13/mo — the `Standard_B1ms` compute charge). Stopping pauses compute billing only; storage and data are retained. This never applies to production.
+
+- **Scheduled stop**: `.github/workflows/postgres-staging.yml` runs on a nightly cron (`0 22 * * *`, 22:00 UTC) and stops the server if it's `Ready`. Because Azure auto-restarts a server that's been stopped for ~7 days, the workflow re-applies the stop every night rather than relying on a one-off stop — the schedule itself is the mechanism that outlasts the auto-restart.
+- **Automatic start on deploy**: `deploy-staging` in `backend.yml` runs an "Ensure PostgreSQL is running" step before the Alembic migration job — it starts the server if `Stopped` and polls until `Ready`, so a deploy against a stopped server just costs a couple of extra minutes rather than failing.
+- **Manual start/stop**: trigger `postgres-staging.yml` via `workflow_dispatch` with `action: start` or `action: stop` (GitHub Actions UI or `gh workflow run postgres-staging.yml -f action=start`) — useful when working against staging outside of a deploy (e.g. `psql` access, manual query debugging).
+- **Both paths are OIDC-authenticated** via the `staging` GitHub Environment's federated credential — no long-lived secrets. The job is hardcoded to `environment: staging`, so it can never resolve production's credentials or resource names.
+- **Caveat**: the nightly stop only pauses compute for the idle window (deploy-time → 22:00 UTC), so days with a deploy realize less than the full ~$13/mo saving. This is acceptable for a solo-dev staging environment; use the manual `stop` dispatch if you want to pause it immediately after a work session.
+- **Caveat**: `postgres-staging.yml` and `backend.yml` don't share a concurrency group, so a deploy that happens to be mid-migration at 22:00 UTC could race the nightly stop. This is rare (needs a deploy running at exactly that hour), staging-only, and re-runnable — not worth a cross-workflow lock, but worth knowing about if a staging deploy ever fails with the Postgres server unexpectedly `Stopping`.
+
+Requires the `POSTGRES_SERVER_NAME` variable in the `staging` GitHub Environment (see step 7c).
+
 ### Rotating the JWT signing key
 
 1. Generate a new key: `openssl rand -base64 48`
@@ -649,6 +667,7 @@ Application Insights traces are available at:
 | Var: `FRONTEND_APP_NAME` | `allarounder-staging-frontend` |
 | Var: `MIGRATION_JOB_NAME` | `allarounder-staging-migrate` |
 | Var: `STAGING_URL` | `https://<frontend-fqdn>` from Bicep output |
+| Var: `POSTGRES_SERVER_NAME` | `allarounder-stg-pg-fc2a7` (used by `postgres-staging.yml` and `deploy-staging`) |
 
 ### Production environment
 
