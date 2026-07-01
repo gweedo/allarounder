@@ -462,27 +462,29 @@ After the first successful deploy, wire the real domains.
 
 ### 10a — Get the Front Door CNAME
 
+Since ADR-0016, **staging does not run Front Door** (`enableFrontDoor = false` in `staging.bicepparam`) — it's reached directly on its Container App FQDN. Only production has a Front Door profile to query:
+
 ```bash
 az afd endpoint show \
-  --profile-name "allarounder-staging-afd" \
-  --resource-group allarounder-staging \
-  --endpoint-name "allarounder-staging" \
+  --profile-name "allarounder-production-afd" \
+  --resource-group allarounder-production \
+  --endpoint-name "allarounder-production" \
   --query "hostName" -o tsv
-# → allarounder-staging.azurefd.net
+# → allarounder-production.azurefd.net
 ```
 
 ### 10b — Add DNS records at your registrar
 
 For `allarounder.it`:
 ```
-CNAME  @       allarounder-staging.azurefd.net   (or production endpoint)
-CNAME  cdn     allarounder-staging.azurefd.net
+CNAME  @       allarounder-production.azurefd.net
+CNAME  cdn     allarounder-production.azurefd.net
 TXT    _dnsauth.<host>   <value shown in Azure portal custom domain tab>
 ```
 
 For `allarounder.eu`:
 ```
-CNAME  @       allarounder-staging.azurefd.net
+CNAME  @       allarounder-production.azurefd.net
 TXT    _dnsauth.<host>   <value shown in Azure portal custom domain tab>
 ```
 
@@ -563,7 +565,7 @@ Microsoft-managed rule sets (`Microsoft_DefaultRuleSet`) and bot protection requ
 
 ### Scaling Container Apps
 
-The apps auto-scale by default (1–5 replicas, HTTP-based). To adjust:
+The apps auto-scale HTTP-based between `minReplicas` and 5 replicas. `minReplicas` is parameterized per environment (`infra/parameters/*.bicepparam`): staging scales to **0** (tolerates a cold start after idle), production stays at **1** (no cold starts for visitors). To adjust ad hoc:
 
 ```bash
 az containerapp update \

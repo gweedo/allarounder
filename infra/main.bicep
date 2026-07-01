@@ -53,6 +53,12 @@ param cdnBaseUrl string
 @description('CORS allowed origins (comma-separated)')
 param corsAllowedOrigins string
 
+@description('Whether to deploy Front Door + WAF (true for production; false for staging, which is reached directly on its Container App FQDN)')
+param enableFrontDoor bool = true
+
+@description('Minimum replica count for backend/frontend Container Apps (0 for staging scale-to-zero; 1 for production to avoid cold starts)')
+param minReplicas int = 1
+
 // ── Monitoring ───────────────────────────────────────────────────────────────
 
 module monitoring './modules/monitoring.bicep' = {
@@ -171,6 +177,7 @@ module containerApps './modules/container-apps.bicep' = {
     frontendImage: frontendImage
     corsAllowedOrigins: corsAllowedOrigins
     cdnBaseUrl: cdnBaseUrl
+    minReplicas: minReplicas
     backendIdentityId: identity.outputs.backendIdentityId
     backendIdentityName: identity.outputs.backendIdentityName
     backendIdentityPrincipalId: identity.outputs.backendIdentityPrincipalId
@@ -182,7 +189,7 @@ module containerApps './modules/container-apps.bicep' = {
 
 // ── Front Door ────────────────────────────────────────────────────────────────
 
-module frontdoor './modules/frontdoor.bicep' = {
+module frontdoor './modules/frontdoor.bicep' = if (enableFrontDoor) {
   name: 'frontdoor'
   params: {
     env: env
@@ -203,7 +210,7 @@ output migrationJobName string = containerApps.outputs.migrationJobName
 output caeName string = containerApps.outputs.caeName
 output backendFqdn string = containerApps.outputs.backendFqdn
 output frontendFqdn string = containerApps.outputs.frontendFqdn
-output frontDoorEndpoint string = frontdoor.outputs.frontDoorEndpointHostname
+output frontDoorEndpoint string = enableFrontDoor ? frontdoor!.outputs.frontDoorEndpointHostname : ''
 output keyVaultUri string = keyvault.outputs.keyVaultUri
 output postgresHost string = postgres.outputs.postgresHost
 output appInsightsConnectionString string = monitoring.outputs.appInsightsConnectionString

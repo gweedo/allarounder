@@ -29,3 +29,8 @@ param canonicalDomain = 'allarounder.it'
 param redirectDomain = 'allarounder.eu'
 param cdnBaseUrl = 'https://cdn.allarounder.it/images'
 param corsAllowedOrigins = 'https://allarounder.it,https://www.allarounder.it'
+
+param enableFrontDoor = true
+
+// Always-on — production visitors should never pay a cold-start penalty.
+param minReplicas = 1
