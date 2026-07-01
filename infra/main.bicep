@@ -59,6 +59,12 @@ param enableFrontDoor bool = true
 @description('Minimum replica count for backend/frontend Container Apps (0 for staging scale-to-zero; 1 for production to avoid cold starts)')
 param minReplicas int = 1
 
+@description('Monthly Cost Management budget amount for this resource group, in USD')
+param budgetAmount int
+
+@description('Email addresses notified when the budget crosses 50/80/100% actual or 100% forecast')
+param budgetContactEmails array = ['guido.s1998@gmail.com']
+
 // ── Monitoring ───────────────────────────────────────────────────────────────
 
 module monitoring './modules/monitoring.bicep' = {
@@ -198,6 +204,17 @@ module frontdoor './modules/frontdoor.bicep' = if (enableFrontDoor) {
     storageContainerName: storage.outputs.containerName
     canonicalDomain: canonicalDomain
     redirectDomain: redirectDomain
+  }
+}
+
+// ── Cost Management budget ─────────────────────────────────────────────────────
+
+module budget './modules/budget.bicep' = {
+  name: 'budget'
+  params: {
+    env: env
+    amount: budgetAmount
+    contactEmails: budgetContactEmails
   }
 }
 
