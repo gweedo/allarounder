@@ -592,6 +592,7 @@ Staging's PostgreSQL Flexible Server is stopped nightly to cut idle compute cost
 - **Manual start/stop**: trigger `postgres-staging.yml` via `workflow_dispatch` with `action: start` or `action: stop` (GitHub Actions UI or `gh workflow run postgres-staging.yml -f action=start`) — useful when working against staging outside of a deploy (e.g. `psql` access, manual query debugging).
 - **Both paths are OIDC-authenticated** via the `staging` GitHub Environment's federated credential — no long-lived secrets. The job is hardcoded to `environment: staging`, so it can never resolve production's credentials or resource names.
 - **Caveat**: the nightly stop only pauses compute for the idle window (deploy-time → 22:00 UTC), so days with a deploy realize less than the full ~$13/mo saving. This is acceptable for a solo-dev staging environment; use the manual `stop` dispatch if you want to pause it immediately after a work session.
+- **Caveat**: `postgres-staging.yml` and `backend.yml` don't share a concurrency group, so a deploy that happens to be mid-migration at 22:00 UTC could race the nightly stop. This is rare (needs a deploy running at exactly that hour), staging-only, and re-runnable — not worth a cross-workflow lock, but worth knowing about if a staging deploy ever fails with the Postgres server unexpectedly `Stopping`.
 
 Requires the `POSTGRES_SERVER_NAME` variable in the `staging` GitHub Environment (see step 7c).
 

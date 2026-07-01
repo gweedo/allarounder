@@ -216,10 +216,20 @@ jobs:
             --query "state" -o tsv)
           echo "Current PostgreSQL state: $STATE"
 
-          if [[ "$STATE" == "Stopped" ]]; then
-            echo "Starting $SERVER..."
-            az postgres flexible-server start --name "$SERVER" --resource-group "$RG"
-          fi
+          case "$STATE" in
+            Ready|Starting|Updating|Restarting)
+              ;; # already up or already on its way there — just poll below
+            Stopped)
+              echo "Starting $SERVER..."
+              az postgres flexible-server start --name "$SERVER" --resource-group "$RG"
+              ;;
+            *)
+              # e.g. Disabled (subscription spending limit/billing issue),
+              # Dropping, Inaccessible — not something a start call can fix.
+              echo "PostgreSQL is in an unrecoverable state for this workflow ($STATE). Check the Azure portal."
+              exit 1
+              ;;
+          esac
 
           # Poll until the server reports Ready (covers both the start we just
           # issued and the case where it was already starting/updating).

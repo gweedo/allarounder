@@ -21,6 +21,9 @@ on:
           - stop
         default: stop
 
+# Static (not per-ref) group: this guards a singleton external resource, not
+# a CI run, so a second trigger should queue behind the first rather than
+# cancel it mid-stop/start.
 concurrency:
   group: postgres-staging
   cancel-in-progress: false
@@ -30,6 +33,7 @@ permissions:
   id-token: write
 
 jobs:
+  # ── Stop (schedule) or start/stop (manual) staging PostgreSQL ────────────────
   postgres-action:
     name: PostgreSQL ${{ github.event_name == 'schedule' && 'stop' || inputs.action }} (staging)
     runs-on: ubuntu-latest
@@ -54,12 +58,44 @@ jobs:
             --query "state" -o tsv)
           echo "Requested action: $ACTION. Current state: $STATE"
 
-          if [[ "$ACTION" == "stop" && "$STATE" == "Ready" ]]; then
-            echo "Stopping $SERVER..."
-            az postgres flexible-server stop --name "$SERVER" --resource-group "$RG"
-          elif [[ "$ACTION" == "start" && "$STATE" == "Stopped" ]]; then
-            echo "Starting $SERVER..."
-            az postgres flexible-server start --name "$SERVER" --resource-group "$RG"
+          case "$STATE" in
+            Starting|Stopping|Updating|Restarting)
+              echo "Server is mid-transition ($STATE) — skipping this run, it'll be caught next time."
+              exit 0
+              ;;
+          esac
+
+          if [[ "$ACTION" == "stop" ]]; then
+            case "$STATE" in
+              Ready)
+                echo "Stopping $SERVER..."
+                az postgres flexible-server stop --name "$SERVER" --resource-group "$RG"
+                ;;
+              Stopped|Disabled)
+                # Compute is already paused (Disabled is typically a
+                # subscription spending-limit/billing hold) — the cost goal
+                # is already met, so this isn't worth failing the run over.
+                echo "No action needed — server is already $STATE."
+                ;;
+              *)
+                echo "PostgreSQL is in an unexpected state ($STATE) for a stop request — refusing to act. Check the Azure portal."
+                exit 1
+                ;;
+            esac
           else
-            echo "No action needed — current state ($STATE) is not a valid source state for '$ACTION'."
+            case "$STATE" in
+              Stopped)
+                echo "Starting $SERVER..."
+                az postgres flexible-server start --name "$SERVER" --resource-group "$RG"
+                ;;
+              Ready)
+                echo "No action needed — server is already Ready."
+                ;;
+              *)
+                # e.g. Disabled (subscription spending limit/billing issue),
+                # Dropping, Inaccessible — a start call can't fix these.
+                echo "PostgreSQL is in an unexpected state ($STATE) for a start request — refusing to act. Check the Azure portal."
+                exit 1
+                ;;
+            esac
           fi
