@@ -596,6 +596,16 @@ Staging's PostgreSQL Flexible Server is stopped nightly to cut idle compute cost
 
 Requires the `POSTGRES_SERVER_NAME` variable in the `staging` GitHub Environment (see step 7c).
 
+### Cost Management budget & alerts
+
+Each resource group has a Consumption budget (`infra/modules/budget.bicep`) so a fixed-cost regression is caught in week one instead of at the bill — the direct fix for the failure mode in `retrospective-infra-cost-overprovisioning-2026-06-25.md`, where the Front Door Premium overspend was only discovered from the bill.
+
+- **Amounts**: `budgetAmount` in each `.bicepparam` — staging `$30`/mo, production `$110`/mo. Both sit just above the documented post-optimization steady-state (`retrospective-infra-cost-review-2026-06-29.md`) so the alerts stay meaningful instead of firing on routine variance.
+- **Thresholds**: 50% / 80% / 100% of actual spend, plus 100% of forecasted spend — all four email `budgetContactEmails` (defaults to `guido.s1998@gmail.com`).
+- **Reproducible**: defined in Bicep like every other resource, deployed as part of the normal `main.bicep` stamp — no click-ops.
+- **No cost**: Cost Management budgets and alerts are free.
+- If the steady-state cost picture changes (a new resource, a SKU change), update `budgetAmount` in the relevant `.bicepparam` and redeploy rather than letting the alert drift out of sync with reality.
+
 ### Rotating the JWT signing key
 
 1. Generate a new key: `openssl rand -base64 48`

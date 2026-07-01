@@ -31,6 +31,7 @@ az deployment group create \
 | `modules/storage.bicep` | Blob Storage account + private `images` container |
 | `modules/container-apps.bicep` | CAE + backend app + frontend app + migration job + managed identities + role assignments |
 | `modules/frontdoor.bicep` | Front Door Standard + custom-rule WAF (rate limit) + HSTS rule + .eu→.it redirect + CDN route |
+| `modules/budget.bicep` | Cost Management budget (monthly) with 50/80/100% actual + 100% forecast email alerts |
 
 ## Environments
 
