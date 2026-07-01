@@ -232,6 +232,15 @@ Last updated: 2026-06-14
 - **Status**: ✅ Final (see ADR-0015)
 - **Decided by**: Team
 
+### Front Door optional per-environment; disabled on staging (ADR-0016)
+- **Date**: 2026-07-01
+- **Decision**: Gate the `frontdoor` Bicep module behind a new `enableFrontDoor` parameter (default `true`); set it `false` on staging and `true` on production. Staging's frontend Container App remains reachable directly over Azure-managed HTTPS on its own FQDN.
+- **Rationale**: Front Door's jobs (custom-domain TLS, `.eu → .it` redirect, WAF rate-limit rule, image CDN) are production-facing concerns staging doesn't exercise; the ~$35/month Standard-tier base fee (ADR-0015) is flat per environment regardless of use. Part of the v1 infra cost-optimization pass (issue #71/#72).
+- **Trade-off**: Staging can no longer verify the Front Door redirect/TLS/WAF pre-production; that verification now happens directly against production, or by temporarily flipping `enableFrontDoor = true` on staging for a one-off check.
+- **Amends**: ADR-0015 Action Item 4 (staging-first WAF verification is no longer achievable as written).
+- **Status**: ✅ Final (see ADR-0016)
+- **Decided by**: Team
+
 ### Logging & observability: OpenTelemetry → Azure Monitor
 - **Date**: 2026-06-14
 - **Decision**: Instrument both apps with **OpenTelemetry**, exporting to **Azure Monitor / Application Insights** (Log Analytics in Italy North). **Structured JSON logs** to stdout; **W3C trace-context correlation IDs** across the frontend→backend hop; INFO+ in prod / DEBUG in dev; **PII & secret redaction** for GDPR; retention 30–90 days via Bicep. Logging stays out of the `domain` layer (DDD dependency rule); tests assert no secrets/PII are logged.
@@ -240,9 +249,9 @@ Last updated: 2026-06-14
 - **Decided by**: Team
 
 ### Environments: separate staging + production
-- **Date**: 2026-06-14
+- **Date**: 2026-06-14 (Front Door verification clause superseded 2026-07-01, ADR-0016)
 - **Decision**: Run a **fully separate staging environment** (its own Container Apps environment, database, and config) in addition to production, both defined via Bicep. Releases are verified on staging, then promoted to production.
-- **Rationale**: Complements TDD — tests verify code, staging verifies the environment (Azure config, Key Vault wiring, migrations against prod-shaped data, Front Door redirect, TLS, inter-service calls). Bicep makes the second environment a parameterized stamp; Container Apps scale-to-zero keeps idle cost low. Provides a safe place to rehearse migrations.
+- **Rationale**: Complements TDD — tests verify code, staging verifies the environment (Azure config, Key Vault wiring, migrations against prod-shaped data, inter-service calls). Bicep makes the second environment a parameterized stamp; Container Apps scale-to-zero keeps idle cost low. Provides a safe place to rehearse migrations. _(Amended by ADR-0016: staging no longer runs Front Door — it was a ~$35/month flat fee for production-facing capability (custom domain TLS, `.eu → .it` redirect, WAF) that staging's `*.azurecontainerapps.io` FQDN doesn't need; staging's frontend Container App remains directly reachable over Azure-managed HTTPS without it.)_
 - **Status**: ✅ Final
 - **Decided by**: Team
 

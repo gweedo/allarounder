@@ -19,6 +19,7 @@ This directory records the significant architectural decisions for the Allaround
 | [0013](0013-security-architecture.md) | Security architecture | Accepted | 2026-06-18 |
 | [0014](0014-github-branch-protection.md) | GitHub branch protection for `main` | Accepted | 2026-06-21 |
 | [0015](0015-front-door-standard-tier.md) | Front Door Standard tier (drop managed WAF rule set) — amends 0013 §11 | Accepted | 2026-06-25 |
+| [0016](0016-front-door-optional-per-environment.md) | Front Door optional per-environment; disabled on staging — amends 0015 item 4 | Accepted | 2026-07-01 |
 
 ## Conventions
 
