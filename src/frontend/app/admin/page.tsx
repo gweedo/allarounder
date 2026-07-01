@@ -108,9 +108,14 @@ export default function AdminDashboard() {
         style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}
       >
         <h1>Dashboard</h1>
-        <Link href="/admin/articles/new">
-          <button type="button">Nuovo articolo</button>
-        </Link>
+        <div style={{ display: "flex", gap: "0.75rem" }}>
+          <Link href="/admin/guests/new">
+            <button type="button">Nuovo ospite</button>
+          </Link>
+          <Link href="/admin/articles/new">
+            <button type="button">Nuovo articolo</button>
+          </Link>
+        </div>
       </div>
 
       {loading && <p>Caricamento...</p>}

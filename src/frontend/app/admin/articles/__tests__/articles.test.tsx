@@ -3,8 +3,10 @@ import { expect, it, describe, vi, beforeEach } from "vitest";
 import ArticlesPage from "../page";
 import NewArticlePage from "../new/page";
 
+const mockPush = vi.fn();
+
 vi.mock("next/navigation", () => ({
-  useRouter: () => ({ push: vi.fn() }),
+  useRouter: () => ({ push: mockPush }),
 }));
 
 vi.mock("next/link", () => ({
@@ -19,6 +21,7 @@ vi.mock("next/link", () => ({
 
 beforeEach(() => {
   global.fetch = vi.fn();
+  mockPush.mockClear();
 });
 
 describe("ArticlesPage", () => {
@@ -128,5 +131,20 @@ describe("NewArticlePage", () => {
       expect(screen.getByRole("button")).toBeDisabled();
     });
     resolve!({ ok: true, json: async () => ({}) });
+  });
+
+  it("redirects to the edit page after successful creation", async () => {
+    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ id: "abc-123" }),
+    });
+    render(<NewArticlePage />);
+    fireEvent.change(screen.getByLabelText(/titolo/i), {
+      target: { value: "Nuovo articolo" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: /salva bozza/i }));
+    await waitFor(() =>
+      expect(mockPush).toHaveBeenCalledWith("/admin/articles/abc-123")
+    );
   });
 });
