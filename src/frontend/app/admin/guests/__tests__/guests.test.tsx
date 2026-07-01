@@ -5,6 +5,16 @@ vi.mock("next/navigation", () => ({
   useRouter: () => ({ push: vi.fn() }),
 }));
 
+vi.mock("next/link", () => ({
+  default: ({
+    href,
+    children,
+  }: {
+    href: string;
+    children: React.ReactNode;
+  }) => <a href={href}>{children}</a>,
+}));
+
 const GUEST = {
   id: "g1",
   name: "Mario Bianchi",
@@ -60,39 +70,18 @@ describe("AdminGuestsPage", () => {
     await waitFor(() => expect(screen.getByRole("alert")).toBeInTheDocument());
   });
 
-  it("creates a new guest on form submit", async () => {
-    (global.fetch as ReturnType<typeof vi.fn>)
-      .mockResolvedValueOnce({ ok: true, json: async () => ({ items: [] }) })
-      .mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ ...GUEST, name: "Nuovo Ospite", id: "g2" }),
-      });
+  it("renders a link to create a new guest", async () => {
+    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ items: [] }),
+    });
     await renderGuestsPage();
-    await waitFor(() => expect(screen.getByLabelText(/nome/i)).toBeInTheDocument());
-    fireEvent.change(screen.getByLabelText(/nome \*/i), {
-      target: { value: "Nuovo Ospite" },
-    });
-    fireEvent.click(screen.getByRole("button", { name: /crea ospite/i }));
-    await waitFor(() => expect(screen.getByText("Nuovo Ospite")).toBeInTheDocument());
-  });
-
-  it("shows create error when POST fails", async () => {
-    (global.fetch as ReturnType<typeof vi.fn>)
-      .mockResolvedValueOnce({ ok: true, json: async () => ({ items: [] }) })
-      .mockResolvedValueOnce({
-        ok: false,
-        json: async () => ({ detail: "Nome non valido" }),
-      });
-    await renderGuestsPage();
-    await waitFor(() => expect(screen.getByLabelText(/nome \*/i)).toBeInTheDocument());
-    fireEvent.change(screen.getByLabelText(/nome \*/i), {
-      target: { value: "X" },
-    });
-    fireEvent.click(screen.getByRole("button", { name: /crea ospite/i }));
-    await waitFor(() => {
-      const alerts = screen.getAllByRole("alert");
-      expect(alerts.some((el) => el.textContent?.includes("Nome non valido"))).toBe(true);
-    });
+    await waitFor(() =>
+      expect(screen.getByRole("link", { name: /nuovo ospite/i })).toHaveAttribute(
+        "href",
+        "/admin/guests/new"
+      )
+    );
   });
 
   it("removes a guest from the list after delete", async () => {

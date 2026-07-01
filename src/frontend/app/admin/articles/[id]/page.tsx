@@ -73,6 +73,11 @@ export default function EditArticlePage({ params }: Props) {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [showGuestModal, setShowGuestModal] = useState(false);
+  const [modalName, setModalName] = useState("");
+  const [modalBio, setModalBio] = useState("");
+  const [modalSaving, setModalSaving] = useState(false);
+  const [modalError, setModalError] = useState<string | null>(null);
 
   useEffect(() => {
     params.then(({ id }) => setArticleId(id));
@@ -239,6 +244,35 @@ export default function EditArticlePage({ params }: Props) {
       setError("Errore di rete. Riprova.");
     } finally {
       setSaving(false);
+    }
+  }
+
+  async function handleCreateGuest(e: FormEvent) {
+    e.preventDefault();
+    setModalSaving(true);
+    setModalError(null);
+    try {
+      const res = await fetch("/api/admin/guests", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: modalName, bio: modalBio || undefined }),
+        credentials: "include",
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        setModalError((data as { detail?: string }).detail ?? "Errore nella creazione.");
+        return;
+      }
+      const created = (await res.json()) as Guest;
+      setAllGuests((prev) => [...prev, created]);
+      setGuestIds((prev) => [...prev, created.id]);
+      setShowGuestModal(false);
+      setModalName("");
+      setModalBio("");
+    } catch {
+      setModalError("Errore di rete. Riprova.");
+    } finally {
+      setModalSaving(false);
     }
   }
 
@@ -432,9 +466,18 @@ export default function EditArticlePage({ params }: Props) {
             </button>
           </div>
         </div>
-        {allGuests.length > 0 && (
-          <div style={{ marginTop: "1rem" }}>
+        <div style={{ marginTop: "1rem" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <label>Ospiti</label>
+            <button
+              type="button"
+              onClick={() => setShowGuestModal(true)}
+              style={{ fontSize: "0.875rem" }}
+            >
+              + Nuovo ospite
+            </button>
+          </div>
+          {allGuests.length > 0 && (
             <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem", marginTop: "0.25rem" }}>
               {allGuests.map((guest) => (
                 <label
@@ -465,8 +508,8 @@ export default function EditArticlePage({ params }: Props) {
                 </label>
               ))}
             </div>
-          </div>
-        )}
+          )}
+        </div>
         <div style={{ marginTop: "1rem" }}>
           <label htmlFor="spotify-url">URL Spotify (episodio)</label>
           <br />
@@ -540,6 +583,82 @@ export default function EditArticlePage({ params }: Props) {
           Anteprima
         </button>
       </div>
+
+      {showGuestModal && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="guest-modal-title"
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,0.4)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 1000,
+          }}
+        >
+          <div
+            style={{
+              background: "#fff",
+              borderRadius: "6px",
+              padding: "1.5rem",
+              width: "100%",
+              maxWidth: "420px",
+            }}
+          >
+            <h2 id="guest-modal-title" style={{ marginTop: 0 }}>Nuovo ospite</h2>
+            {modalError && (
+              <p role="alert" style={{ color: "red" }}>
+                {modalError}
+              </p>
+            )}
+            <form onSubmit={handleCreateGuest}>
+              <div>
+                <label htmlFor="modal-guest-name">Nome *</label>
+                <br />
+                <input
+                  id="modal-guest-name"
+                  type="text"
+                  required
+                  value={modalName}
+                  onChange={(e) => setModalName(e.target.value)}
+                  style={{ width: "100%", marginTop: "0.25rem" }}
+                />
+              </div>
+              <div style={{ marginTop: "1rem" }}>
+                <label htmlFor="modal-guest-bio">Bio</label>
+                <br />
+                <textarea
+                  id="modal-guest-bio"
+                  rows={3}
+                  value={modalBio}
+                  onChange={(e) => setModalBio(e.target.value)}
+                  style={{ width: "100%", marginTop: "0.25rem" }}
+                />
+              </div>
+              <div style={{ marginTop: "1rem", display: "flex", gap: "0.75rem" }}>
+                <button type="submit" disabled={modalSaving}>
+                  {modalSaving ? "…" : "Crea e aggiungi"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowGuestModal(false);
+                    setModalName("");
+                    setModalBio("");
+                    setModalError(null);
+                  }}
+                  style={{ background: "none", border: "1px solid #ccc", cursor: "pointer" }}
+                >
+                  Annulla
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
