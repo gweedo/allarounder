@@ -278,6 +278,13 @@ Last updated: 2026-06-14
 - **Status**: ✅ Final
 - **Decided by**: Team
 
+### Session persistence via rotating refresh token + "Ricordami"
+- **Date**: 2026-07-07
+- **Decision**: Writers stay signed in across the 30-minute access-token lifetime via a middleware-driven silent refresh, instead of being bounced to `/admin/login` every time the access token expires. The Next.js admin `middleware.ts` catches a missing/expired `access_token` cookie, calls the backend `/api/admin/auth/refresh` endpoint server-to-server using the `refresh_token` cookie, and relays the rotated `Set-Cookie` headers onto the response before letting the request through. Client-side fetches get the same behavior via a shared `apiFetch` wrapper (`src/frontend/lib/api.ts`) that retries a single 401 after a **single-flight** refresh (concurrent 401s share one in-flight refresh call, not one per request). A **"Ricordami per 14 giorni"** checkbox on the login form (default checked) sends `remember_me` to `/api/admin/auth/login`; the resulting refresh token carries a `persistent` flag (`RefreshToken.persistent`, default `true`) that controls whether the `refresh_token` cookie is a 14-day persistent cookie or a browser-session cookie (no `Max-Age`). The flag is preserved across rotation — `/refresh` re-issues a token that inherits the prior token's `persistent` value — so an unchecked "Ricordami" doesn't silently regain persistence after the first silent refresh.
+- **Rationale**: The access token's short lifetime is a deliberate security trade-off (ADR-0013), but it was logging writers out mid-edit every 30 minutes with no compensating refresh path, which is a usability regression for non-technical content editors. A refresh-token-backed silent refresh keeps the short access-token window while giving writers a session that survives it; the "Ricordami" checkbox lets a writer opt out of persistence (e.g. on a shared machine) by falling back to an ordinary session cookie.
+- **Status**: ✅ Final
+- **Decided by**: Guido + Claude (Milestone 1 of the admin-UX plan)
+
 ---
 
 ## 🔄 Provisional / Supporting Decisions
