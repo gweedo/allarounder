@@ -1,4 +1,4 @@
-"""Admin tag endpoints — list all tags, delete (admin-only)."""
+"""Admin tag endpoints — list all tags, rename, delete (admin-only mutations)."""
 
 import uuid
 from typing import Annotated
@@ -6,10 +6,14 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from app.application.content.use_cases import DeleteTag, TagNotFoundError
+from app.application.content.use_cases import DeleteTag, RenameTag, TagNotFoundError
 from app.domain.content.entities import Tag
 from app.infrastructure.content.repositories import SqlTagRepository
-from app.interfaces.api.admin.tags.schemas import TagListResponse, TagResponse
+from app.interfaces.api.admin.tags.schemas import (
+    TagListResponse,
+    TagResponse,
+    UpdateTagRequest,
+)
 from app.interfaces.api.auth.dependencies import (
     CurrentUser,
     get_db_session,
@@ -37,6 +41,22 @@ def list_tags(
 ) -> TagListResponse:
     tags = repo.list_all()
     return TagListResponse(items=[_to_response(t) for t in tags])
+
+
+@router.put("/{tag_id}", response_model=TagResponse)
+def update_tag(
+    tag_id: uuid.UUID,
+    body: UpdateTagRequest,
+    repo: Annotated[SqlTagRepository, Depends(get_tag_repo)],
+    _: Annotated[CurrentUser, Depends(require_admin)],
+) -> TagResponse:
+    try:
+        tag = RenameTag(repo).execute(tag_id=tag_id, name=body.name)
+    except TagNotFoundError:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Tag not found"
+        )
+    return _to_response(tag)
 
 
 @router.delete("/{tag_id}", status_code=status.HTTP_204_NO_CONTENT)

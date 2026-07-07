@@ -286,6 +286,22 @@ class SetArticleTags:
         return tags
 
 
+class RenameTag:
+    def __init__(self, repo: TagRepository) -> None:
+        self._repo = repo
+
+    def execute(self, *, tag_id: uuid.UUID, name: str) -> Tag:
+        tag = self._repo.get_by_id(tag_id)
+        if tag is None:
+            raise TagNotFoundError(f"Tag {tag_id} not found")
+        # Slug is intentionally not re-derived here — it stays stable across
+        # renames, matching UpdateCategory, so existing /tags/<slug> links
+        # keep working.
+        tag.name = name
+        self._repo.save(tag)
+        return tag
+
+
 class DeleteTag:
     def __init__(self, repo: TagRepository) -> None:
         self._repo = repo
