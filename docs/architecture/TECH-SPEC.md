@@ -192,7 +192,7 @@ erDiagram
 Full endpoint list in `SITE-STRUCTURE.md §3`. Two surfaces:
 
 - **Public read API** — published content only (filters `status = published AND publish_at <= now`): articles (list/detail, paginated), categories, tags, guests, authors, events, pages, search. *(Newsletter subscribe is phase 2.)*
-- **Admin API** (auth required) — login; full CRUD for articles (incl. drafts/scheduled), categories, tags, guests, authors, events, pages; media upload; publish/schedule.
+- **Admin API** (auth required) — login; full CRUD for articles (incl. drafts/scheduled), categories, tags, guests, authors, events, pages; media upload (direct-to-Blob SAS) and media import (server-side re-upload of an external image URL, e.g. from a Google Docs paste); publish/schedule.
 
 Contract: JSON over REST; paginated responses as `{ items, total, page, page_size }`. The OpenAPI schema is the source of truth for the frontend.
 
