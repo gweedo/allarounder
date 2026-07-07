@@ -33,7 +33,9 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
   const [loggingOut, setLoggingOut] = useState(false);
 
   if (pathname === "/admin/login") {
-    return <>{children}</>;
+    // No sidebar/nav chrome here, but the login screen still gets the
+    // admin color/font palette via the .admin-bare hook (see globals.css).
+    return <div className="admin-bare">{children}</div>;
   }
 
   async function handleLogout() {

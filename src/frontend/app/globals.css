@@ -55,9 +55,23 @@
 
 body {
   margin: 0;
+  line-height: 1.5;
+}
+
+/*
+ * Font/color/background live here rather than on `body` so that public
+ * pages — which still render with the browser default font on a white
+ * background via inline styles set on their own elements, not on `body` —
+ * are not silently re-themed by an inherited body rule. `.admin-bare` is the
+ * equivalent hook for the chrome-free /admin/login screen (see
+ * AdminShell.tsx), which renders no sidebar but should still pick up the
+ * palette.
+ */
+.admin-shell,
+.admin-bare {
+  min-height: 100vh;
   font-family: var(--font-sans);
   font-size: var(--text-base);
-  line-height: 1.5;
   color: var(--color-text);
   background: var(--color-bg);
 }
@@ -181,7 +195,6 @@ body {
 .admin-shell {
   display: grid;
   grid-template-columns: 220px 1fr;
-  min-height: 100vh;
 }
 
 .admin-shell-sidebar {
