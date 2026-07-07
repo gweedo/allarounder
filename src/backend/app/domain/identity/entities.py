@@ -47,6 +47,7 @@ class RefreshToken:
     token_hash: str
     expires_at: datetime
     revoked_at: datetime | None = field(default=None)
+    persistent: bool = field(default=True)
 
     def is_valid(self, now: datetime) -> bool:
         return self.revoked_at is None and now < self.expires_at
