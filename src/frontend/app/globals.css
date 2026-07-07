@@ -1,0 +1,272 @@
+/*
+ * Global stylesheet: design tokens + a small set of semantic component
+ * classes used by the admin UI shell (and, from here on, new admin/public
+ * screens). See docs/DECISIONS.md — "Styling: single global stylesheet with
+ * design tokens" — for the rationale (no Tailwind/CSS-modules/CSS-in-JS).
+ *
+ * Public pages still use inline styles (pre-dating this file) and are left
+ * alone until M5; inline styles win over class styles, and the reset below
+ * is deliberately conservative so it can't visibly change them.
+ */
+
+:root {
+  /* Color palette — warm, restrained editorial tone */
+  --color-text: #1a1613;
+  --color-text-muted: #6b6560;
+  --color-bg: #fdfbf9;
+  --color-surface: #ffffff;
+  --color-border: #e4dfda;
+  --color-accent: #a8462f;
+  --color-accent-hover: #8a3a27;
+  --color-danger: #b3261e;
+  --color-danger-hover: #922019;
+  --color-danger-bg: #fdecea;
+
+  /* Spacing scale */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+
+  /* Radius */
+  --radius: 6px;
+
+  /* Fonts */
+  --font-sans:
+    system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-serif: Georgia, "Times New Roman", serif; /* reserved for article body, M5 */
+
+  /* Type scale */
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.5rem;
+  --text-2xl: 2rem;
+}
+
+/* Minimal reset */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  line-height: 1.5;
+  color: var(--color-text);
+  background: var(--color-bg);
+}
+
+/* Semantic component classes */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  font-size: var(--text-sm);
+  font-family: inherit;
+  border-radius: var(--radius);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.btn-primary {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: #fff;
+}
+
+.btn-primary:not(:disabled):hover {
+  background: var(--color-accent-hover);
+  border-color: var(--color-accent-hover);
+}
+
+.btn-danger {
+  background: var(--color-danger);
+  border-color: var(--color-danger);
+  color: #fff;
+}
+
+.btn-danger:not(:disabled):hover {
+  background: var(--color-danger-hover);
+  border-color: var(--color-danger-hover);
+}
+
+.label {
+  display: block;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  margin-bottom: var(--space-1);
+}
+
+.input {
+  display: block;
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-base);
+  font-family: inherit;
+  color: var(--color-text);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+}
+
+.input:focus {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 1px;
+}
+
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: var(--space-4);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-sm);
+}
+
+.table th,
+.table td {
+  text-align: left;
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.table th {
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.table tbody tr:hover {
+  background: var(--color-bg);
+}
+
+.badge {
+  display: inline-block;
+  padding: var(--space-1) var(--space-2);
+  font-size: var(--text-sm);
+  border-radius: var(--radius);
+  background: var(--color-border);
+  color: var(--color-text);
+}
+
+.alert-error {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius);
+  background: var(--color-danger-bg);
+  color: var(--color-danger);
+  font-size: var(--text-sm);
+}
+
+/* Admin shell layout */
+
+.admin-shell {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  min-height: 100vh;
+}
+
+.admin-shell-sidebar {
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-4);
+  background: var(--color-surface);
+  border-right: 1px solid var(--color-border);
+}
+
+.admin-shell-brand {
+  font-size: var(--text-lg);
+  font-weight: 700;
+  margin-bottom: var(--space-5);
+}
+
+.admin-shell-nav {
+  flex: 1;
+}
+
+.admin-shell-nav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.admin-shell-nav a {
+  display: block;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius);
+  color: var(--color-text);
+  text-decoration: none;
+  font-size: var(--text-sm);
+}
+
+.admin-shell-nav a:hover {
+  background: var(--color-bg);
+}
+
+.admin-shell-nav a[aria-current="page"] {
+  background: var(--color-accent);
+  color: #fff;
+  font-weight: 600;
+}
+
+.admin-shell-logout {
+  margin-top: var(--space-4);
+  width: 100%;
+}
+
+.admin-shell-content {
+  overflow-y: auto;
+  padding: var(--space-4);
+}
+
+@media (max-width: 768px) {
+  .admin-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-shell-sidebar {
+    flex-direction: row;
+    align-items: center;
+    border-right: none;
+    border-bottom: 1px solid var(--color-border);
+    overflow-x: auto;
+  }
+
+  .admin-shell-brand {
+    margin-bottom: 0;
+    margin-right: var(--space-4);
+    white-space: nowrap;
+  }
+
+  .admin-shell-nav ul {
+    flex-direction: row;
+  }
+
+  .admin-shell-logout {
+    width: auto;
+    margin-top: 0;
+    margin-left: var(--space-2);
+    white-space: nowrap;
+  }
+}
