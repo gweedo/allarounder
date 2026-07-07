@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this repository is
 
-This is the **planning and specification workspace and application repo** for **Allarounder**, an Italian written-articles blog that promotes a podcast hosted on Spotify. The repo holds decisions, ADRs, a tech spec, the site/data-model design, a content-team questionnaire — **and the application build is underway**: a `src/` monorepo with `src/backend/` (FastAPI, Python) and `src/frontend/` (Next.js), both with passing test suites. `infra/` (Bicep IaC) does not exist yet.
+This is the **planning and specification workspace and application repo** for **Allarounder**, an Italian written-articles blog that promotes a podcast hosted on Spotify. The repo holds decisions, ADRs, a tech spec, the site/data-model design, a content-team questionnaire — **and the application build is underway**: a `src/` monorepo with `src/backend/` (FastAPI, Python) and `src/frontend/` (Next.js), both with passing test suites, plus `infra/` (Bicep IaC for the Azure environments).
 
 ## The product in one paragraph
 
