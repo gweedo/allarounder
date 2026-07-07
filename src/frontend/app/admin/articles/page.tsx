@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { apiFetch } from "../../../lib/api";
 
 interface Article {
   id: string;
@@ -24,7 +25,7 @@ export default function ArticlesPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/admin/articles", { credentials: "include" })
+    apiFetch("/api/admin/articles")
       .then((res) => {
         if (!res.ok) throw new Error("Errore nel caricamento degli articoli.");
         return res.json() as Promise<ArticleListResponse>;
