@@ -27,7 +27,31 @@ test.describe("Admin login", () => {
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
   });
 
-  test("logout clears session cookie and redirects to /admin/login", async ({ page }) => {
+  test("logged-in sidebar shows all 7 nav sections", async ({ page }) => {
+    await page.goto("/admin/login");
+    await page.fill("#email", ADMIN_EMAIL);
+    await page.fill("#password", ADMIN_PASSWORD);
+    await page.click("button[type=submit]");
+    await page.waitForURL("**/admin", { timeout: 15_000 });
+
+    const nav = page.getByRole("navigation", { name: /amministrazione/i });
+    await expect(nav).toBeVisible();
+    for (const label of [
+      "Bacheca",
+      "Articoli",
+      "Autori",
+      "Ospiti",
+      "Categorie",
+      "Tag",
+      "Pagine",
+    ]) {
+      await expect(nav.getByRole("link", { name: label })).toBeVisible();
+    }
+  });
+
+  test("Esci logs out and redirects to /admin/login; protected pages then bounce back", async ({
+    page,
+  }) => {
     // Log in first
     await page.goto("/admin/login");
     await page.fill("#email", ADMIN_EMAIL);
@@ -35,10 +59,11 @@ test.describe("Admin login", () => {
     await page.click("button[type=submit]");
     await page.waitForURL("**/admin", { timeout: 15_000 });
 
-    // No logout button in the UI — call the API directly.
-    // page.request shares the browser context's cookie jar.
-    await page.request.post("/api/admin/auth/logout");
+    await page.getByRole("button", { name: /esci/i }).click();
+    await page.waitForURL("**/admin/login", { timeout: 15_000 });
+    await expect(page).toHaveURL(/\/admin\/login$/);
 
+    // Session is gone — a protected page should redirect back to login.
     await page.goto("/admin");
     await expect(page).toHaveURL(/\/admin\/login/);
   });
