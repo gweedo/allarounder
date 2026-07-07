@@ -8,6 +8,7 @@ from typing import Any
 
 from app.application.identity.protocols import (
     BreachedPasswordChecker,
+    OidcIdentity,
     PasswordHasher,
     TokenIssuer,
 )
@@ -75,6 +76,40 @@ class AuthService:
         self._users.save(user)
 
         return self._issue_tokens(user, now, persistent=remember_me)
+
+    def login_with_google(self, identity: OidcIdentity, now: datetime) -> dict[str, Any]:
+        """Log in (or link) a user via a verified Google OIDC identity.
+
+        Google is an authentication method, not a registration channel: only
+        emails that already have a User row may authenticate this way. Account
+        linking is by `google_sub` first (fast path for returning SSO users),
+        falling back to a case-insensitive email match on first login, at which
+        point the sub is persisted for subsequent logins. SSO sessions are
+        always persistent (equivalent to "Ricordami" checked) since there is no
+        password form to offer a "remember me" choice on.
+        """
+        if not identity.email_verified:
+            raise InvalidCredentialsError("Google account email is not verified")
+
+        user = self._users.get_by_google_sub(identity.sub)
+
+        if user is None:
+            try:
+                normalised_email = Email(identity.email)
+            except ValueError:
+                raise InvalidCredentialsError("Invalid credentials")
+
+            user = self._users.get_by_email(normalised_email)
+            if user is None:
+                raise InvalidCredentialsError("No account registered for this email")
+
+            user.link_google(identity.sub)
+            self._users.save(user)
+
+        if not user.is_active:
+            raise UserInactiveError("Account is disabled")
+
+        return self._issue_tokens(user, now, persistent=True)
 
     def refresh(self, raw_token: str, now: datetime) -> dict[str, Any]:
         token_hash = _hash_token(raw_token)
