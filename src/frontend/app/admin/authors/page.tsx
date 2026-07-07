@@ -77,9 +77,13 @@ export default function AdminAuthorsPage() {
   if (loading) return <p>Caricamento...</p>;
 
   return (
-    <main style={{ maxWidth: 800, margin: "2rem auto", padding: "0 1rem" }}>
+    <main className="page-container">
       <h1>Autori</h1>
-      {error && <p role="alert" style={{ color: "red" }}>{error}</p>}
+      {error && (
+        <p role="alert" className="alert-error">
+          {error}
+        </p>
+      )}
       {authors.length === 0 ? (
         <p>Nessun autore creato.</p>
       ) : (
@@ -92,12 +96,12 @@ export default function AdminAuthorsPage() {
                 justifyContent: "space-between",
                 alignItems: "center",
                 padding: "0.75rem 0",
-                borderBottom: "1px solid #eee",
+                borderBottom: "1px solid var(--color-border)",
               }}
             >
               <div>
                 <strong>{author.name}</strong>
-                <span style={{ color: "#888", fontSize: "0.875rem", marginLeft: "0.5rem" }}>
+                <span className="article-meta" style={{ marginLeft: "0.5rem" }}>
                   /{author.slug}
                 </span>
               </div>
@@ -105,8 +109,8 @@ export default function AdminAuthorsPage() {
                 <Link href={`/admin/authors/${author.id}`}>Modifica</Link>
                 <button
                   type="button"
+                  className="btn btn-danger"
                   onClick={() => void handleDelete(author.id)}
-                  style={{ color: "red", background: "none", border: "none", cursor: "pointer" }}
                 >
                   Elimina
                 </button>
@@ -115,34 +119,40 @@ export default function AdminAuthorsPage() {
           ))}
         </ul>
       )}
-      <section style={{ marginTop: "2rem" }}>
+      <section className="card" style={{ marginTop: "2rem" }}>
         <h2>Nuovo autore</h2>
-        {createError && <p role="alert" style={{ color: "red" }}>{createError}</p>}
+        {createError && (
+          <p role="alert" className="alert-error">
+            {createError}
+          </p>
+        )}
         <form onSubmit={handleCreate}>
           <div>
-            <label htmlFor="author-name">Nome *</label>
-            <br />
+            <label htmlFor="author-name" className="label">
+              Nome *
+            </label>
             <input
               id="author-name"
               type="text"
+              className="input"
               required
               value={name}
               onChange={(e) => setName(e.target.value)}
-              style={{ width: "100%", marginTop: "0.25rem" }}
             />
           </div>
           <div style={{ marginTop: "1rem" }}>
-            <label htmlFor="author-bio">Bio</label>
-            <br />
+            <label htmlFor="author-bio" className="label">
+              Bio
+            </label>
             <textarea
               id="author-bio"
+              className="input"
               rows={3}
               value={bio}
               onChange={(e) => setBio(e.target.value)}
-              style={{ width: "100%", marginTop: "0.25rem" }}
             />
           </div>
-          <button type="submit" disabled={creating} style={{ marginTop: "1rem" }}>
+          <button type="submit" className="btn btn-primary" disabled={creating} style={{ marginTop: "1rem" }}>
             {creating ? "…" : "Crea autore"}
           </button>
         </form>

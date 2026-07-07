@@ -92,74 +92,81 @@ export default function EditStaticPagePage({ params }: Props) {
   if (loading) return <p>Caricamento...</p>;
   if (error || !page)
     return (
-      <p role="alert" style={{ color: "red" }}>
+      <p role="alert" className="alert-error">
         {error ?? "Pagina non trovata."}
       </p>
     );
 
   return (
-    <main style={{ maxWidth: 900, margin: "2rem auto", padding: "0 1rem" }}>
+    <main className="page-container page-container--wide">
       <h1>
         Modifica: <em>{page.title}</em>
       </h1>
-      <p style={{ color: "#888", fontSize: "0.875rem" }}>
+      <p className="article-meta">
         URL pubblico:{" "}
         <a href={`/${page.slug}`} target="_blank" rel="noopener noreferrer">
           /{page.slug}
         </a>
       </p>
       {saveError && (
-        <p role="alert" style={{ color: "red" }}>
+        <p role="alert" className="alert-error">
           {saveError}
         </p>
       )}
       <form onSubmit={handleSave}>
         <div style={{ marginBottom: "1rem" }}>
-          <label htmlFor="page-title">Titolo *</label>
-          <br />
+          <label htmlFor="page-title" className="label">
+            Titolo *
+          </label>
           <input
             id="page-title"
             type="text"
+            className="input"
             required
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            style={{ width: "100%", marginTop: "0.25rem" }}
           />
         </div>
         <div style={{ marginBottom: "1rem" }}>
-          <label htmlFor="page-body">Corpo (Markdown) *</label>
+          <label htmlFor="page-body" className="label">
+            Corpo (Markdown) *
+          </label>
           <MarkdownEditor value={body} onChange={setBody} />
         </div>
-        <fieldset style={{ border: "1px solid #ddd", padding: "1rem", borderRadius: 4 }}>
+        <fieldset style={{ border: "1px solid var(--color-border)", padding: "1rem", borderRadius: "var(--radius)" }}>
           <legend>SEO</legend>
           <div style={{ marginBottom: "0.75rem" }}>
-            <label htmlFor="page-meta-title">Meta title</label>
-            <br />
+            <label htmlFor="page-meta-title" className="label">
+              Meta title
+            </label>
             <input
               id="page-meta-title"
               type="text"
+              className="input"
               value={metaTitle}
               onChange={(e) => setMetaTitle(e.target.value)}
-              style={{ width: "100%", marginTop: "0.25rem" }}
             />
           </div>
           <div>
-            <label htmlFor="page-meta-desc">Meta description</label>
-            <br />
+            <label htmlFor="page-meta-desc" className="label">
+              Meta description
+            </label>
             <textarea
               id="page-meta-desc"
+              className="input"
               rows={2}
               value={metaDescription}
               onChange={(e) => setMetaDescription(e.target.value)}
-              style={{ width: "100%", marginTop: "0.25rem" }}
             />
           </div>
         </fieldset>
         <div style={{ marginTop: "1.5rem", display: "flex", gap: "1rem" }}>
-          <button type="submit" disabled={saving}>
+          <button type="submit" className="btn btn-primary" disabled={saving}>
             {saving ? "Salvataggio…" : "Salva"}
           </button>
-          <Link href="/admin/pages">Annulla</Link>
+          <Link href="/admin/pages" className="btn">
+            Annulla
+          </Link>
         </div>
       </form>
     </main>

@@ -40,20 +40,22 @@ export default function LoginPage() {
   }
 
   return (
-    <main style={{ maxWidth: 400, margin: "10vh auto", padding: "0 1rem" }}>
+    <main className="page-container" style={{ maxWidth: 400, margin: "10vh auto" }}>
       <h1>Accedi</h1>
       {error && (
-        <p role="alert" style={{ color: "red" }}>
+        <p role="alert" className="alert-error">
           {error}
         </p>
       )}
       <form onSubmit={handleSubmit}>
         <div>
-          <label htmlFor="email">Email</label>
-          <br />
+          <label htmlFor="email" className="label">
+            Email
+          </label>
           <input
             id="email"
             type="email"
+            className="input"
             autoComplete="email"
             required
             value={email}
@@ -61,11 +63,13 @@ export default function LoginPage() {
           />
         </div>
         <div style={{ marginTop: "1rem" }}>
-          <label htmlFor="password">Password</label>
-          <br />
+          <label htmlFor="password" className="label">
+            Password
+          </label>
           <input
             id="password"
             type="password"
+            className="input"
             autoComplete="current-password"
             required
             value={password}
@@ -83,11 +87,7 @@ export default function LoginPage() {
             Ricordami per 14 giorni
           </label>
         </div>
-        <button
-          type="submit"
-          disabled={loading}
-          style={{ marginTop: "1.5rem" }}
-        >
+        <button type="submit" className="btn btn-primary" disabled={loading} style={{ marginTop: "1.5rem" }}>
           {loading ? "…" : "Accedi"}
         </button>
       </form>

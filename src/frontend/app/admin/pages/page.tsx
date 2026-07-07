@@ -29,10 +29,10 @@ export default function AdminPagesPage() {
   if (loading) return <p>Caricamento...</p>;
 
   return (
-    <main style={{ maxWidth: 800, margin: "2rem auto", padding: "0 1rem" }}>
+    <main className="page-container">
       <h1>Pagine statiche</h1>
       {error && (
-        <p role="alert" style={{ color: "red" }}>
+        <p role="alert" className="alert-error">
           {error}
         </p>
       )}
@@ -48,14 +48,12 @@ export default function AdminPagesPage() {
                 justifyContent: "space-between",
                 alignItems: "center",
                 padding: "0.75rem 0",
-                borderBottom: "1px solid #eee",
+                borderBottom: "1px solid var(--color-border)",
               }}
             >
               <div>
                 <strong>{page.title}</strong>
-                <span
-                  style={{ color: "#888", fontSize: "0.875rem", marginLeft: "0.5rem" }}
-                >
+                <span className="article-meta" style={{ marginLeft: "0.5rem" }}>
                   /{page.slug}
                 </span>
               </div>
