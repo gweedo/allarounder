@@ -63,11 +63,11 @@ export default async function StaticPageRoute({ params }: Props) {
   const bodyHtml = await renderMarkdown(page.body);
 
   return (
-    <main style={{ maxWidth: 800, margin: "2rem auto", padding: "0 1rem" }}>
+    <main className="page-container">
       <article>
         <h1>{page.title}</h1>
         <div
-          className="page-body"
+          className="page-body article-body"
           dangerouslySetInnerHTML={{ __html: bodyHtml }}
         />
       </article>

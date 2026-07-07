@@ -44,30 +44,18 @@ export default async function PreviewArticlePage({ params }: Props) {
   const bodyHtml = await renderMarkdown(article.body);
 
   return (
-    <main style={{ maxWidth: 800, margin: "2rem auto", padding: "0 1rem" }}>
-      <div
-        role="banner"
-        aria-label="anteprima"
-        style={{
-          background: "#fef3c7",
-          border: "1px solid #f59e0b",
-          borderRadius: "8px",
-          padding: "0.75rem 1rem",
-          marginBottom: "1.5rem",
-          fontWeight: 600,
-          color: "#92400e",
-        }}
-      >
+    <main className="page-container">
+      <div role="banner" aria-label="anteprima" className="page-banner">
         ANTEPRIMA — non pubblicato
       </div>
       <article>
         {article.cover_image_url && (
-          <div style={{ position: "relative", width: "100%", aspectRatio: "16/9", marginBottom: "1.5rem" }}>
+          <div className="cover-image" style={{ aspectRatio: "16/9", marginBottom: "1.5rem" }}>
             <Image
               src={article.cover_image_url}
               alt={article.cover_image_alt ?? `Copertina articolo: ${article.title}`}
               fill
-              style={{ objectFit: "cover", borderRadius: "8px" }}
+              style={{ objectFit: "cover" }}
             />
           </div>
         )}
@@ -76,12 +64,12 @@ export default async function PreviewArticlePage({ params }: Props) {
           {new Date(article.publish_at).toLocaleDateString("it-IT")}
         </time>
         {article.reading_time && (
-          <span style={{ marginLeft: "1rem", color: "#666" }}>
+          <span className="article-meta" style={{ marginLeft: "1rem" }}>
             {article.reading_time} min di lettura
           </span>
         )}
         {article.excerpt && (
-          <p style={{ fontStyle: "italic", marginTop: "1rem", color: "#555" }}>
+          <p className="article-excerpt" style={{ fontStyle: "italic", marginTop: "1rem" }}>
             {article.excerpt}
           </p>
         )}
@@ -90,20 +78,8 @@ export default async function PreviewArticlePage({ params }: Props) {
           dangerouslySetInnerHTML={{ __html: bodyHtml }}
         />
         {article.spotify_url && (
-          <div
-            style={{
-              marginTop: "2rem",
-              padding: "1rem",
-              border: "1px solid #1db954",
-              borderRadius: "8px",
-            }}
-          >
-            <a
-              href={article.spotify_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{ color: "#1db954", textDecoration: "none" }}
-            >
+          <div className="spotify-callout">
+            <a href={article.spotify_url} target="_blank" rel="noopener noreferrer">
               Ascolta su Spotify
             </a>
           </div>

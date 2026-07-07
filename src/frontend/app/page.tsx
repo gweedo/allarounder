@@ -72,102 +72,46 @@ export default async function HomePage({ searchParams }: Props) {
   const totalPages = Math.ceil(data.total / PAGE_SIZE);
 
   return (
-    <main style={{ maxWidth: 1100, margin: "2rem auto", padding: "0 1rem" }}>
-      <h1 style={{ marginBottom: "2rem", fontSize: "1.25rem", fontWeight: "bold" }}>
-        <Link href="/" style={{ textDecoration: "none", color: "inherit" }}>
-          Allarounder
-        </Link>
+    <main className="page-container page-container--wide">
+      <h1 className="site-title">
+        <Link href="/">Allarounder</Link>
       </h1>
 
       {hero && (
-        <section
-          style={{
-            marginBottom: "3rem",
-            borderBottom: "2px solid #111",
-            paddingBottom: "2rem",
-          }}
-          aria-label="Articolo in evidenza"
-        >
+        <section className="hero" aria-label="Articolo in evidenza">
           {hero.cover_image_url ? (
-            <div style={{ position: "relative", width: "100%", height: 400, marginBottom: "1.5rem" }}>
+            <div className="cover-image" style={{ height: 400 }}>
               <Image
                 src={hero.cover_image_url}
                 alt={hero.cover_image_alt ?? `Copertina: ${hero.title}`}
                 fill
-                style={{ objectFit: "cover", borderRadius: 8 }}
+                style={{ objectFit: "cover" }}
                 priority
               />
             </div>
           ) : (
-            <div
-              aria-hidden="true"
-              style={{
-                width: "100%",
-                height: 300,
-                background: "#f0f0f0",
-                borderRadius: 8,
-                marginBottom: "1.5rem",
-              }}
-            />
+            <div className="cover-image" aria-hidden="true" style={{ height: 300 }} />
           )}
           {hero.category && (
-            <Link
-              href={`/argomenti/${hero.category.slug}`}
-              style={{
-                display: "inline-block",
-                background: "#111",
-                color: "#fff",
-                padding: "0.2rem 0.6rem",
-                borderRadius: 4,
-                fontSize: "0.8rem",
-                textDecoration: "none",
-                marginBottom: "0.75rem",
-              }}
-            >
+            <Link href={`/argomenti/${hero.category.slug}`} className="category-badge">
               {hero.category.name}
             </Link>
           )}
-          <h2 style={{ fontSize: "2rem", margin: "0 0 0.5rem" }}>
-            <Link
-              href={`/articoli/${hero.slug}`}
-              style={{ textDecoration: "none", color: "inherit" }}
-            >
-              {hero.title}
-            </Link>
+          <h2 className="hero-title">
+            <Link href={`/articoli/${hero.slug}`}>{hero.title}</Link>
           </h2>
-          {hero.excerpt && (
-            <p style={{ color: "#555", fontSize: "1.1rem", margin: "0.5rem 0 1rem" }}>
-              {hero.excerpt}
-            </p>
-          )}
-          <div style={{ color: "#888", fontSize: "0.875rem", marginBottom: "1rem" }}>
+          {hero.excerpt && <p className="hero-excerpt">{hero.excerpt}</p>}
+          <div className="article-meta" style={{ marginBottom: "1rem" }}>
             <time dateTime={hero.publish_at}>
               {new Date(hero.publish_at).toLocaleDateString("it-IT")}
             </time>
             {hero.author_profile && (
               <span style={{ marginLeft: "1rem" }}>
-                di{" "}
-                <Link
-                  href={`/autori/${hero.author_profile.slug}`}
-                  style={{ color: "#555", textDecoration: "underline" }}
-                >
-                  {hero.author_profile.name}
-                </Link>
+                di <Link href={`/autori/${hero.author_profile.slug}`}>{hero.author_profile.name}</Link>
               </span>
             )}
           </div>
-          <Link
-            href={`/articoli/${hero.slug}`}
-            style={{
-              display: "inline-block",
-              padding: "0.5rem 1.25rem",
-              background: "#111",
-              color: "#fff",
-              borderRadius: 4,
-              textDecoration: "none",
-              fontWeight: "bold",
-            }}
-          >
+          <Link href={`/articoli/${hero.slug}`} className="hero-cta">
             Leggi
           </Link>
         </section>
@@ -175,67 +119,36 @@ export default async function HomePage({ searchParams }: Props) {
 
       {grid.length > 0 && (
         <section aria-label="Articoli recenti">
-          <ul
-            style={{
-              listStyle: "none",
-              padding: 0,
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
-              gap: "2rem",
-            }}
-          >
+          <ul className="card-grid">
             {grid.map((article) => (
               <li key={article.id}>
                 {article.cover_image_url ? (
-                  <div style={{ position: "relative", width: "100%", height: 180, marginBottom: "0.75rem" }}>
+                  <div className="cover-image" style={{ height: 180 }}>
                     <Image
                       src={article.cover_image_url}
                       alt={article.cover_image_alt ?? `Copertina: ${article.title}`}
                       fill
-                      style={{ objectFit: "cover", borderRadius: 6 }}
+                      style={{ objectFit: "cover" }}
                     />
                   </div>
                 ) : (
-                  <div
-                    aria-hidden="true"
-                    style={{
-                      width: "100%",
-                      height: 180,
-                      background: "#f0f0f0",
-                      borderRadius: 6,
-                      marginBottom: "0.75rem",
-                    }}
-                  />
+                  <div className="cover-image" aria-hidden="true" style={{ height: 180 }} />
                 )}
                 {article.category && (
                   <Link
                     href={`/argomenti/${article.category.slug}`}
-                    style={{
-                      display: "inline-block",
-                      background: "#eee",
-                      color: "#333",
-                      padding: "0.15rem 0.5rem",
-                      borderRadius: 4,
-                      fontSize: "0.75rem",
-                      textDecoration: "none",
-                      marginBottom: "0.5rem",
-                    }}
+                    className="category-badge category-badge--muted"
                   >
                     {article.category.name}
                   </Link>
                 )}
-                <h2 style={{ margin: "0 0 0.4rem", fontSize: "1rem" }}>
-                  <Link
-                    href={`/articoli/${article.slug}`}
-                    style={{ textDecoration: "none", color: "inherit" }}
-                  >
-                    {article.title}
-                  </Link>
+                <h2 className="card-title" style={{ fontSize: "1rem" }}>
+                  <Link href={`/articoli/${article.slug}`}>{article.title}</Link>
                 </h2>
                 {article.excerpt && (
                   <p
+                    className="article-excerpt"
                     style={{
-                      color: "#666",
                       fontSize: "0.875rem",
                       margin: "0 0 0.5rem",
                       display: "-webkit-box",
@@ -247,7 +160,7 @@ export default async function HomePage({ searchParams }: Props) {
                     {article.excerpt}
                   </p>
                 )}
-                <div style={{ color: "#999", fontSize: "0.8rem" }}>
+                <div className="article-meta">
                   <time dateTime={article.publish_at}>
                     {new Date(article.publish_at).toLocaleDateString("it-IT")}
                   </time>
@@ -264,53 +177,21 @@ export default async function HomePage({ searchParams }: Props) {
       )}
 
       {data.total === 0 && (
-        <p style={{ color: "#888", textAlign: "center", marginTop: "4rem" }}>
+        <p className="page-lede" style={{ textAlign: "center", marginTop: "4rem" }}>
           Nessun articolo pubblicato.
         </p>
       )}
 
       {totalPages > 1 && (
-        <nav
-          aria-label="Paginazione"
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            gap: "1rem",
-            marginTop: "3rem",
-            paddingTop: "1.5rem",
-            borderTop: "1px solid #eee",
-          }}
-        >
+        <nav aria-label="Paginazione" className="pagination-nav">
           {page > 1 && (
-            <Link
-              href={`/?page=${page - 1}`}
-              style={{
-                padding: "0.5rem 1rem",
-                border: "1px solid #ccc",
-                borderRadius: 4,
-                textDecoration: "none",
-                color: "#333",
-              }}
-            >
-              ← Pagina precedente
-            </Link>
+            <Link href={`/?page=${page - 1}`}>← Pagina precedente</Link>
           )}
-          <span style={{ padding: "0.5rem 0", color: "#888" }}>
+          <span className="pagination-status">
             {page} / {totalPages}
           </span>
           {page < totalPages && (
-            <Link
-              href={`/?page=${page + 1}`}
-              style={{
-                padding: "0.5rem 1rem",
-                border: "1px solid #ccc",
-                borderRadius: 4,
-                textDecoration: "none",
-                color: "#333",
-              }}
-            >
-              Pagina successiva →
-            </Link>
+            <Link href={`/?page=${page + 1}`}>Pagina successiva →</Link>
           )}
         </nav>
       )}
