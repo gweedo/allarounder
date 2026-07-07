@@ -1,12 +1,8 @@
 /*
  * Global stylesheet: design tokens + a small set of semantic component
- * classes used by the admin UI shell (and, from here on, new admin/public
- * screens). See docs/DECISIONS.md — "Styling: single global stylesheet with
- * design tokens" — for the rationale (no Tailwind/CSS-modules/CSS-in-JS).
- *
- * Public pages still use inline styles (pre-dating this file) and are left
- * alone until M5; inline styles win over class styles, and the reset below
- * is deliberately conservative so it can't visibly change them.
+ * classes shared by the admin UI and the public site. See
+ * docs/DECISIONS.md — "Styling: single global stylesheet with design
+ * tokens" — for the rationale (no Tailwind/CSS-modules/CSS-in-JS).
  */
 
 :root {
@@ -60,24 +56,20 @@
 body {
   margin: 0;
   line-height: 1.5;
-}
-
-/*
- * Font/color/background live here rather than on `body` so that public
- * pages — which still render with the browser default font on a white
- * background via inline styles set on their own elements, not on `body` —
- * are not silently re-themed by an inherited body rule. `.admin-bare` is the
- * equivalent hook for the chrome-free /admin/login screen (see
- * AdminShell.tsx), which renders no sidebar but should still pick up the
- * palette.
- */
-.admin-shell,
-.admin-bare {
-  min-height: 100vh;
   font-family: var(--font-sans);
   font-size: var(--text-base);
   color: var(--color-text);
   background: var(--color-bg);
+}
+
+/*
+ * `.admin-shell`/`.admin-bare` (see AdminShell.tsx) now only need the
+ * min-height for their layout — font/color/background come from `body`,
+ * which public pages share as of M5.
+ */
+.admin-shell,
+.admin-bare {
+  min-height: 100vh;
 }
 
 /* Semantic component classes */
@@ -325,6 +317,279 @@ body {
   margin: var(--space-6) 0;
   border: none;
   border-top: 1px solid var(--color-border);
+}
+
+/* Public page layout */
+
+.page-container {
+  max-width: 70ch;
+  margin: var(--space-6) auto;
+  padding: 0 var(--space-4);
+}
+
+.page-container--wide {
+  max-width: 1100px;
+}
+
+.site-title {
+  margin: 0 0 var(--space-6);
+  font-size: var(--text-xl);
+  font-weight: 700;
+}
+
+.site-title a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.page-header {
+  margin-bottom: var(--space-6);
+}
+
+.page-lede {
+  font-size: var(--text-lg);
+  color: var(--color-text-muted);
+}
+
+.page-count {
+  color: var(--color-text-muted);
+}
+
+.page-banner {
+  margin-bottom: var(--space-5);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid #f59e0b;
+  border-radius: var(--radius);
+  background: #fef3c7;
+  color: #92400e;
+  font-weight: 600;
+}
+
+/* Profile header (author/guest pages) */
+
+.profile-header {
+  display: flex;
+  gap: var(--space-5);
+  align-items: flex-start;
+  margin-bottom: var(--space-6);
+}
+
+.profile-photo {
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.profile-bio {
+  color: var(--color-text-muted);
+}
+
+.profile-links {
+  display: flex;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+}
+
+.profile-links a {
+  color: var(--color-accent);
+  font-size: var(--text-sm);
+  text-decoration: none;
+}
+
+.profile-links a:hover,
+.profile-links a:focus-visible {
+  text-decoration: underline;
+}
+
+/* Article hero + cards (home page) */
+
+.hero {
+  margin-bottom: var(--space-6);
+  padding-bottom: var(--space-5);
+  border-bottom: 2px solid var(--color-text);
+}
+
+.hero-title {
+  margin: 0 0 var(--space-2);
+  font-size: var(--text-2xl);
+}
+
+.hero-excerpt {
+  margin: var(--space-2) 0 var(--space-4);
+  font-size: var(--text-lg);
+  color: var(--color-text-muted);
+}
+
+.hero-cta {
+  display: inline-block;
+  padding: var(--space-2) var(--space-5);
+  border-radius: var(--radius);
+  background: var(--color-text);
+  color: #fff;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.card-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--space-6);
+}
+
+/* Article list (category/author/guest/tag listing pages) */
+
+.article-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-5);
+}
+
+.article-list-item {
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: var(--space-5);
+}
+
+.cover-image {
+  position: relative;
+  width: 100%;
+  margin-bottom: var(--space-3);
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--color-border);
+}
+
+.cover-image img {
+  object-fit: cover;
+}
+
+.category-badge {
+  display: inline-block;
+  margin-bottom: var(--space-2);
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius);
+  background: var(--color-text);
+  color: #fff;
+  font-size: var(--text-sm);
+  text-decoration: none;
+}
+
+.category-badge--muted {
+  background: var(--color-border);
+  color: var(--color-text);
+}
+
+.card-title {
+  margin: 0 0 var(--space-2);
+}
+
+.card-title a,
+.article-title a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.article-title {
+  margin: 0 0 var(--space-1);
+}
+
+.article-excerpt {
+  color: var(--color-text-muted);
+}
+
+.article-meta {
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+.article-meta a {
+  color: var(--color-text-muted);
+  text-decoration: underline;
+}
+
+.tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+}
+
+.tag-pill {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius);
+  background: var(--color-border);
+  color: var(--color-text);
+  font-size: var(--text-sm);
+  text-decoration: none;
+}
+
+.spotify-callout {
+  margin-top: var(--space-6);
+  padding: var(--space-4);
+  border: 1px solid #1db954;
+  border-radius: var(--radius);
+}
+
+.spotify-callout a {
+  color: #1db954;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.pagination-nav {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-4);
+  margin-top: var(--space-6);
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--color-border);
+}
+
+.pagination-nav a {
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+.pagination-status {
+  padding: var(--space-2) 0;
+  color: var(--color-text-muted);
+}
+
+/* Site footer */
+
+.site-footer {
+  margin-top: var(--space-6);
+  padding: var(--space-6) var(--space-4);
+  border-top: 1px solid var(--color-border);
+  text-align: center;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+.site-footer nav a {
+  margin-right: var(--space-5);
+  color: var(--color-text-muted);
+  text-decoration: none;
+}
+
+.site-footer nav a:last-child {
+  margin-right: 0;
+}
+
+.site-footer nav a:hover,
+.site-footer nav a:focus-visible {
+  text-decoration: underline;
+}
+
+.site-footer p {
+  margin-top: var(--space-4);
 }
 
 /* Admin shell layout */

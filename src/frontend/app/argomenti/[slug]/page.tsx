@@ -60,44 +60,39 @@ export default async function CategoryPage({ params }: Props) {
   if (!data) notFound();
 
   return (
-    <main style={{ maxWidth: 900, margin: "2rem auto", padding: "0 1rem" }}>
-      <header style={{ marginBottom: "2rem" }}>
+    <main className="page-container page-container--wide">
+      <header className="page-header">
         <h1>{data.name}</h1>
-        {data.description && (
-          <p style={{ color: "#555", fontSize: "1.1rem" }}>{data.description}</p>
-        )}
-        <p style={{ color: "#888" }}>
+        {data.description && <p className="page-lede">{data.description}</p>}
+        <p className="page-count">
           {data.total} {data.total === 1 ? "articolo" : "articoli"}
         </p>
       </header>
       {data.articles.length === 0 ? (
         <p>Nessun articolo pubblicato in questa categoria.</p>
       ) : (
-        <ul style={{ listStyle: "none", padding: 0, display: "grid", gap: "1.5rem" }}>
+        <ul className="article-list">
           {data.articles.map((article) => (
-            <li key={article.id} style={{ borderBottom: "1px solid #eee", paddingBottom: "1.5rem" }}>
+            <li key={article.id} className="article-list-item">
               {article.cover_image_url && (
-                <div style={{ position: "relative", width: "100%", height: 200 }}>
+                <div className="cover-image" style={{ height: 200 }}>
                   <Image
                     src={article.cover_image_url}
                     alt={article.cover_image_alt ?? `Copertina: ${article.title}`}
                     fill
-                    style={{ objectFit: "cover", borderRadius: 6 }}
+                    style={{ objectFit: "cover" }}
                   />
                 </div>
               )}
-              <h2 style={{ marginTop: "0.75rem" }}>
-                <a
-                  href={`/articoli/${article.slug}`}
-                  style={{ textDecoration: "none", color: "inherit" }}
-                >
-                  {article.title}
-                </a>
+              <h2 className="card-title" style={{ marginTop: "0.75rem" }}>
+                <a href={`/articoli/${article.slug}`}>{article.title}</a>
               </h2>
               {article.excerpt && (
-                <p style={{ color: "#555", marginTop: "0.5rem" }}>{article.excerpt}</p>
+                <p className="article-excerpt" style={{ marginTop: "0.5rem" }}>
+                  {article.excerpt}
+                </p>
               )}
-              <div style={{ color: "#888", fontSize: "0.875rem", marginTop: "0.5rem" }}>
+              <div className="article-meta" style={{ marginTop: "0.5rem" }}>
                 <time dateTime={article.publish_at}>
                   {new Date(article.publish_at).toLocaleDateString("it-IT")}
                 </time>
