@@ -1,7 +1,15 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useCallback, useState } from "react";
+import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
+import { apiFetch } from "../../../../lib/api";
+import { uploadImage } from "../../../../lib/upload";
+
+const MarkdownEditor = dynamic(() => import("../../../../components/MarkdownEditor"), {
+  ssr: false,
+  loading: () => <textarea rows={15} style={{ width: "100%", fontFamily: "monospace" }} />,
+});
 
 export default function NewArticlePage() {
   const router = useRouter();
@@ -10,16 +18,19 @@ export default function NewArticlePage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
+  const handleBodyImageUpload = useCallback(async (file: File): Promise<string> => {
+    return uploadImage(file);
+  }, []);
+
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setError(null);
     setLoading(true);
     try {
-      const res = await fetch("/api/admin/articles", {
+      const res = await apiFetch("/api/admin/articles", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ title, body }),
-        credentials: "include",
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
@@ -35,38 +46,32 @@ export default function NewArticlePage() {
   }
 
   return (
-    <main style={{ maxWidth: 800, margin: "2rem auto", padding: "0 1rem" }}>
+    <main>
       <h1>Nuovo articolo</h1>
       {error && (
-        <p role="alert" style={{ color: "red" }}>
+        <p role="alert" className="alert-error">
           {error}
         </p>
       )}
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={(e) => void handleSubmit(e)}>
         <div>
-          <label htmlFor="title">Titolo</label>
-          <br />
+          <label htmlFor="title" className="label">
+            Titolo
+          </label>
           <input
             id="title"
             type="text"
+            className="input"
             required
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            style={{ width: "100%", marginTop: "0.25rem" }}
           />
         </div>
         <div style={{ marginTop: "1rem" }}>
-          <label htmlFor="body">Testo (Markdown)</label>
-          <br />
-          <textarea
-            id="body"
-            rows={15}
-            value={body}
-            onChange={(e) => setBody(e.target.value)}
-            style={{ width: "100%", marginTop: "0.25rem", fontFamily: "monospace" }}
-          />
+          <label className="label">Testo (Markdown)</label>
+          <MarkdownEditor value={body} onChange={setBody} onUploadImage={handleBodyImageUpload} />
         </div>
-        <button type="submit" disabled={loading} style={{ marginTop: "1.5rem" }}>
+        <button type="submit" className="btn btn-primary" disabled={loading} style={{ marginTop: "1.5rem" }}>
           {loading ? "…" : "Salva bozza"}
         </button>
       </form>

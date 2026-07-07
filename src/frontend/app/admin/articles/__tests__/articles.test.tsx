@@ -89,13 +89,80 @@ describe("ArticlesPage", () => {
     render(<ArticlesPage />);
     expect(screen.getByRole("link", { name: /nuovo articolo/i })).toBeInTheDocument();
   });
+
+  it("links each row title to its edit page", async () => {
+    const mockData = {
+      items: [
+        {
+          id: "art-1",
+          title: "Test Article",
+          slug: "test-article",
+          status: "draft",
+          created_at: "2026-06-19T00:00:00Z",
+        },
+      ],
+      total: 1,
+      page: 1,
+      page_size: 20,
+    };
+    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+      ok: true,
+      json: async () => mockData,
+    });
+    render(<ArticlesPage />);
+    await waitFor(() => {
+      expect(screen.getByRole("link", { name: "Test Article" })).toHaveAttribute(
+        "href",
+        "/admin/articles/art-1"
+      );
+    });
+  });
+
+  it("renders filter tabs and defaults to Tutti", async () => {
+    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ items: [], total: 0, page: 1, page_size: 20 }),
+    });
+    render(<ArticlesPage />);
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "Tutti" })).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: "Bozze" })).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: "Pubblicati" })).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: "Archiviati" })).toBeInTheDocument();
+    });
+    expect(global.fetch).toHaveBeenCalledWith("/api/admin/articles", { credentials: "include" });
+  });
+
+  it("refetches with the status query param when a filter tab is clicked", async () => {
+    (global.fetch as ReturnType<typeof vi.fn>)
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ items: [], total: 0, page: 1, page_size: 20 }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ items: [], total: 0, page: 1, page_size: 20 }),
+      });
+    render(<ArticlesPage />);
+    await waitFor(() => screen.getByRole("button", { name: "Bozze" }));
+
+    fireEvent.click(screen.getByRole("button", { name: "Bozze" }));
+
+    await waitFor(() => {
+      expect(global.fetch).toHaveBeenCalledWith("/api/admin/articles?status=draft", {
+        credentials: "include",
+      });
+    });
+  });
 });
 
 describe("NewArticlePage", () => {
-  it("renders title and body fields with save button", () => {
+  it("renders title and body fields with save button", async () => {
     render(<NewArticlePage />);
     expect(screen.getByLabelText(/titolo/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/testo/i)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByLabelText(/testo markdown/i)).toBeInTheDocument();
+    });
     expect(
       screen.getByRole("button", { name: /salva bozza/i })
     ).toBeInTheDocument();
@@ -128,7 +195,7 @@ describe("NewArticlePage", () => {
     });
     fireEvent.click(screen.getByRole("button", { name: /salva bozza/i }));
     await waitFor(() => {
-      expect(screen.getByRole("button")).toBeDisabled();
+      expect(screen.getByRole("button", { name: /…/ })).toBeDisabled();
     });
     resolve!({ ok: true, json: async () => ({}) });
   });
