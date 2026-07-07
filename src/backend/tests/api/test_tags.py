@@ -81,6 +81,51 @@ class TestAdminTagList:
         assert resp.status_code == 401
 
 
+class TestAdminTagUpdate:
+    def test_200_admin_can_rename(self, client: TestClient, mock_tag_repo: MagicMock) -> None:
+        tag = _make_tag("calcio", "calcio")
+        mock_tag_repo.get_by_id.return_value = tag
+        mock_tag_repo.save.return_value = None
+        resp = client.put(
+            f"/api/admin/tags/{tag.id}",
+            json={"name": "pallone"},
+            cookies={"access_token": _make_token(role="admin")},
+        )
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["name"] == "pallone"
+        assert data["slug"] == "calcio"
+
+    def test_401_without_token(self, client: TestClient) -> None:
+        resp = client.put(f"/api/admin/tags/{uuid.uuid4()}", json={"name": "pallone"})
+        assert resp.status_code == 401
+
+    def test_403_editor_cannot_rename(self, client: TestClient) -> None:
+        resp = client.put(
+            f"/api/admin/tags/{uuid.uuid4()}",
+            json={"name": "pallone"},
+            cookies={"access_token": _make_token(role="editor")},
+        )
+        assert resp.status_code == 403
+
+    def test_404_when_not_found(self, client: TestClient, mock_tag_repo: MagicMock) -> None:
+        mock_tag_repo.get_by_id.return_value = None
+        resp = client.put(
+            f"/api/admin/tags/{uuid.uuid4()}",
+            json={"name": "pallone"},
+            cookies={"access_token": _make_token(role="admin")},
+        )
+        assert resp.status_code == 404
+
+    def test_422_when_name_empty(self, client: TestClient, mock_tag_repo: MagicMock) -> None:
+        resp = client.put(
+            f"/api/admin/tags/{uuid.uuid4()}",
+            json={"name": ""},
+            cookies={"access_token": _make_token(role="admin")},
+        )
+        assert resp.status_code == 422
+
+
 class TestAdminTagDelete:
     def test_204_admin_can_delete(self, client: TestClient, mock_tag_repo: MagicMock) -> None:
         tag = _make_tag()

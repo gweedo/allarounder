@@ -297,6 +297,12 @@ class SqlTagRepository:
                 [{"article_id": article_id, "tag_id": t} for t in tag_ids],
             )
 
+    def save(self, tag: Tag) -> None:
+        m = self._session.get(TagModel, tag.id)
+        if m is not None:
+            m.name = tag.name
+            m.slug = tag.slug.value
+
     def delete(self, tag_id: uuid.UUID) -> None:
         m = self._session.get(TagModel, tag_id)
         if m is not None:
