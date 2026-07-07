@@ -352,6 +352,7 @@ export default function EditArticlePage({ params }: Props) {
             value={body}
             onChange={setBody}
             onUploadImage={handleBodyImageUpload}
+            onImportWarning={setError}
           />
         </div>
         <div style={{ marginTop: "1rem" }}>

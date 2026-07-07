@@ -69,7 +69,12 @@ export default function NewArticlePage() {
         </div>
         <div style={{ marginTop: "1rem" }}>
           <label className="label">Testo (Markdown)</label>
-          <MarkdownEditor value={body} onChange={setBody} onUploadImage={handleBodyImageUpload} />
+          <MarkdownEditor
+            value={body}
+            onChange={setBody}
+            onUploadImage={handleBodyImageUpload}
+            onImportWarning={setError}
+          />
         </div>
         <button type="submit" className="btn btn-primary" disabled={loading} style={{ marginTop: "1.5rem" }}>
           {loading ? "…" : "Salva bozza"}
