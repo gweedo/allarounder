@@ -7,7 +7,7 @@ async function createAndPublishArticle(page: Page): Promise<{ id: string; slug: 
   await page.goto("/admin/articles/new");
   const title = `Tag Article ${Date.now()}`;
   await page.fill("#title", title);
-  await page.fill("#body", "Articolo per il test dei tag.");
+  await page.getByLabel(/testo markdown/i).fill("Articolo per il test dei tag.");
 
   const [createRes] = await Promise.all([
     page.waitForResponse(
@@ -66,5 +66,44 @@ test.describe("Admin tags", () => {
     // Tag appears on public article detail page
     await page.goto(`/articoli/${slug}`);
     await expect(page.getByText(tagName)).toBeVisible({ timeout: 10_000 });
+  });
+
+  test("rename tag on the tags screen → new name persists", async ({ page }) => {
+    const { id } = await createAndPublishArticle(page);
+    const originalName = `renametag${Date.now()}`;
+    const renamedName = `renamed${Date.now()}`;
+
+    // Add the tag on the article edit page so it exists on the tags screen.
+    await page.goto(`/admin/articles/${id}`);
+    await page.fill("#tag-input", originalName);
+    await page.getByRole("button", { name: /aggiungi/i }).click();
+    await expect(page.getByText(`#${originalName}`)).toBeVisible({ timeout: 5_000 });
+    await Promise.all([
+      page.waitForResponse(
+        (r) =>
+          r.url().includes(`/api/admin/articles/${id}`) &&
+          r.request().method() === "PUT",
+        { timeout: 10_000 },
+      ),
+      page.click("button[type=submit]"),
+    ]);
+
+    // Rename it on /admin/tags
+    await page.goto("/admin/tags");
+    await expect(page.getByText(originalName)).toBeVisible({ timeout: 10_000 });
+    const row = page.locator("tr").filter({ hasText: originalName });
+    await row.getByRole("button", { name: /modifica/i }).click();
+    await row.locator("input").fill(renamedName);
+
+    await Promise.all([
+      page.waitForResponse(
+        (r) => r.url().includes("/api/admin/tags/") && r.request().method() === "PUT",
+        { timeout: 10_000 },
+      ),
+      row.getByRole("button", { name: /salva/i }).click(),
+    ]);
+
+    await expect(page.getByText(renamedName)).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText(originalName)).toBeHidden();
   });
 });
