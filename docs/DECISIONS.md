@@ -285,6 +285,13 @@ Last updated: 2026-06-14
 - **Status**: ✅ Final
 - **Decided by**: Guido + Claude (Milestone 1 of the admin-UX plan)
 
+### Styling: single global stylesheet with design tokens
+- **Date**: 2026-07-07
+- **Decision**: Style the app with one hand-written stylesheet, `src/frontend/app/globals.css`, imported once at the top of the root layout. It defines CSS custom properties as design tokens (color palette, spacing scale, radius, font stacks including a reserved `--font-serif` for article body typography, and a type scale) plus a small set of semantic component classes (`.btn`/`.btn-primary`/`.btn-danger`, `.input`, `.label`, `.card`, `.table`, `.badge`, `.alert-error`) and the `.admin-shell` layout classes used by the new admin sidebar. No Tailwind, CSS Modules, or CSS-in-JS.
+- **Rationale**: Solo-dev pragmatism — zero build config or extra dependencies beyond what Next.js already ships with. A plain stylesheet with tokens is enough for a small admin UI and public site; the SEO-critical `.article-body` typography (arriving in M5) needs a real stylesheet regardless, so introducing one now rather than layering a utility framework or CSS-in-JS on top avoids churn later. Public pages keep their pre-existing inline styles for now (inline styles win over class styles) and will be migrated to the same token system in M5.
+- **Status**: ✅ Final
+- **Decided by**: Guido + Claude (Milestone 2 of the admin-UX plan)
+
 ---
 
 ## 🔄 Provisional / Supporting Decisions
