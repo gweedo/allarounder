@@ -49,7 +49,9 @@ class AuthService:
 
     # ── Public use cases ─────────────────────────────────────────────────────
 
-    def login(self, email: str, password: str, now: datetime) -> dict[str, str]:
+    def login(
+        self, email: str, password: str, now: datetime, remember_me: bool = True
+    ) -> dict[str, Any]:
         try:
             normalised_email = Email(email)
         except ValueError:
@@ -72,9 +74,9 @@ class AuthService:
         user.record_successful_login()
         self._users.save(user)
 
-        return self._issue_tokens(user, now)
+        return self._issue_tokens(user, now, persistent=remember_me)
 
-    def refresh(self, raw_token: str, now: datetime) -> dict[str, str]:
+    def refresh(self, raw_token: str, now: datetime) -> dict[str, Any]:
         token_hash = _hash_token(raw_token)
         stored = self._tokens.get_by_hash(token_hash)
 
@@ -94,7 +96,7 @@ class AuthService:
         if user is None or not user.is_active:
             raise InvalidCredentialsError("User not found or disabled")
 
-        return self._issue_tokens(user, now)
+        return self._issue_tokens(user, now, persistent=stored.persistent)
 
     def logout(self, raw_token: str, now: datetime) -> None:
         token_hash = _hash_token(raw_token)
@@ -121,11 +123,19 @@ class AuthService:
 
     # ── Helpers ──────────────────────────────────────────────────────────────
 
-    def _issue_tokens(self, user: User, now: datetime) -> dict[str, str]:
+    def _issue_tokens(
+        self, user: User, now: datetime, *, persistent: bool
+    ) -> dict[str, Any]:
         access_token = self._make_jwt(user, now)
-        raw_refresh, refresh_entity = self._make_refresh_token(user, now)
+        raw_refresh, refresh_entity = self._make_refresh_token(
+            user, now, persistent=persistent
+        )
         self._tokens.add(refresh_entity)
-        return {"access_token": access_token, "refresh_token": raw_refresh}
+        return {
+            "access_token": access_token,
+            "refresh_token": raw_refresh,
+            "persistent": persistent,
+        }
 
     def _make_jwt(self, user: User, now: datetime) -> str:
         payload: dict[str, Any] = {
@@ -138,7 +148,7 @@ class AuthService:
         return self._issuer.encode(payload)
 
     def _make_refresh_token(
-        self, user: User, now: datetime
+        self, user: User, now: datetime, *, persistent: bool
     ) -> tuple[str, RefreshToken]:
         raw = secrets.token_urlsafe(32)
         entity = RefreshToken(
@@ -146,5 +156,6 @@ class AuthService:
             user_id=user.id,
             token_hash=_hash_token(raw),
             expires_at=now + self._refresh_ttl,
+            persistent=persistent,
         )
         return raw, entity
