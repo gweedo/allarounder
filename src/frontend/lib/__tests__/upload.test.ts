@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { uploadImage, UploadError } from "../upload";
+import { uploadImage, importExternalImage, UploadError } from "../upload";
 
 // jsdom does not implement Blob.prototype.arrayBuffer — polyfill it so
 // file.slice(0, 512).arrayBuffer() works in the test environment.
@@ -154,5 +154,46 @@ describe("uploadImage", () => {
     expect(blobOptions.headers["x-ms-blob-type"]).toBe("BlockBlob");
     expect(blobOptions.headers["Content-Type"]).toBe("image/jpeg");
     expect(blobOptions.body).toBe(file);
+  });
+});
+
+describe("importExternalImage", () => {
+  it("posts the URL to /api/admin/media/import and returns blob_url on success", async () => {
+    const expectedUrl = "https://cdn.allarounder.it/images/imported.png";
+    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ blob_url: expectedUrl }),
+    });
+    const result = await importExternalImage(
+      "https://lh7-us.googleusercontent.com/abc"
+    );
+    expect(result).toBe(expectedUrl);
+    const [url, options] = (global.fetch as ReturnType<typeof vi.fn>).mock.calls[0];
+    expect(url).toBe("/api/admin/media/import");
+    expect(options.method).toBe("POST");
+    expect(options.credentials).toBe("include");
+    expect(JSON.parse(options.body as string)).toEqual({
+      url: "https://lh7-us.googleusercontent.com/abc",
+    });
+  });
+
+  it("throws UploadError with detail when the import endpoint returns ok: false", async () => {
+    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+      ok: false,
+      json: async () => ({ detail: "Immagine troppo grande" }),
+    });
+    const promise = importExternalImage("https://lh7-us.googleusercontent.com/abc");
+    await expect(promise).rejects.toBeInstanceOf(UploadError);
+    await expect(promise).rejects.toThrow("Immagine troppo grande");
+  });
+
+  it("throws UploadError with a fallback message when there is no detail", async () => {
+    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+      ok: false,
+      json: async () => ({}),
+    });
+    const promise = importExternalImage("https://lh7-us.googleusercontent.com/abc");
+    await expect(promise).rejects.toBeInstanceOf(UploadError);
+    await expect(promise).rejects.toThrow("Impossibile importare l'immagine.");
   });
 });

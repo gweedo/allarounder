@@ -1,6 +1,12 @@
+import { useState } from "react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor, act } from "@testing-library/react";
-import MarkdownEditor, { insertWrap, insertLinePrefix } from "../MarkdownEditor";
+import MarkdownEditor, {
+  insertWrap,
+  insertLinePrefix,
+  insertText,
+} from "../MarkdownEditor";
+import { importExternalImage } from "../../lib/upload";
 
 // Mock the dynamic remark pipeline used for preview
 vi.mock("remark", () => ({
@@ -17,6 +23,50 @@ vi.mock("remark", () => ({
 vi.mock("remark-rehype", () => ({ default: vi.fn() }));
 vi.mock("rehype-sanitize", () => ({ default: vi.fn() }));
 vi.mock("rehype-stringify", () => ({ default: vi.fn() }));
+
+// The paste-to-image-import flow re-uploads external image URLs server-side;
+// mock it so tests control success/failure without a real network call. The
+// HTML -> Markdown conversion itself (lib/html-to-markdown) is exercised for
+// real (it's fast and already unit-tested on its own).
+vi.mock("../../lib/upload", () => ({
+  importExternalImage: vi.fn(),
+  UploadError: class UploadError extends Error {},
+}));
+
+/** Minimal controlled wrapper so paste-driven onChange calls flow back into `value`. */
+function ControlledEditor(props: {
+  initialValue?: string;
+  onImportWarning?: (message: string) => void;
+}) {
+  const [value, setValue] = useState(props.initialValue ?? "");
+  return (
+    <MarkdownEditor
+      value={value}
+      onChange={setValue}
+      onImportWarning={props.onImportWarning}
+    />
+  );
+}
+
+function pasteEvent(html: string, text: string): Event {
+  const event = new Event("paste", { bubbles: true, cancelable: true });
+  Object.assign(event, {
+    clipboardData: {
+      getData: (type: string) => (type === "text/html" ? html : text),
+    },
+  });
+  return event;
+}
+
+function deferred<T>() {
+  let resolve!: (value: T) => void;
+  let reject!: (reason?: unknown) => void;
+  const promise = new Promise<T>((res, rej) => {
+    resolve = res;
+    reject = rej;
+  });
+  return { promise, resolve, reject };
+}
 
 // ── Pure helper tests ─────────────────────────────────────────────────────────
 
@@ -203,5 +253,163 @@ describe("MarkdownEditor", () => {
       expect(onUploadImage).toHaveBeenCalledWith(file);
       expect(onChange).toHaveBeenCalledWith(expect.stringContaining("https://cdn.example.com/img.jpg"));
     });
+  });
+});
+
+// ── insertText pure helper ───────────────────────────────────────────────────
+
+describe("insertText", () => {
+  it("replaces the current selection with the given text", () => {
+    const { value } = insertText("hello world", 0, 5, "goodbye");
+    expect(value).toBe("goodbye world");
+  });
+
+  it("inserts at the cursor when start === end (no selection)", () => {
+    const { value } = insertText("ab", 1, 1, "XY");
+    expect(value).toBe("aXYb");
+  });
+
+  it("positions the cursor at the end of the inserted text", () => {
+    const { cursorStart, cursorEnd } = insertText("hello", 0, 5, "hi");
+    expect(cursorStart).toBe(2);
+    expect(cursorEnd).toBe(2);
+  });
+});
+
+// ── Paste-from-rich-text (Google Docs and beyond) ────────────────────────────
+
+describe("MarkdownEditor paste handling", () => {
+  beforeEach(() => {
+    vi.mocked(importExternalImage).mockReset();
+  });
+
+  it("converts a text/html paste to Markdown and inserts it, replacing the selection", async () => {
+    render(<ControlledEditor />);
+    const textarea = screen.getByLabelText(/testo markdown/i) as HTMLTextAreaElement;
+    textarea.selectionStart = 0;
+    textarea.selectionEnd = 0;
+
+    fireEvent(
+      textarea,
+      pasteEvent("<p>Hello <strong>world</strong></p>", "Hello world"),
+    );
+
+    await waitFor(() => {
+      expect(textarea.value).toBe("Hello **world**");
+    });
+  });
+
+  it("leaves a plain-text-only paste completely untouched (no preventDefault, no HTML conversion)", () => {
+    render(<ControlledEditor initialValue="" />);
+    const textarea = screen.getByLabelText(/testo markdown/i) as HTMLTextAreaElement;
+
+    const event = pasteEvent("", "plain text only");
+    const preventDefaultSpy = vi.spyOn(event, "preventDefault");
+    fireEvent(textarea, event);
+
+    expect(preventDefaultSpy).not.toHaveBeenCalled();
+    // The component's own onChange path was never triggered by paste; the
+    // textarea's value is whatever the (untested-here) native browser paste
+    // would produce, which this handler must not interfere with.
+    expect(textarea.value).toBe("");
+  });
+
+  it("falls back to inserting plain text when conversion yields empty markdown", async () => {
+    render(<ControlledEditor />);
+    const textarea = screen.getByLabelText(/testo markdown/i) as HTMLTextAreaElement;
+    textarea.selectionStart = 0;
+    textarea.selectionEnd = 0;
+
+    // A <script>-only payload converts to empty Markdown.
+    fireEvent(
+      textarea,
+      pasteEvent("<script>alert(1)</script>", "fallback text"),
+    );
+
+    await waitFor(() => {
+      expect(textarea.value).toBe("fallback text");
+    });
+  });
+
+  it("rewrites a successfully-imported external image URL in place", async () => {
+    vi.mocked(importExternalImage).mockResolvedValue(
+      "https://cdn.allarounder.it/images/imported.png",
+    );
+    render(<ControlledEditor />);
+    const textarea = screen.getByLabelText(/testo markdown/i) as HTMLTextAreaElement;
+    textarea.selectionStart = 0;
+    textarea.selectionEnd = 0;
+
+    fireEvent(
+      textarea,
+      pasteEvent(
+        '<p><img src="https://lh7-us.googleusercontent.com/abc"></p>',
+        "",
+      ),
+    );
+
+    await waitFor(() => {
+      expect(textarea.value).toContain(
+        "https://cdn.allarounder.it/images/imported.png",
+      );
+    });
+    expect(textarea.value).not.toContain("googleusercontent.com");
+  });
+
+  it("shows an in-flight note while imports are running, and clears it after", async () => {
+    const gate = deferred<string>();
+    vi.mocked(importExternalImage).mockReturnValue(gate.promise);
+    render(<ControlledEditor />);
+    const textarea = screen.getByLabelText(/testo markdown/i) as HTMLTextAreaElement;
+    textarea.selectionStart = 0;
+    textarea.selectionEnd = 0;
+
+    fireEvent(
+      textarea,
+      pasteEvent(
+        '<p><img src="https://lh7-us.googleusercontent.com/abc"></p>',
+        "",
+      ),
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText(/importazione immagini/i)).toBeInTheDocument();
+    });
+
+    gate.resolve("https://cdn.allarounder.it/images/done.png");
+
+    await waitFor(() => {
+      expect(screen.queryByText(/importazione immagini/i)).toBeNull();
+    });
+  });
+
+  it("surfaces an Italian warning via onImportWarning for images that fail to import, while keeping successes", async () => {
+    vi.mocked(importExternalImage).mockImplementation((url: string) =>
+      url.endsWith("ok")
+        ? Promise.resolve("https://cdn.allarounder.it/images/ok.png")
+        : Promise.reject(new Error("upstream 404")),
+    );
+    const onImportWarning = vi.fn();
+    render(<ControlledEditor onImportWarning={onImportWarning} />);
+    const textarea = screen.getByLabelText(/testo markdown/i) as HTMLTextAreaElement;
+    textarea.selectionStart = 0;
+    textarea.selectionEnd = 0;
+
+    fireEvent(
+      textarea,
+      pasteEvent(
+        '<p><img src="https://lh7-us.googleusercontent.com/ok">' +
+          '<img src="https://lh7-us.googleusercontent.com/bad"></p>',
+        "",
+      ),
+    );
+
+    await waitFor(() => {
+      expect(onImportWarning).toHaveBeenCalledWith(
+        "1 immagine non importata: incolla di nuovo o caricale manualmente.",
+      );
+    });
+    expect(textarea.value).toContain("https://cdn.allarounder.it/images/ok.png");
+    expect(textarea.value).toContain("https://lh7-us.googleusercontent.com/bad");
   });
 });
