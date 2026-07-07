@@ -16,6 +16,8 @@ Adopt the following security posture across all layers of the stack.
 
 ### 1. Authentication — JWT in httpOnly cookies
 
+> **Amended by [ADR-0017](0017-google-sso-and-session-persistence.md) (2026-07-07):** Google SSO is added as a second, feature-flagged (default off) login method that ends by issuing the same cookies described below via the same `AuthService` token-issuing path — no new session system, no change to password login. The original text is preserved for history.
+
 Use **OAuth2 password flow + JWT**, with tokens stored exclusively in **`httpOnly`, `Secure`, `SameSite=Strict` cookies** set by the FastAPI backend. JavaScript on the page never reads the raw token value, making it immune to XSS-based token exfiltration.
 
 Two cookies per session:
