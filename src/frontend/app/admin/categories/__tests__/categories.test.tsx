@@ -108,4 +108,56 @@ describe("AdminCategoriesPage", () => {
       expect(screen.getByRole("alert")).toHaveTextContent("Errore server");
     });
   });
+
+  it("edits a category inline and updates the list", async () => {
+    (global.fetch as ReturnType<typeof vi.fn>)
+      .mockResolvedValueOnce({ ok: true, json: async () => ({ items: CATEGORIES }) })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ id: "cat-1", name: "Rubriche", slug: "interviste", description: "nuova desc" }),
+      });
+    render(<AdminCategoriesPage />);
+    await waitFor(() => screen.getByText("Interviste"));
+
+    fireEvent.click(screen.getAllByRole("button", { name: /modifica/i })[0]);
+    fireEvent.change(screen.getByDisplayValue("Interviste"), { target: { value: "Rubriche" } });
+    fireEvent.click(screen.getByRole("button", { name: /salva/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText("Rubriche")).toBeInTheDocument();
+    });
+    const [, editCall] = (global.fetch as ReturnType<typeof vi.fn>).mock.calls;
+    expect(editCall[0]).toBe("/api/admin/categories/cat-1");
+    expect(editCall[1]).toMatchObject({ method: "PUT" });
+  });
+
+  it("cancels inline edit without calling the API", async () => {
+    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ items: CATEGORIES }),
+    });
+    render(<AdminCategoriesPage />);
+    await waitFor(() => screen.getByText("Interviste"));
+
+    fireEvent.click(screen.getAllByRole("button", { name: /modifica/i })[0]);
+    fireEvent.click(screen.getByRole("button", { name: /annulla/i }));
+
+    expect(screen.getByText("Interviste")).toBeInTheDocument();
+    expect(global.fetch).toHaveBeenCalledTimes(1);
+  });
+
+  it("shows error when edit fails", async () => {
+    (global.fetch as ReturnType<typeof vi.fn>)
+      .mockResolvedValueOnce({ ok: true, json: async () => ({ items: CATEGORIES }) })
+      .mockResolvedValueOnce({ ok: false, json: async () => ({ detail: "Nome duplicato" }) });
+    render(<AdminCategoriesPage />);
+    await waitFor(() => screen.getByText("Interviste"));
+
+    fireEvent.click(screen.getAllByRole("button", { name: /modifica/i })[0]);
+    fireEvent.click(screen.getByRole("button", { name: /salva/i }));
+
+    await waitFor(() => {
+      expect(screen.getByRole("alert")).toHaveTextContent("Nome duplicato");
+    });
+  });
 });
