@@ -1,9 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { remark } from "remark";
-import remarkRehype from "remark-rehype";
-import rehypeSanitize from "rehype-sanitize";
-import rehypeStringify from "rehype-stringify";
+import { renderMarkdown } from "../../lib/markdown";
 
 export const revalidate = 300;
 
@@ -30,15 +27,6 @@ async function getPage(slug: string): Promise<StaticPage | null> {
   } catch {
     return null;
   }
-}
-
-async function renderMarkdown(markdown: string): Promise<string> {
-  const file = await remark()
-    .use(remarkRehype, { allowDangerousHtml: false })
-    .use(rehypeSanitize)
-    .use(rehypeStringify)
-    .process(markdown);
-  return String(file);
 }
 
 interface Props {

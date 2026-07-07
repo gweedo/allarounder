@@ -7,6 +7,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { renderMarkdown } from "../lib/markdown";
 
 // ── Pure helpers (exported for unit testing) ──────────────────────────────────
 
@@ -47,21 +48,6 @@ export function insertLinePrefix(
   return { value: newValue, cursorStart: newCursor, cursorEnd: newCursor };
 }
 
-// ── Remark pipeline (browser-side) ───────────────────────────────────────────
-
-async function toHtml(markdown: string): Promise<string> {
-  const { remark } = await import("remark");
-  const { default: remarkRehype } = await import("remark-rehype");
-  const { default: rehypeSanitize } = await import("rehype-sanitize");
-  const { default: rehypeStringify } = await import("rehype-stringify");
-  const file = await remark()
-    .use(remarkRehype, { allowDangerousHtml: false })
-    .use(rehypeSanitize)
-    .use(rehypeStringify)
-    .process(markdown);
-  return String(file);
-}
-
 // ── Component ─────────────────────────────────────────────────────────────────
 
 interface Props {
@@ -79,7 +65,7 @@ export default function MarkdownEditor({ value, onChange, onUploadImage }: Props
   // Debounced live preview
   useEffect(() => {
     const id = setTimeout(() => {
-      void toHtml(value).then(setPreview);
+      void renderMarkdown(value).then(setPreview);
     }, 300);
     return () => clearTimeout(id);
   }, [value]);
