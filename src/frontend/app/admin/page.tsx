@@ -25,7 +25,7 @@ function ArticleCard({ item }: { item: DashboardArticleItem }) {
     <div
       style={{
         padding: "0.75rem 1rem",
-        borderBottom: "1px solid #eee",
+        borderBottom: "1px solid var(--color-border)",
         display: "flex",
         justifyContent: "space-between",
         alignItems: "center",
@@ -34,15 +34,12 @@ function ArticleCard({ item }: { item: DashboardArticleItem }) {
     >
       <div>
         <div style={{ fontWeight: 500 }}>{item.title}</div>
-        <div style={{ fontSize: "0.85rem", color: "#666", marginTop: "0.2rem" }}>
+        <div className="article-meta" style={{ marginTop: "0.2rem" }}>
           {item.author_name} · creato {formatDate(item.created_at)} · aggiornato{" "}
           {formatDate(item.updated_at)}
         </div>
       </div>
-      <Link
-        href={`/admin/articles/${item.id}`}
-        style={{ whiteSpace: "nowrap", fontSize: "0.9rem" }}
-      >
+      <Link href={`/admin/articles/${item.id}`} style={{ whiteSpace: "nowrap", fontSize: "0.9rem" }}>
         Modifica
       </Link>
     </div>
@@ -75,9 +72,11 @@ function Section({
           Vedi tutti
         </Link>
       </div>
-      <div style={{ border: "1px solid #eee", borderRadius: 4 }}>
+      <div className="card" style={{ padding: 0 }}>
         {items.length === 0 ? (
-          <p style={{ padding: "0.75rem 1rem", margin: 0, color: "#888" }}>{emptyText}</p>
+          <p className="article-meta" style={{ padding: "0.75rem 1rem", margin: 0 }}>
+            {emptyText}
+          </p>
         ) : (
           items.map((item) => <ArticleCard key={item.id} item={item} />)
         )}
@@ -103,17 +102,21 @@ export default function AdminDashboard() {
   }, []);
 
   return (
-    <main style={{ maxWidth: 900, margin: "2rem auto", padding: "0 1rem" }}>
+    <main className="page-container page-container--wide">
       <div
         style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}
       >
         <h1>Dashboard</h1>
         <div style={{ display: "flex", gap: "0.75rem" }}>
           <Link href="/admin/guests/new">
-            <button type="button">Nuovo ospite</button>
+            <button type="button" className="btn">
+              Nuovo ospite
+            </button>
           </Link>
           <Link href="/admin/articles/new">
-            <button type="button">Nuovo articolo</button>
+            <button type="button" className="btn btn-primary">
+              Nuovo articolo
+            </button>
           </Link>
         </div>
       </div>
@@ -121,7 +124,7 @@ export default function AdminDashboard() {
       {loading && <p>Caricamento...</p>}
 
       {error && (
-        <p role="alert" style={{ color: "red" }}>
+        <p role="alert" className="alert-error">
           {error}
         </p>
       )}
