@@ -22,6 +22,16 @@ def _make_token(**kwargs: object) -> RefreshToken:
     return RefreshToken(**defaults)  # type: ignore[arg-type]
 
 
+class TestRefreshTokenPersistence:
+    def test_persistent_defaults_to_true(self) -> None:
+        token = _make_token()
+        assert token.persistent is True
+
+    def test_persistent_can_be_set_false(self) -> None:
+        token = _make_token(persistent=False)
+        assert token.persistent is False
+
+
 class TestRefreshTokenValidity:
     def test_valid_token_is_active(self) -> None:
         token = _make_token()
