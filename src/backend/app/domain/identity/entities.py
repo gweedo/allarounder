@@ -2,7 +2,7 @@ import uuid
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 
-from app.domain.identity.exceptions import AccountLockedError
+from app.domain.identity.exceptions import AccountLockedError, GoogleAccountMismatchError
 from app.domain.identity.value_objects import Email, UserRole
 
 _LOCKOUT_THRESHOLD = 10
@@ -19,6 +19,20 @@ class User:
     created_at: datetime
     failed_login_count: int = field(default=0)
     locked_until: datetime | None = field(default=None)
+    google_sub: str | None = field(default=None)
+
+    def link_google(self, sub: str) -> None:
+        """Link this user to a Google account subject identifier.
+
+        Idempotent when the sub already matches (repeated logins). Raises if
+        the account is already linked to a *different* Google account — that
+        would silently hijack the login to a different Google identity.
+        """
+        if self.google_sub is not None and self.google_sub != sub:
+            raise GoogleAccountMismatchError(
+                f"User {self.email.value} is already linked to a different Google account"
+            )
+        self.google_sub = sub
 
     def is_locked(self, now: datetime) -> bool:
         if self.locked_until is None:
