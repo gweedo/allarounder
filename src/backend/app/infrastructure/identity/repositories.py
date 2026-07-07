@@ -30,6 +30,7 @@ def _model_to_refresh_token(m: RefreshTokenModel) -> RefreshToken:
         token_hash=m.token_hash,
         expires_at=m.expires_at,
         revoked_at=m.revoked_at,
+        persistent=m.persistent,
     )
 
 
@@ -88,6 +89,7 @@ class SqlRefreshTokenRepository:
             token_hash=token.token_hash,
             expires_at=token.expires_at,
             revoked_at=token.revoked_at,
+            persistent=token.persistent,
         )
         self._session.add(m)
 

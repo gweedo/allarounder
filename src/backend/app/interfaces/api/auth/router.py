@@ -30,7 +30,7 @@ def _now() -> datetime:
 
 
 def _set_auth_cookies(
-    response: Response, access_token: str, refresh_token: str
+    response: Response, access_token: str, refresh_token: str, persistent: bool
 ) -> None:
     response.set_cookie(
         "access_token",
@@ -44,7 +44,7 @@ def _set_auth_cookies(
     response.set_cookie(
         "refresh_token",
         refresh_token,
-        max_age=_REFRESH_MAX_AGE,
+        max_age=_REFRESH_MAX_AGE if persistent else None,
         httponly=True,
         secure=True,
         samesite="strict",
@@ -66,7 +66,7 @@ async def login(
     auth: Annotated[AuthService, Depends(get_auth_service)],
 ) -> TokenResponse:
     try:
-        tokens = auth.login(body.email, body.password, _now())
+        tokens = auth.login(body.email, body.password, _now(), body.remember_me)
     except AccountLockedError:
         raise HTTPException(
             status_code=status.HTTP_429_TOO_MANY_REQUESTS,
@@ -80,7 +80,9 @@ async def login(
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials"
         )
-    _set_auth_cookies(response, tokens["access_token"], tokens["refresh_token"])
+    _set_auth_cookies(
+        response, tokens["access_token"], tokens["refresh_token"], tokens["persistent"]
+    )
     return TokenResponse()
 
 
@@ -103,7 +105,9 @@ async def refresh(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Refresh token invalid or expired",
         )
-    _set_auth_cookies(response, tokens["access_token"], tokens["refresh_token"])
+    _set_auth_cookies(
+        response, tokens["access_token"], tokens["refresh_token"], tokens["persistent"]
+    )
     return TokenResponse()
 
 

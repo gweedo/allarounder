@@ -49,6 +49,7 @@ class TestLogin:
         mock_auth_service.login.return_value = {
             "access_token": "access.jwt.token",
             "refresh_token": "raw-refresh-token",
+            "persistent": True,
         }
         resp = client.post(
             "/api/admin/auth/login",
@@ -92,6 +93,48 @@ class TestLogin:
         resp = client.post("/api/admin/auth/login", json={})
         assert resp.status_code == 422
 
+    def test_remember_me_false_sets_session_cookie_without_max_age(
+        self, client: TestClient, mock_auth_service: MagicMock
+    ) -> None:
+        mock_auth_service.login.return_value = {
+            "access_token": "access.jwt.token",
+            "refresh_token": "raw-refresh-token",
+            "persistent": False,
+        }
+        resp = client.post(
+            "/api/admin/auth/login",
+            json={
+                "email": "admin@example.com",
+                "password": "securepassword!",
+                "remember_me": False,
+            },
+        )
+        assert resp.status_code == 200
+        set_cookie_headers = resp.headers.get_list("set-cookie")
+        refresh_cookie = next(h for h in set_cookie_headers if h.startswith("refresh_token="))
+        assert "Max-Age" not in refresh_cookie
+
+    def test_remember_me_true_sets_refresh_cookie_max_age_14_days(
+        self, client: TestClient, mock_auth_service: MagicMock
+    ) -> None:
+        mock_auth_service.login.return_value = {
+            "access_token": "access.jwt.token",
+            "refresh_token": "raw-refresh-token",
+            "persistent": True,
+        }
+        resp = client.post(
+            "/api/admin/auth/login",
+            json={
+                "email": "admin@example.com",
+                "password": "securepassword!",
+                "remember_me": True,
+            },
+        )
+        assert resp.status_code == 200
+        set_cookie_headers = resp.headers.get_list("set-cookie")
+        refresh_cookie = next(h for h in set_cookie_headers if h.startswith("refresh_token="))
+        assert "Max-Age=1209600" in refresh_cookie
+
 
 # ── Refresh ───────────────────────────────────────────────────────────────────
 
@@ -103,6 +146,7 @@ class TestRefresh:
         mock_auth_service.refresh.return_value = {
             "access_token": "new.access.token",
             "refresh_token": "new-refresh-token",
+            "persistent": True,
         }
         resp = client.post(
             "/api/admin/auth/refresh",
@@ -134,6 +178,40 @@ class TestRefresh:
             cookies={"refresh_token": "revoked-token"},
         )
         assert resp.status_code == 401
+
+    def test_refresh_preserves_non_persistent_flag(
+        self, client: TestClient, mock_auth_service: MagicMock
+    ) -> None:
+        mock_auth_service.refresh.return_value = {
+            "access_token": "new.access.token",
+            "refresh_token": "new-refresh-token",
+            "persistent": False,
+        }
+        resp = client.post(
+            "/api/admin/auth/refresh",
+            cookies={"refresh_token": "old-refresh-token"},
+        )
+        assert resp.status_code == 200
+        set_cookie_headers = resp.headers.get_list("set-cookie")
+        refresh_cookie = next(h for h in set_cookie_headers if h.startswith("refresh_token="))
+        assert "Max-Age" not in refresh_cookie
+
+    def test_refresh_preserves_persistent_flag(
+        self, client: TestClient, mock_auth_service: MagicMock
+    ) -> None:
+        mock_auth_service.refresh.return_value = {
+            "access_token": "new.access.token",
+            "refresh_token": "new-refresh-token",
+            "persistent": True,
+        }
+        resp = client.post(
+            "/api/admin/auth/refresh",
+            cookies={"refresh_token": "old-refresh-token"},
+        )
+        assert resp.status_code == 200
+        set_cookie_headers = resp.headers.get_list("set-cookie")
+        refresh_cookie = next(h for h in set_cookie_headers if h.startswith("refresh_token="))
+        assert "Max-Age=1209600" in refresh_cookie
 
 
 # ── Logout ────────────────────────────────────────────────────────────────────
