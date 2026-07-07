@@ -30,6 +30,9 @@ class InMemoryUserRepo:
     def get_by_email(self, email: Email) -> User | None:
         return next((u for u in self._users.values() if u.email == email), None)
 
+    def get_by_google_sub(self, sub: str) -> User | None:
+        return next((u for u in self._users.values() if u.google_sub == sub), None)
+
     def save(self, user: User) -> None:
         self._users[user.id] = user
 

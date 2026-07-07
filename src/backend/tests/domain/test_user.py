@@ -6,7 +6,7 @@ from datetime import UTC, datetime, timedelta
 import pytest
 
 from app.domain.identity.entities import User
-from app.domain.identity.exceptions import AccountLockedError
+from app.domain.identity.exceptions import AccountLockedError, GoogleAccountMismatchError
 from app.domain.identity.value_objects import Email, UserRole
 
 
@@ -106,3 +106,26 @@ class TestUserLockout:
     def test_no_raise_if_not_locked(self) -> None:
         user = _make_user()
         user.assert_not_locked(_now())  # must not raise
+
+
+class TestGoogleLink:
+    def test_google_sub_defaults_to_none(self) -> None:
+        user = _make_user()
+        assert user.google_sub is None
+
+    def test_link_google_sets_sub(self) -> None:
+        user = _make_user()
+        user.link_google("google-sub-123")
+        assert user.google_sub == "google-sub-123"
+
+    def test_link_google_is_idempotent_for_same_sub(self) -> None:
+        user = _make_user(google_sub="google-sub-123")
+        user.link_google("google-sub-123")  # must not raise
+        assert user.google_sub == "google-sub-123"
+
+    def test_link_google_raises_on_different_sub(self) -> None:
+        user = _make_user(google_sub="google-sub-123")
+        with pytest.raises(GoogleAccountMismatchError):
+            user.link_google("google-sub-456")
+        # Original link is preserved on mismatch.
+        assert user.google_sub == "google-sub-123"
