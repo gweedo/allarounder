@@ -299,6 +299,13 @@ Last updated: 2026-06-14
 - **Status**: ✅ Final
 - **Decided by**: Guido + Claude (Milestone 6). If Phase B (Drive Picker import) is ever built, it will get its own ADR-0018.
 
+### Google SSO for admin login (backend-driven OIDC)
+- **Date**: 2026-07-07
+- **Decision**: Add Google Sign-In as a second, feature-flagged (`GOOGLE_SSO_ENABLED`, default off) login method for the admin UI, alongside — not instead of — password login. The backend (not NextAuth, not the frontend) owns the full OAuth authorization-code + PKCE flow: `GET /api/admin/auth/google/login` redirects to Google, `GET /api/admin/auth/google/callback` verifies the id_token, calls `AuthService.login_with_google`, and issues the same cookies password login does. Only emails that already have a `User` row can authenticate this way — Google is an authentication method, not a registration channel; there is still no self-signup. Accounts link by verified email on first login, then by the immutable Google `sub` for every login after that.
+- **Rationale**: The team already lives in Google Workspace/Gmail; removing one password for the people who want that is low-risk once it's built to not create a second session system or a signup backdoor. See [ADR-0017](architecture/adr/0017-google-sso-and-session-persistence.md) for the full decision, the NextAuth rejection, and two `SameSite=Strict` cookie gotchas the OAuth redirect chain runs into.
+- **Status**: ✅ Final
+- **Decided by**: Guido + Claude (Milestone 7)
+
 ---
 
 ## 🔄 Provisional / Supporting Decisions

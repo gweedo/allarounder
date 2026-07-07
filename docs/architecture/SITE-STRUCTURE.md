@@ -183,10 +183,12 @@ POST /api/newsletter                                       { email } → subscri
 
 Returns only `status = published` and `publish_at <= now`. Paginated responses include `{ items, total, page, page_size }`.
 
-### Admin API (auth required — OAuth2 password flow / JWT)
+### Admin API (auth required — OAuth2 password flow / JWT, or optional Google SSO per ADR-0017)
 
 ```
 POST   /api/admin/auth/login                  → access token
+GET    /api/admin/auth/google/login            → 302 to Google (PKCE); feature-flagged, 404 when disabled (ADR-0017)
+GET    /api/admin/auth/google/callback         → verifies id_token, logs in, 302 to /admin/login?sso=
 GET    /api/admin/articles?status=            list incl. drafts/scheduled
 POST   /api/admin/articles                    create
 GET    /api/admin/articles/{id}               fetch for editing
