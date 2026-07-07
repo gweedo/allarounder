@@ -1,3 +1,5 @@
+import { apiFetch } from "./api";
+
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
 
 export class UploadError extends Error {}
@@ -32,5 +34,30 @@ export async function uploadImage(file: File): Promise<string> {
   if (!uploadRes.ok) {
     throw new UploadError("Errore nel caricamento dell'immagine su Azure.");
   }
+  return blob_url;
+}
+
+/**
+ * Re-upload an externally-hosted image (e.g. a transient
+ * lh7-us.googleusercontent.com URL left behind by a Google Docs paste) to our
+ * own Blob Storage, server-side, so the article body never links to a URL we
+ * don't control. Uses apiFetch (rather than a bare fetch, unlike uploadImage
+ * above) since this call can race a background paste against an expired
+ * access token and should get the same silent-refresh-and-retry behavior as
+ * other admin calls.
+ */
+export async function importExternalImage(url: string): Promise<string> {
+  const res = await apiFetch("/api/admin/media/import", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ url }),
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new UploadError(
+      (data as { detail?: string }).detail ?? "Impossibile importare l'immagine."
+    );
+  }
+  const { blob_url } = (await res.json()) as { blob_url: string };
   return blob_url;
 }
