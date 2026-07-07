@@ -292,6 +292,13 @@ Last updated: 2026-06-14
 - **Status**: ✅ Final
 - **Decided by**: Guido + Claude (Milestone 2 of the admin-UX plan)
 
+### Google Docs import: paste-first (Phase A)
+- **Date**: 2026-07-07
+- **Decision**: Writers get a Google Docs → Markdown converter built into the admin article editor's paste handler (`src/frontend/lib/html-to-markdown.ts`, wired into `MarkdownEditor`'s `onPaste`), plus a server-side `POST /api/admin/media/import` endpoint that re-uploads any transient image URLs the paste leaves behind (Docs serves pasted images from an expiring `googleusercontent.com` link) to our own Blob Storage. A full Google Drive Picker / Docs API import flow (browsing and pulling a whole Doc by picking it from Drive, rather than copy-pasting its content) is deferred until paste-based import proves insufficient for the writers' workflow.
+- **Rationale**: The three non-technical writers already draft in Google Docs; converting what they paste is a small, self-contained addition to the existing custom admin editor and needs no new Google API scopes, OAuth consent screen, or Drive integration. A full Picker-based import is a materially larger build (Google API client, file browsing UI, auth scope, token storage) that isn't justified until paste is shown to be a poor fit in practice.
+- **Status**: ✅ Final
+- **Decided by**: Guido + Claude (Milestone 6). If Phase B (Drive Picker import) is ever built, it will get its own ADR-0018.
+
 ---
 
 ## 🔄 Provisional / Supporting Decisions

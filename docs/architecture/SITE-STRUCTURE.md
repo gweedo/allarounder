@@ -194,6 +194,7 @@ PUT    /api/admin/articles/{id}               update
 DELETE /api/admin/articles/{id}               delete
 POST   /api/admin/articles/{id}/publish       publish (set status=published + publish_at)
 POST   /api/admin/media/sas                    request SAS token → returns { sas_url, blob_url }; browser uploads direct to Blob Storage
+POST   /api/admin/media/import                 import an external image URL (e.g. left by a Google Docs paste) → downloads, validates, and re-uploads server-side, returns { blob_url }
 CRUD   /api/admin/categories | /tags | /guests | /authors | /events | /pages
 ```
 
