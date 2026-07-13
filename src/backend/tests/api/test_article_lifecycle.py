@@ -125,6 +125,28 @@ class TestUpdateArticle:
         resp = client.put(f"/api/admin/articles/{uuid.uuid4()}", json={"title": "X"})
         assert resp.status_code == 401
 
+    def test_422_meta_title_too_long(self, client: TestClient, mock_repo: MagicMock) -> None:
+        article = _make_article()
+        mock_repo.get_by_id.return_value = article
+        resp = client.put(
+            f"/api/admin/articles/{article.id}",
+            json={"meta_title": "x" * 61},
+            cookies={"access_token": _make_token()},
+        )
+        assert resp.status_code == 422
+
+    def test_422_meta_description_too_long(
+        self, client: TestClient, mock_repo: MagicMock
+    ) -> None:
+        article = _make_article()
+        mock_repo.get_by_id.return_value = article
+        resp = client.put(
+            f"/api/admin/articles/{article.id}",
+            json={"meta_description": "x" * 161},
+            cookies={"access_token": _make_token()},
+        )
+        assert resp.status_code == 422
+
 
 # ── POST /api/admin/articles/{id}/publish ────────────────────────────────────
 

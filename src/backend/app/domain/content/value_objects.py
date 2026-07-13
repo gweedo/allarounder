@@ -7,6 +7,12 @@ _SPOTIFY_PATTERN = re.compile(
     r"^https://open\.spotify\.com/(episode|show|track)/[A-Za-z0-9]+$"
 )
 
+# SEO field caps: shared between SQLAlchemy columns (infrastructure/content/models.py)
+# and the admin API request schemas so validation matches storage width. Sized to
+# common SERP snippet truncation points for meta title / meta description.
+META_TITLE_MAX_LENGTH = 60
+META_DESCRIPTION_MAX_LENGTH = 160
+
 
 class PublicationStatus(enum.Enum):
     draft = "draft"

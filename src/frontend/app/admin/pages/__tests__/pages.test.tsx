@@ -177,4 +177,25 @@ describe("EditStaticPagePage", () => {
     await waitFor(() => expect(screen.getByRole("alert")).toBeInTheDocument());
     expect(screen.getByRole("alert")).toHaveTextContent("Errore salvataggio");
   });
+
+  it("shows meta title/description character counts and enforces maxLength", async () => {
+    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+      ok: true,
+      json: async () => PAGE_DATA,
+    });
+    const { default: EditStaticPagePage } = await import("../[id]/page");
+    render(<EditStaticPagePage params={Promise.resolve({ id: PAGE_DATA.id })} />);
+
+    const metaTitleInput = await screen.findByLabelText(/meta title/i);
+    const metaDescInput = screen.getByLabelText(/meta description/i);
+
+    expect(metaTitleInput).toHaveAttribute("maxlength", "60");
+    expect(metaDescInput).toHaveAttribute("maxlength", "160");
+    expect(
+      screen.getByText(`Meta title (${PAGE_DATA.meta_title.length}/60)`),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(`Meta description (${PAGE_DATA.meta_description.length}/160)`),
+    ).toBeInTheDocument();
+  });
 });
