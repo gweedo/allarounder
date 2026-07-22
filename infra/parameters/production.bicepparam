@@ -35,6 +35,8 @@ param enableFrontDoor = true
 // Always-on — production visitors should never pay a cold-start penalty.
 param minReplicas = 1
 
-// Documented steady-state is ~$80-105/mo (retrospective-infra-cost-review-2026-06-29.md);
-// $110 sits just above that range so 80%/100% thresholds are meaningful, not noise.
+// Documented steady-state is ~$80-105/mo on the retrospective's USD-based estimate
+// (retrospective-infra-cost-review-2026-06-29.md). The budget below is evaluated in the
+// subscription's billing currency (EUR for this account) — €110 sits just above that
+// range so 80%/100% thresholds are meaningful, not noise.
 param budgetAmount = 110

@@ -15,17 +15,17 @@ The cost gap is large and fixed, independent of traffic:
 
 | Tier | Base fee | What it buys |
 |---|---|---|
-| **Standard** | **~$35/month** | Custom WAF rules, routing rules, caching, managed TLS, HSTS, redirects |
-| **Premium** | **~$330/month** | All of Standard **plus** Microsoft-managed rule sets, bot protection, Private Link origins |
+| **Standard** | **~€31/month** | Custom WAF rules, routing rules, caching, managed TLS, HSTS, redirects |
+| **Premium** | **~€362/month** | All of Standard **plus** Microsoft-managed rule sets, bot protection, Private Link origins |
 
-(Source: [Compare pricing between Azure Front Door tiers](https://learn.microsoft.com/azure/frontdoor/understanding-pricing#cost-assessment).)
+(Source: [Compare pricing between Azure Front Door tiers](https://learn.microsoft.com/azure/frontdoor/understanding-pricing#cost-assessment); EUR figures from the Azure Retail Prices API, this subscription's billing currency.)
 
 Two facts make the Premium spend hard to justify for this project:
 
 1. The managed rule set was configured in **Log/Detection mode** (`ruleSetAction: 'Log'`), so it was paying the Premium premium without actively blocking anything. ADR-0013 §11 *planned* to flip it to Prevention after a 2–4 week burn-in — so the spend was buying a **planned future** capability, not a control in force today.
 2. The only **active** blocking control at the edge is the **custom per-IP rate-limit rule** (1,000 req/min), which is a *custom* rule and is fully supported on Standard.
 
-For a single-developer Italian content blog whose origins are public Container Apps and whose images are served via User Delegation SAS (not Private Link), ~$295/month (~$3,500/year, doubled across staging + production) for managed WAF detection-only rules is poor value.
+For a single-developer Italian content blog whose origins are public Container Apps and whose images are served via User Delegation SAS (not Private Link), ~€331/month (~€4,000/year, doubled across staging + production) for managed WAF detection-only rules is poor value.
 
 ## Decision
 
@@ -39,7 +39,7 @@ This **amends ADR-0013 §11**: the managed `Microsoft_DefaultRuleSet_2.1` and it
 
 ## Options Considered
 
-- **Stay on Premium and flip managed rules to Prevention.** Justified only if managed OWASP/bot protection is a hard requirement. For this product the app-layer controls already cover the relevant classes (below), so this is ~$295/month for marginal defence-in-depth.
+- **Stay on Premium and flip managed rules to Prevention.** Justified only if managed OWASP/bot protection is a hard requirement. For this product the app-layer controls already cover the relevant classes (below), so this is ~€331/month for marginal defence-in-depth.
 - **Standard + managed rules.** Not possible — managed rule sets are not offered on Standard.
 - **Standard, keep custom rate limit, drop managed rules (chosen).** Retains the only active edge control, keeps TLS/HSTS/redirect/CDN, and removes the cost driver.
 
@@ -57,7 +57,7 @@ What is given up is **defence-in-depth at the edge**, not a primary control. The
 
 ## Consequences
 
-- **Easier / cheaper:** Front Door base fee drops from ~$330 to ~$35/month per environment (~$295/month, ~$3,500/year saved per environment; roughly double across staging + production).
+- **Easier / cheaper:** Front Door base fee drops from ~€362 to ~€31/month per environment (~€331/month, ~€4,000/year saved per environment; roughly double across staging + production).
 - **Lost:** Microsoft-managed OWASP/bot-manager rule sets at the edge, and the option of Private Link origins. Edge WAF is now custom-rules-only.
 - **Unchanged:** TLS, HSTS, `.eu → .it` 301 redirect, image CDN/caching, custom domains with managed certificates, and the per-IP volumetric rate limit.
 - **Revisit if:** WAF/edge logs show real application-layer attack traffic that the app controls don't catch; bot abuse becomes material; or a compliance/customer requirement mandates a managed WAF rule set. Re-upgrading is a one-line SKU revert on both resources plus re-adding the `managedRules` block — Standard → Premium is a non-breaking upgrade.

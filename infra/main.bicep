@@ -59,7 +59,7 @@ param enableFrontDoor bool = true
 @description('Minimum replica count for backend/frontend Container Apps (0 for staging scale-to-zero; 1 for production to avoid cold starts)')
 param minReplicas int = 1
 
-@description('Monthly Cost Management budget amount for this resource group, in USD')
+@description('Monthly Cost Management budget amount for this resource group, in the subscription billing currency (EUR for this account)')
 param budgetAmount int
 
 @description('Email addresses notified when the budget crosses 50/80/100% actual or 100% forecast')

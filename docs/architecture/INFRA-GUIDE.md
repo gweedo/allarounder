@@ -585,13 +585,13 @@ az containerapp update \
 
 ### Staging PostgreSQL stop/start
 
-Staging's PostgreSQL Flexible Server is stopped nightly to cut idle compute cost (~$13/mo — the `Standard_B1ms` compute charge). Stopping pauses compute billing only; storage and data are retained. This never applies to production.
+Staging's PostgreSQL Flexible Server is stopped nightly to cut idle compute cost (~€13/mo — the `Standard_B1ms` compute charge). Stopping pauses compute billing only; storage and data are retained. This never applies to production.
 
 - **Scheduled stop**: `.github/workflows/postgres-staging.yml` runs on a nightly cron (`0 22 * * *`, 22:00 UTC) and stops the server if it's `Ready`. Because Azure auto-restarts a server that's been stopped for ~7 days, the workflow re-applies the stop every night rather than relying on a one-off stop — the schedule itself is the mechanism that outlasts the auto-restart.
 - **Automatic start on deploy**: `deploy-staging` in `backend.yml` runs an "Ensure PostgreSQL is running" step before the Alembic migration job — it starts the server if `Stopped` and polls until `Ready`, so a deploy against a stopped server just costs a couple of extra minutes rather than failing.
 - **Manual start/stop**: trigger `postgres-staging.yml` via `workflow_dispatch` with `action: start` or `action: stop` (GitHub Actions UI or `gh workflow run postgres-staging.yml -f action=start`) — useful when working against staging outside of a deploy (e.g. `psql` access, manual query debugging).
 - **Both paths are OIDC-authenticated** via the `staging` GitHub Environment's federated credential — no long-lived secrets. The job is hardcoded to `environment: staging`, so it can never resolve production's credentials or resource names.
-- **Caveat**: the nightly stop only pauses compute for the idle window (deploy-time → 22:00 UTC), so days with a deploy realize less than the full ~$13/mo saving. This is acceptable for a solo-dev staging environment; use the manual `stop` dispatch if you want to pause it immediately after a work session.
+- **Caveat**: the nightly stop only pauses compute for the idle window (deploy-time → 22:00 UTC), so days with a deploy realize less than the full ~€13/mo saving. This is acceptable for a solo-dev staging environment; use the manual `stop` dispatch if you want to pause it immediately after a work session.
 - **Caveat**: `postgres-staging.yml` and `backend.yml` don't share a concurrency group, so a deploy that happens to be mid-migration at 22:00 UTC could race the nightly stop. This is rare (needs a deploy running at exactly that hour), staging-only, and re-runnable — not worth a cross-workflow lock, but worth knowing about if a staging deploy ever fails with the Postgres server unexpectedly `Stopping`.
 
 Requires the `POSTGRES_SERVER_NAME` variable in the `staging` GitHub Environment (see step 7c).
@@ -600,7 +600,7 @@ Requires the `POSTGRES_SERVER_NAME` variable in the `staging` GitHub Environment
 
 Each resource group has a Consumption budget (`infra/modules/budget.bicep`) so a fixed-cost regression is caught in week one instead of at the bill — the direct fix for the failure mode in `retrospective-infra-cost-overprovisioning-2026-06-25.md`, where the Front Door Premium overspend was only discovered from the bill.
 
-- **Amounts**: `budgetAmount` in each `.bicepparam` — staging `$30`/mo, production `$110`/mo. Both sit just above the documented post-optimization steady-state (`retrospective-infra-cost-review-2026-06-29.md`) so the alerts stay meaningful instead of firing on routine variance.
+- **Amounts**: `budgetAmount` in each `.bicepparam` — staging `€30`/mo, production `€110`/mo (evaluated in the subscription's billing currency, EUR for this account). Both sit just above the documented post-optimization steady-state (`retrospective-infra-cost-review-2026-06-29.md`, recorded there in USD list prices) so the alerts stay meaningful instead of firing on routine variance.
 - **Thresholds**: 50% / 80% / 100% of actual spend, plus 100% of forecasted spend — all four email `budgetContactEmails` (defaults to `guido.s1998@gmail.com`).
 - **Reproducible**: defined in Bicep like every other resource, deployed as part of the normal `main.bicep` stamp — no click-ops.
 - **No cost**: Cost Management budgets and alerts are free.

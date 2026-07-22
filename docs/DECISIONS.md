@@ -217,7 +217,7 @@ Last updated: 2026-06-14
   - **Markdown rendering** — `remark-rehype` (no raw HTML) → `rehype-sanitize`; raw HTML in article bodies is not supported.
   - **HTTP headers** — `nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy`, `Permissions-Policy` in `next.config.js`; HSTS at Front Door. CSP deferred to post-launch hardening.
   - **Blob Storage** — private container; all image URLs through Front Door (`cdn.allarounder.it/...`); raw Blob URLs never exposed.
-  - **WAF** — custom per-IP volumetric rate-limit rule (Prevention) on Front Door **Standard** tier. _(Amended by ADR-0015: the managed `Microsoft_DefaultRuleSet_2.1` was withdrawn — managed rule sets are Premium-only — to drop the ~$295/month Premium base fee; see "Front Door Standard tier" below.)_
+  - **WAF** — custom per-IP volumetric rate-limit rule (Prevention) on Front Door **Standard** tier. _(Amended by ADR-0015: the managed `Microsoft_DefaultRuleSet_2.1` was withdrawn — managed rule sets are Premium-only — to drop the ~€331/month Premium base fee; see "Front Door Standard tier" below.)_
   - **Secrets** — managed identity for Postgres and Blob (no passwords in Key Vault); JWT signing key is the only Key Vault secret.
   - **Audit logging** — deferred to phase 2.
 - **Status**: ✅ Final (see ADR-0013)
@@ -226,7 +226,7 @@ Last updated: 2026-06-14
 ### Front Door Standard tier (ADR-0015)
 - **Date**: 2026-06-25
 - **Decision**: Move Azure Front Door (profile + WAF policy) from **Premium** to **Standard** tier and remove the Microsoft-managed `Microsoft_DefaultRuleSet_2.1`. Managed rule sets, bot protection, and Private Link origins are Premium-only; the custom per-IP rate-limit rule (Prevention) and all other edge features (TLS, HSTS, `.eu → .it` redirect, image CDN, managed-cert custom domains) are retained on Standard.
-- **Rationale**: The managed rule set was the only feature requiring Premium and was running in Detection (log-only) mode — paying the ~$330/month Premium base fee (vs ~$35 on Standard) for a not-yet-enforced, defence-in-depth layer. The attack classes it covered are handled at the app layer (parameterized queries, Markdown sanitization, magic-bytes upload checks, Pydantic validation), and the active edge control (volumetric rate limit) is a custom rule that Standard supports. Saves ~$295/month per environment.
+- **Rationale**: The managed rule set was the only feature requiring Premium and was running in Detection (log-only) mode — paying the ~€362/month Premium base fee (vs ~€31 on Standard) for a not-yet-enforced, defence-in-depth layer. The attack classes it covered are handled at the app layer (parameterized queries, Markdown sanitization, magic-bytes upload checks, Pydantic validation), and the active edge control (volumetric rate limit) is a custom rule that Standard supports. Saves ~€331/month per environment.
 - **Trade-off**: Loses managed OWASP/bot rule sets and Private Link at the edge. Blob access is unaffected (private container via User Delegation SAS, not Private Link). Re-upgrading to Premium is a non-breaking one-line SKU revert if edge logs later justify it.
 - **Amends**: ADR-0013 §11 (WAF rules).
 - **Status**: ✅ Final (see ADR-0015)
@@ -235,7 +235,7 @@ Last updated: 2026-06-14
 ### Front Door optional per-environment; disabled on staging (ADR-0016)
 - **Date**: 2026-07-01
 - **Decision**: Gate the `frontdoor` Bicep module behind a new `enableFrontDoor` parameter (default `true`); set it `false` on staging and `true` on production. Staging's frontend Container App remains reachable directly over Azure-managed HTTPS on its own FQDN.
-- **Rationale**: Front Door's jobs (custom-domain TLS, `.eu → .it` redirect, WAF rate-limit rule, image CDN) are production-facing concerns staging doesn't exercise; the ~$35/month Standard-tier base fee (ADR-0015) is flat per environment regardless of use. Part of the v1 infra cost-optimization pass (issue #71/#72).
+- **Rationale**: Front Door's jobs (custom-domain TLS, `.eu → .it` redirect, WAF rate-limit rule, image CDN) are production-facing concerns staging doesn't exercise; the ~€31/month Standard-tier base fee (ADR-0015) is flat per environment regardless of use. Part of the v1 infra cost-optimization pass (issue #71/#72).
 - **Trade-off**: Staging can no longer verify the Front Door redirect/TLS/WAF pre-production; that verification now happens directly against production, or by temporarily flipping `enableFrontDoor = true` on staging for a one-off check.
 - **Amends**: ADR-0015 Action Item 4 (staging-first WAF verification is no longer achievable as written).
 - **Status**: ✅ Final (see ADR-0016)
@@ -251,7 +251,7 @@ Last updated: 2026-06-14
 ### Environments: separate staging + production
 - **Date**: 2026-06-14 (Front Door verification clause superseded 2026-07-01, ADR-0016)
 - **Decision**: Run a **fully separate staging environment** (its own Container Apps environment, database, and config) in addition to production, both defined via Bicep. Releases are verified on staging, then promoted to production.
-- **Rationale**: Complements TDD — tests verify code, staging verifies the environment (Azure config, Key Vault wiring, migrations against prod-shaped data, inter-service calls). Bicep makes the second environment a parameterized stamp; Container Apps scale-to-zero keeps idle cost low. Provides a safe place to rehearse migrations. _(Amended by ADR-0016: staging no longer runs Front Door — it was a ~$35/month flat fee for production-facing capability (custom domain TLS, `.eu → .it` redirect, WAF) that staging's `*.azurecontainerapps.io` FQDN doesn't need; staging's frontend Container App remains directly reachable over Azure-managed HTTPS without it.)_
+- **Rationale**: Complements TDD — tests verify code, staging verifies the environment (Azure config, Key Vault wiring, migrations against prod-shaped data, inter-service calls). Bicep makes the second environment a parameterized stamp; Container Apps scale-to-zero keeps idle cost low. Provides a safe place to rehearse migrations. _(Amended by ADR-0016: staging no longer runs Front Door — it was a ~€31/month flat fee for production-facing capability (custom domain TLS, `.eu → .it` redirect, WAF) that staging's `*.azurecontainerapps.io` FQDN doesn't need; staging's frontend Container App remains directly reachable over Azure-managed HTTPS without it.)_
 - **Status**: ✅ Final
 - **Decided by**: Team
 

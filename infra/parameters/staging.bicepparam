@@ -36,9 +36,12 @@ param corsAllowedOrigins = 'https://allarounder.it,https://www.allarounder.it'
 param enableFrontDoor = false
 
 // Scale to zero when idle — staging tolerates a cold start on the first request
-// after a period of no traffic (~$25-40/mo saved vs. an always-on replica per app).
+// after a period of no traffic (~$25-40/mo saved vs. an always-on replica per app,
+// on the retrospective's USD-based estimate).
 param minReplicas = 0
 
-// Post-optimization staging idles well under $20/mo (no Front Door, scale-to-zero,
-// Postgres paused nightly); $30 leaves headroom while still catching a regression.
+// Post-optimization staging idles well under $20/mo on the retrospective's USD-based
+// estimate (no Front Door, scale-to-zero, Postgres paused nightly); the budget below is
+// evaluated in the subscription's billing currency (EUR for this account) — €30 leaves
+// headroom while still catching a regression.
 param budgetAmount = 30
