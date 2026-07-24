@@ -11,8 +11,16 @@ param deployAcr = true
 // Update <suffix> with the last 5 chars of your resource group ID for uniqueness
 param keyVaultName = 'alla-stg-kv-fc2a7'
 
-// PostgreSQL server name: globally unique, lowercase alphanumeric and hyphens
+// PostgreSQL server name: globally unique, lowercase alphanumeric and hyphens.
+// Unused while deployPostgres = false below, but Bicep still requires a value.
 param postgresServerName = 'allarounder-stg-pg-fc2a7'
+
+// Temporary pre-launch cost measure: staging Postgres moved to Neon's free tier
+// (no Azure Postgres Flexible Server floor cost — see retrospective-infra-cost-under-10eur).
+// externalDatabaseUrl must NEVER be a literal secret here — it's read from an environment
+// variable at deploy time (export NEON_DATABASE_URL=... before running az deployment group create).
+param deployPostgres = false
+param externalDatabaseUrl = readEnvironmentVariable('NEON_DATABASE_URL', '')
 
 // Storage account: 3-24 chars, lowercase alphanumeric, globally unique
 param storageAccountName = 'allastgfc2a7'
@@ -39,6 +47,8 @@ param enableFrontDoor = false
 // after a period of no traffic (~$25-40/mo saved vs. an always-on replica per app).
 param minReplicas = 0
 
-// Post-optimization staging idles well under $20/mo (no Front Door, scale-to-zero,
-// Postgres paused nightly); $30 leaves headroom while still catching a regression.
-param budgetAmount = 30
+// Hard ceiling: keep the whole bill (production is torn down for now) under €10/mo.
+// Expected floor with ACR + Neon + scale-to-zero is ~€6-7/mo; €10 sits right at the
+// ceiling itself so 50%/80%/100% alerts are meaningful against the actual constraint,
+// not the old (now irrelevant) pre-optimization steady-state.
+param budgetAmount = 10

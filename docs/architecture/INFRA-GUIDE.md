@@ -366,10 +366,10 @@ gh variable set FRONTEND_APP_NAME   --env staging --body "$STG_FRONTEND_APP"
 gh variable set MIGRATION_JOB_NAME  --env staging --body "$STG_MIGRATE_JOB"
 gh variable set STAGING_URL         --env staging --body "https://${STG_FRONTEND_FQDN}"
 
-# Required by the postgres-staging.yml stop/start workflow and by
-# deploy-staging's pre-migration readiness check (see Day-2 § Staging
-# PostgreSQL stop/start). Set this before the next staging deploy runs.
-gh variable set POSTGRES_SERVER_NAME --env staging --body "allarounder-stg-pg-fc2a7"
+# POSTGRES_SERVER_NAME / postgres-staging.yml are only relevant while
+# deployPostgres = true (see Day-2 § Staging PostgreSQL stop/start — currently
+# inactive, staging runs on Neon's free tier as a temporary pre-launch cost
+# measure). Skip this while deployPostgres = false in staging.bicepparam.
 ```
 
 ### 7d — Production environment secrets and variables
@@ -583,28 +583,34 @@ az containerapp update \
   --scale-rule-http-concurrency 30
 ```
 
-### Staging PostgreSQL stop/start
+### Staging PostgreSQL stop/start (currently inactive)
 
-Staging's PostgreSQL Flexible Server is stopped nightly to cut idle compute cost (~$13/mo — the `Standard_B1ms` compute charge). Stopping pauses compute billing only; storage and data are retained. This never applies to production.
+**Temporary pre-launch cost measure (see `retrospective-infra-cost-under-10eur-2026-07-22.md`): staging's Postgres moved to Neon's free tier, and `deployPostgres = false` in `staging.bicepparam`.** This whole section describes the Azure Postgres Flexible Server setup, which is dormant while that's the case — `.github/workflows/postgres-staging.yml` has been removed, and `deploy-staging` in `backend.yml` no longer has an "Ensure PostgreSQL is running" step. Revert `deployPostgres = true`, restore the workflow, and follow the steps below again if/when this reverts to Azure Postgres.
 
-- **Scheduled stop**: `.github/workflows/postgres-staging.yml` runs on a nightly cron (`0 22 * * *`, 22:00 UTC) and stops the server if it's `Ready`. Because Azure auto-restarts a server that's been stopped for ~7 days, the workflow re-applies the stop every night rather than relying on a one-off stop — the schedule itself is the mechanism that outlasts the auto-restart.
-- **Automatic start on deploy**: `deploy-staging` in `backend.yml` runs an "Ensure PostgreSQL is running" step before the Alembic migration job — it starts the server if `Stopped` and polls until `Ready`, so a deploy against a stopped server just costs a couple of extra minutes rather than failing.
-- **Manual start/stop**: trigger `postgres-staging.yml` via `workflow_dispatch` with `action: start` or `action: stop` (GitHub Actions UI or `gh workflow run postgres-staging.yml -f action=start`) — useful when working against staging outside of a deploy (e.g. `psql` access, manual query debugging).
-- **Both paths are OIDC-authenticated** via the `staging` GitHub Environment's federated credential — no long-lived secrets. The job is hardcoded to `environment: staging`, so it can never resolve production's credentials or resource names.
-- **Caveat**: the nightly stop only pauses compute for the idle window (deploy-time → 22:00 UTC), so days with a deploy realize less than the full ~$13/mo saving. This is acceptable for a solo-dev staging environment; use the manual `stop` dispatch if you want to pause it immediately after a work session.
-- **Caveat**: `postgres-staging.yml` and `backend.yml` don't share a concurrency group, so a deploy that happens to be mid-migration at 22:00 UTC could race the nightly stop. This is rare (needs a deploy running at exactly that hour), staging-only, and re-runnable — not worth a cross-workflow lock, but worth knowing about if a staging deploy ever fails with the Postgres server unexpectedly `Stopping`.
+Staging's PostgreSQL Flexible Server was stopped nightly to cut idle compute cost (~€13/mo — the `Standard_B1ms` compute charge). Stopping pauses compute billing only; storage and data are retained. This never applied to production.
 
-Requires the `POSTGRES_SERVER_NAME` variable in the `staging` GitHub Environment (see step 7c).
+- **Scheduled stop**: `.github/workflows/postgres-staging.yml` ran on a nightly cron (`0 22 * * *`, 22:00 UTC) and stopped the server if it was `Ready`. Because Azure auto-restarts a server that's been stopped for ~7 days, the workflow re-applied the stop every night rather than relying on a one-off stop — the schedule itself was the mechanism that outlasted the auto-restart.
+- **Automatic start on deploy**: `deploy-staging` in `backend.yml` ran an "Ensure PostgreSQL is running" step before the Alembic migration job.
+- **Manual start/stop**: triggered `postgres-staging.yml` via `workflow_dispatch` with `action: start` or `action: stop`.
+- **Both paths were OIDC-authenticated** via the `staging` GitHub Environment's federated credential — no long-lived secrets. The job was hardcoded to `environment: staging`, so it could never resolve production's credentials or resource names.
+
+Required the `POSTGRES_SERVER_NAME` variable in the `staging` GitHub Environment (see step 7c) — not needed while Postgres is external.
 
 ### Cost Management budget & alerts
 
 Each resource group has a Consumption budget (`infra/modules/budget.bicep`) so a fixed-cost regression is caught in week one instead of at the bill — the direct fix for the failure mode in `retrospective-infra-cost-overprovisioning-2026-06-25.md`, where the Front Door Premium overspend was only discovered from the bill.
 
-- **Amounts**: `budgetAmount` in each `.bicepparam` — staging `$30`/mo, production `$110`/mo. Both sit just above the documented post-optimization steady-state (`retrospective-infra-cost-review-2026-06-29.md`) so the alerts stay meaningful instead of firing on routine variance.
+- **Amounts**: `budgetAmount` in `staging.bicepparam` — **€10/mo, a hard ceiling** (temporary pre-launch constraint — see `retrospective-infra-cost-under-10eur-2026-07-22.md`). This is tighter than the old post-optimization-steady-state framing (`retrospective-infra-cost-review-2026-06-29.md`, which predates production being torn down and staging moving to Neon); expect the 50%/80% thresholds to fire more readily than before, by design. Production currently has no budget resource — its resource group is torn down (see "Production teardown" below).
 - **Thresholds**: 50% / 80% / 100% of actual spend, plus 100% of forecasted spend — all four email `budgetContactEmails` (defaults to `guido.s1998@gmail.com`).
 - **Reproducible**: defined in Bicep like every other resource, deployed as part of the normal `main.bicep` stamp — no click-ops.
 - **No cost**: Cost Management budgets and alerts are free.
 - If the steady-state cost picture changes (a new resource, a SKU change), update `budgetAmount` in the relevant `.bicepparam` and redeploy rather than letting the alert drift out of sync with reality.
+
+### Production teardown (temporary pre-launch cost measure)
+
+Production is not yet live (no DNS/Front Door cutover to `allarounder.it`) and holds no data worth preserving, so its resource group is deleted rather than kept running idle — see `retrospective-infra-cost-under-10eur-2026-07-22.md`. `deploy-production` in both `backend.yml` and `frontend.yml` is gated behind `workflow_dispatch` so a routine merge to `main` doesn't fail trying to deploy to a resource group that doesn't exist.
+
+**Reviving production is not just re-running the Bicep template.** Deleting the resource group also deletes the CI managed identities (`allarounder-ci-production`) and their OIDC federated credentials, created imperatively in Step 2 above — those live outside `main.bicep`. Bringing production back means: re-running Step 2's production identity + federated-credential commands, re-deploying `main.bicep` against the production parameter file (Step 8), then manually triggering `workflow_dispatch` on both workflows once it's ready to receive traffic.
 
 ### Rotating the JWT signing key
 

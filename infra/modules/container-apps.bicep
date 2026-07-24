@@ -8,8 +8,9 @@ param storageAccountName string
 param storageContainerName string
 param keyVaultUri string
 param keyVaultId string
-param postgresHost string
-param databaseName string
+@secure()
+param databaseUrl string
+param azureUseManagedIdentityDb bool = true
 param appInsightsConnectionString string
 param backendImage string = 'mcr.microsoft.com/azuredocs/containerapps-helloworld:latest'
 param frontendImage string = 'mcr.microsoft.com/azuredocs/containerapps-helloworld:latest'
@@ -19,7 +20,6 @@ param minReplicas int = 1
 
 // Identity params — created by identity.bicep before this module runs
 param backendIdentityId string
-param backendIdentityName string
 param backendIdentityPrincipalId string
 param backendIdentityClientId string
 param frontendIdentityId string
@@ -137,12 +137,9 @@ resource backendApp 'Microsoft.App/containerApps@2024-03-01' = {
           env: [
             { name: 'APP_ENV', value: env }
             { name: 'LOG_LEVEL', value: 'INFO' }
-            { name: 'AZURE_USE_MANAGED_IDENTITY', value: 'true' }
+            { name: 'AZURE_USE_MANAGED_IDENTITY', value: azureUseManagedIdentityDb ? 'true' : 'false' }
             { name: 'AZURE_CLIENT_ID', value: backendIdentityClientId }
-            {
-              name: 'DATABASE_URL'
-              value: 'postgresql+psycopg://${backendIdentityName}@${postgresHost}/${databaseName}?sslmode=require'
-            }
+            { name: 'DATABASE_URL', value: databaseUrl }
             { name: 'AZURE_STORAGE_ACCOUNT_NAME', value: storageAccountName }
             { name: 'AZURE_STORAGE_CONTAINER_NAME', value: storageContainerName }
             { name: 'AZURE_CDN_BASE_URL', value: cdnBaseUrl }
@@ -317,12 +314,9 @@ resource migrationJob 'Microsoft.App/jobs@2024-03-01' = {
             memory: '0.5Gi'
           }
           env: [
-            { name: 'AZURE_USE_MANAGED_IDENTITY', value: 'true' }
+            { name: 'AZURE_USE_MANAGED_IDENTITY', value: azureUseManagedIdentityDb ? 'true' : 'false' }
             { name: 'AZURE_CLIENT_ID', value: backendIdentityClientId }
-            {
-              name: 'DATABASE_URL'
-              value: 'postgresql+psycopg://${backendIdentityName}@${postgresHost}/${databaseName}?sslmode=require'
-            }
+            { name: 'DATABASE_URL', value: databaseUrl }
           ]
         }
       ]

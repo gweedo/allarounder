@@ -35,6 +35,13 @@ param postgresEntraAdminObjectId string
 @description('Display name of the Entra PostgreSQL admin')
 param postgresEntraAdminName string
 
+@description('Whether to deploy Azure Database for PostgreSQL Flexible Server. False for a temporary pre-launch cost measure using an external Postgres (e.g. Neon) instead — see externalDatabaseUrl.')
+param deployPostgres bool = true
+
+@secure()
+@description('Full DATABASE_URL connection string for an external Postgres, used only when deployPostgres is false. Never set a literal value in a checked-in .bicepparam file — pass via readEnvironmentVariable() or a CLI parameter override.')
+param externalDatabaseUrl string = ''
+
 @description('Current backend image to deploy (use placeholder on first deploy)')
 param backendImage string = 'mcr.microsoft.com/azuredocs/containerapps-helloworld:latest'
 
@@ -115,7 +122,7 @@ module identity './modules/identity.bicep' = {
 
 // ── PostgreSQL ────────────────────────────────────────────────────────────────
 
-module postgres './modules/postgres.bicep' = {
+module postgres './modules/postgres.bicep' = if (deployPostgres) {
   name: 'postgres'
   params: {
     location: location
@@ -125,7 +132,7 @@ module postgres './modules/postgres.bicep' = {
 
 // Deployed as a separate module so ARM fully completes the postgres server PUT
 // (server returns to Ready) before attempting the Entra auth operation.
-module postgresAdmin './modules/postgres-admin.bicep' = {
+module postgresAdmin './modules/postgres-admin.bicep' = if (deployPostgres) {
   name: 'postgres-admin'
   dependsOn: [postgres]
   params: {
@@ -134,6 +141,13 @@ module postgresAdmin './modules/postgres-admin.bicep' = {
     entraAdminName: postgresEntraAdminName
   }
 }
+
+// Connection string passed to the Container Apps: the real Azure Postgres Flexible
+// Server (passwordless Entra auth, token injected at runtime) when deployed, or the
+// external Postgres connection string (e.g. Neon) when deployPostgres is false.
+var databaseUrl = deployPostgres
+  ? 'postgresql+psycopg://${identity.outputs.backendIdentityName}@${postgres!.outputs.postgresHost}/${postgres!.outputs.databaseName}?sslmode=require'
+  : externalDatabaseUrl
 
 // ── Blob Storage ──────────────────────────────────────────────────────────────
 
@@ -176,8 +190,8 @@ module containerApps './modules/container-apps.bicep' = {
     storageContainerName: storage.outputs.containerName
     keyVaultUri: keyvault.outputs.keyVaultUri
     keyVaultId: keyvault.outputs.keyVaultId
-    postgresHost: postgres.outputs.postgresHost
-    databaseName: postgres.outputs.databaseName
+    databaseUrl: databaseUrl
+    azureUseManagedIdentityDb: deployPostgres
     appInsightsConnectionString: monitoring.outputs.appInsightsConnectionString
     backendImage: backendImage
     frontendImage: frontendImage
@@ -185,7 +199,6 @@ module containerApps './modules/container-apps.bicep' = {
     cdnBaseUrl: cdnBaseUrl
     minReplicas: minReplicas
     backendIdentityId: identity.outputs.backendIdentityId
-    backendIdentityName: identity.outputs.backendIdentityName
     backendIdentityPrincipalId: identity.outputs.backendIdentityPrincipalId
     backendIdentityClientId: identity.outputs.backendIdentityClientId
     frontendIdentityId: identity.outputs.frontendIdentityId
@@ -229,5 +242,5 @@ output backendFqdn string = containerApps.outputs.backendFqdn
 output frontendFqdn string = containerApps.outputs.frontendFqdn
 output frontDoorEndpoint string = enableFrontDoor ? frontdoor!.outputs.frontDoorEndpointHostname : ''
 output keyVaultUri string = keyvault.outputs.keyVaultUri
-output postgresHost string = postgres.outputs.postgresHost
+output postgresHost string = deployPostgres ? postgres!.outputs.postgresHost : ''
 output appInsightsConnectionString string = monitoring.outputs.appInsightsConnectionString

@@ -7,6 +7,10 @@ on:
       - "src/frontend/**"
       - ".github/workflows/frontend.yml"
   pull_request:
+  # Production is torn down for now (temporary pre-launch cost measure — see
+  # retrospective-infra-cost-under-10eur). deploy-production only runs when
+  # manually dispatched, once production is re-provisioned.
+  workflow_dispatch:
 
 concurrency:
   group: frontend-${{ github.ref }}
@@ -116,7 +120,7 @@ jobs:
   # ── Build & push image (main branch only) ────────────────────────────────────
   build:
     name: Build & push image
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
     needs: security
     runs-on: ubuntu-latest
     outputs:
@@ -270,6 +274,9 @@ jobs:
   # ── Promote to production (manual approval required) ─────────────────────────
   deploy-production:
     name: Deploy → production
+    # Production is torn down for now (temporary pre-launch cost measure); only
+    # deploy when explicitly dispatched, once it's been re-provisioned.
+    if: github.event_name == 'workflow_dispatch'
     needs: [build, e2e]
     runs-on: ubuntu-latest
     environment: production
