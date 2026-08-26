@@ -1,5 +1,6 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
+import type { Article } from "../../../../lib/content";
 
 vi.mock("next/navigation", () => ({
   notFound: () => {
@@ -23,44 +24,37 @@ vi.mock("remark-rehype", () => ({ default: vi.fn() }));
 vi.mock("rehype-sanitize", () => ({ default: vi.fn() }));
 vi.mock("rehype-stringify", () => ({ default: vi.fn() }));
 
-const BASE_ARTICLE = {
+const getArticleBySlug = vi.fn();
+vi.mock("../../../../lib/content", () => ({
+  getArticleBySlug: (slug: string) => getArticleBySlug(slug),
+  getAllArticleSlugs: () => [],
+}));
+
+const BASE_ARTICLE: Article = {
   id: "abc",
   title: "Titolo Articolo",
   slug: "titolo-articolo",
   body: "## Corpo",
   author_id: "user-1",
   publish_at: "2026-06-01T00:00:00Z",
-  spotify_url: null as string | null,
-  excerpt: null as string | null,
-  cover_image_url: null as string | null,
-  cover_image_alt: null as string | null,
-  meta_title: null as string | null,
-  meta_description: null as string | null,
-  og_image_url: null as string | null,
-  reading_time: null as number | null,
-  author_profile: null as { id: string; name: string; slug: string } | null,
-  category: null as { id: string; name: string; slug: string } | null,
-  tags: [] as { id: string; name: string; slug: string }[],
+  updated_at: "2026-06-01T00:00:00Z",
+  spotify_url: null,
+  excerpt: null,
+  cover_image_url: null,
+  cover_image_alt: null,
+  meta_title: null,
+  meta_description: null,
+  og_image_url: null,
+  reading_time: null,
+  author_profile: null,
+  category: null,
+  tags: [],
+  guests: [],
 };
 
-beforeEach(() => {
-  global.fetch = vi.fn();
-});
-
-async function renderArticlePage(article: typeof BASE_ARTICLE | null) {
+async function renderArticlePage(article: Article | null) {
   const ArticlePage = (await import("../page")).default;
-
-  if (!article) {
-    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      ok: false,
-      json: async () => ({}),
-    });
-  } else {
-    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      ok: true,
-      json: async () => article,
-    });
-  }
+  getArticleBySlug.mockReturnValueOnce(article);
 
   try {
     render(await ArticlePage({ params: Promise.resolve({ slug: article?.slug ?? "missing" }) }));
@@ -150,7 +144,7 @@ describe("ArticlePage", () => {
     expect(screen.queryByText(/#/i)).toBeNull();
   });
 
-  it("calls notFound when article fetch fails", async () => {
+  it("calls notFound when article lookup fails", async () => {
     const result = await renderArticlePage(null);
     expect(result).toBe("notFound");
   });
@@ -158,32 +152,23 @@ describe("ArticlePage", () => {
 
 describe("generateMetadata", () => {
   it("returns meta_title when set", async () => {
-    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({ ...BASE_ARTICLE, meta_title: "Titolo SEO Personalizzato" }),
-    });
+    getArticleBySlug.mockReturnValueOnce({ ...BASE_ARTICLE, meta_title: "Titolo SEO Personalizzato" });
     const { generateMetadata } = await import("../page");
     const meta = await generateMetadata({ params: Promise.resolve({ slug: "titolo-articolo" }) });
     expect(meta.title).toBe("Titolo SEO Personalizzato");
   });
 
   it("returns fallback title from article title when meta_title is null", async () => {
-    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({ ...BASE_ARTICLE, meta_title: null }),
-    });
+    getArticleBySlug.mockReturnValueOnce({ ...BASE_ARTICLE, meta_title: null });
     const { generateMetadata } = await import("../page");
     const meta = await generateMetadata({ params: Promise.resolve({ slug: "titolo-articolo" }) });
     expect(meta.title).toBe("Titolo Articolo — Allarounder");
   });
 
   it("populates openGraph images when og_image_url is set", async () => {
-    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({
-        ...BASE_ARTICLE,
-        og_image_url: "https://cdn.allarounder.it/og/articolo.jpg",
-      }),
+    getArticleBySlug.mockReturnValueOnce({
+      ...BASE_ARTICLE,
+      og_image_url: "https://cdn.allarounder.it/og/articolo.jpg",
     });
     const { generateMetadata } = await import("../page");
     const meta = await generateMetadata({ params: Promise.resolve({ slug: "titolo-articolo" }) });
@@ -192,7 +177,7 @@ describe("generateMetadata", () => {
   });
 
   it("returns empty object when article not found", async () => {
-    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({ ok: false });
+    getArticleBySlug.mockReturnValueOnce(null);
     const { generateMetadata } = await import("../page");
     const meta = await generateMetadata({ params: Promise.resolve({ slug: "missing" }) });
     expect(meta).toEqual({});

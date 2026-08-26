@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 
 vi.mock("next/navigation", () => ({
@@ -7,46 +7,26 @@ vi.mock("next/navigation", () => ({
   },
 }));
 
-const BASE_TAG = {
-  id: "tag-1",
-  name: "calcio",
-  slug: "calcio",
-  articles: [] as {
-    id: string;
-    title: string;
-    slug: string;
-    excerpt: string | null;
-    cover_image_url: string | null;
-    cover_image_alt: string | null;
-    reading_time: number | null;
-    publish_at: string;
-  }[],
-  total: 0,
-  page: 1,
-  page_size: 20,
-};
+const getTagBySlug = vi.fn();
+vi.mock("../../../../lib/content", () => ({
+  getTagBySlug: (slug: string) => getTagBySlug(slug),
+  getAllTagSlugs: () => [],
+}));
 
-beforeEach(() => {
-  global.fetch = vi.fn();
-});
+const BASE_DETAIL = { id: "tag-1", name: "calcio", slug: "calcio" };
 
-async function renderTagPage(data: typeof BASE_TAG | null) {
+async function renderTagPage(
+  data: { detail: typeof BASE_DETAIL; articles: Record<string, unknown>[] } | null,
+) {
   const TagPage = (await import("../page")).default;
-
-  if (!data) {
-    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      ok: false,
-      json: async () => ({}),
-    });
-  } else {
-    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      ok: true,
-      json: async () => data,
-    });
-  }
+  getTagBySlug.mockReturnValueOnce(data);
 
   try {
-    render(await TagPage({ params: Promise.resolve({ slug: data?.slug ?? "missing" }) }));
+    render(
+      await TagPage({
+        params: Promise.resolve({ slug: data?.detail.slug ?? "missing" }),
+      }),
+    );
   } catch (e) {
     if (e instanceof Error && e.message === "NEXT_NOT_FOUND") return "notFound";
     throw e;
@@ -56,24 +36,26 @@ async function renderTagPage(data: typeof BASE_TAG | null) {
 
 describe("TagPage", () => {
   it("renders tag name as heading", async () => {
-    await renderTagPage(BASE_TAG);
+    await renderTagPage({ detail: BASE_DETAIL, articles: [] });
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("#calcio");
   });
 
   it("renders article count", async () => {
-    await renderTagPage({ ...BASE_TAG, total: 3 });
+    await renderTagPage({
+      detail: BASE_DETAIL,
+      articles: [{}, {}, {}],
+    });
     expect(screen.getByText(/3 articoli/i)).toBeInTheDocument();
   });
 
   it("renders empty state when no articles", async () => {
-    await renderTagPage(BASE_TAG);
+    await renderTagPage({ detail: BASE_DETAIL, articles: [] });
     expect(screen.getByText(/nessun articolo/i)).toBeInTheDocument();
   });
 
   it("renders article list with links", async () => {
     await renderTagPage({
-      ...BASE_TAG,
-      total: 1,
+      detail: BASE_DETAIL,
       articles: [
         {
           id: "a1",
@@ -101,10 +83,7 @@ describe("TagPage", () => {
 
 describe("generateMetadata", () => {
   it("returns title and description for existing tag", async () => {
-    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      ok: true,
-      json: async () => BASE_TAG,
-    });
+    getTagBySlug.mockReturnValueOnce({ detail: BASE_DETAIL, articles: [] });
     const { generateMetadata } = await import("../page");
     const meta = await generateMetadata({ params: Promise.resolve({ slug: "calcio" }) });
     expect(meta.title).toBe("calcio — Allarounder");
@@ -112,7 +91,7 @@ describe("generateMetadata", () => {
   });
 
   it("returns empty object when tag not found", async () => {
-    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({ ok: false });
+    getTagBySlug.mockReturnValueOnce(null);
     const { generateMetadata } = await import("../page");
     const meta = await generateMetadata({ params: Promise.resolve({ slug: "missing" }) });
     expect(meta).toEqual({});

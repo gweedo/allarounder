@@ -7,6 +7,15 @@ vi.mock("next/navigation", () => ({
   },
 }));
 
+const getStaticPageBySlug = vi.fn();
+vi.mock("../../../lib/content", () => ({
+  getStaticPageBySlug: (slug: string) => getStaticPageBySlug(slug),
+}));
+
+beforeEach(() => {
+  getStaticPageBySlug.mockReset();
+});
+
 const BASE_PAGE = {
   id: "00000000-0000-0000-0000-000000000001",
   title: "Chi siamo",
@@ -17,23 +26,8 @@ const BASE_PAGE = {
   updated_at: "2026-06-01T00:00:00Z",
 };
 
-beforeEach(() => {
-  global.fetch = vi.fn();
-  vi.resetModules();
-});
-
 async function renderStaticPage(slug: string, data: typeof BASE_PAGE | null) {
-  if (!data) {
-    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      ok: false,
-      json: async () => ({}),
-    });
-  } else {
-    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      ok: true,
-      json: async () => data,
-    });
-  }
+  getStaticPageBySlug.mockReturnValueOnce(data);
   const { default: StaticPageRoute } = await import("../page");
   try {
     render(await StaticPageRoute({ params: Promise.resolve({ slug }) }));
@@ -55,7 +49,7 @@ describe("StaticPageRoute", () => {
     expect(result).toBe("notFound");
   });
 
-  it("calls notFound when API returns 404", async () => {
+  it("calls notFound when page lookup returns null", async () => {
     const result = await renderStaticPage("chi-siamo", null);
     expect(result).toBe("notFound");
   });
@@ -106,27 +100,21 @@ describe("generateStaticParams", () => {
 
 describe("generateMetadata", () => {
   it("returns meta_title when set", async () => {
-    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      ok: true,
-      json: async () => BASE_PAGE,
-    });
+    getStaticPageBySlug.mockReturnValueOnce(BASE_PAGE);
     const { generateMetadata } = await import("../page");
     const meta = await generateMetadata({ params: Promise.resolve({ slug: "chi-siamo" }) });
     expect(meta.title).toBe("Chi siamo — Allarounder");
   });
 
   it("returns fallback title from page title when meta_title is null", async () => {
-    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({ ...BASE_PAGE, meta_title: null }),
-    });
+    getStaticPageBySlug.mockReturnValueOnce({ ...BASE_PAGE, meta_title: null });
     const { generateMetadata } = await import("../page");
     const meta = await generateMetadata({ params: Promise.resolve({ slug: "chi-siamo" }) });
     expect(meta.title).toBe("Chi siamo — Allarounder");
   });
 
   it("returns empty object when page not found", async () => {
-    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({ ok: false });
+    getStaticPageBySlug.mockReturnValueOnce(null);
     const { generateMetadata } = await import("../page");
     const meta = await generateMetadata({ params: Promise.resolve({ slug: "missing" }) });
     expect(meta).toEqual({});

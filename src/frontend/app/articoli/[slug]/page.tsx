@@ -2,66 +2,10 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { renderMarkdown } from "../../../lib/markdown";
+import { getArticleBySlug, getAllArticleSlugs } from "../../../lib/content";
 
-export const revalidate = 60;
-
-interface AuthorRef {
-  id: string;
-  name: string;
-  slug: string;
-}
-
-interface CategoryRef {
-  id: string;
-  name: string;
-  slug: string;
-}
-
-interface TagRef {
-  id: string;
-  name: string;
-  slug: string;
-}
-
-interface GuestRef {
-  id: string;
-  name: string;
-  slug: string;
-}
-
-interface Article {
-  id: string;
-  title: string;
-  slug: string;
-  body: string;
-  author_id: string;
-  publish_at: string;
-  updated_at: string;
-  spotify_url: string | null;
-  excerpt: string | null;
-  cover_image_url: string | null;
-  cover_image_alt: string | null;
-  meta_title: string | null;
-  meta_description: string | null;
-  og_image_url: string | null;
-  reading_time: number | null;
-  author_profile: AuthorRef | null;
-  category: CategoryRef | null;
-  tags: TagRef[];
-  guests: GuestRef[];
-}
-
-async function getArticle(slug: string): Promise<Article | null> {
-  const apiUrl = process.env.API_URL ?? "http://backend:8000";
-  try {
-    const res = await fetch(`${apiUrl}/api/articles/${slug}`, {
-      next: { revalidate: 60 },
-    });
-    if (!res.ok) return null;
-    return (await res.json()) as Article;
-  } catch {
-    return null;
-  }
+export async function generateStaticParams() {
+  return getAllArticleSlugs().map((slug) => ({ slug }));
 }
 
 interface Props {
@@ -70,7 +14,7 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const article = await getArticle(slug);
+  const article = getArticleBySlug(slug);
   if (!article) return {};
 
   const title = article.meta_title ?? `${article.title} — Allarounder`;
@@ -94,7 +38,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function ArticlePage({ params }: Props) {
   const { slug } = await params;
-  const article = await getArticle(slug);
+  const article = getArticleBySlug(slug);
   if (!article) notFound();
 
   const bodyHtml = await renderMarkdown(article.body);

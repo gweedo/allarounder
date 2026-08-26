@@ -1,5 +1,6 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
+import type { ArticleMeta, ArticleListResult } from "../../lib/content";
 
 vi.mock("next/navigation", () => ({
   notFound: () => {
@@ -17,70 +18,55 @@ vi.mock("next/link", () => ({
   }) => <a href={href}>{children}</a>,
 }));
 
-interface TestArticle {
-  id: string;
-  title: string;
-  slug: string;
-  excerpt: string | null;
-  cover_image_url: string | null;
-  cover_image_alt: string | null;
-  publish_at: string;
-  reading_time: number | null;
-  category: { id: string; name: string; slug: string } | null;
-  author_profile: { id: string; name: string; slug: string } | null;
-}
+const getArticleCards = vi.fn();
+vi.mock("../../lib/content", () => ({
+  getArticleCards: (...args: unknown[]) => getArticleCards(...args),
+}));
 
-interface TestResponse {
-  items: TestArticle[];
-  total: number;
-  page: number;
-  page_size: number;
-}
-
-const BASE_ARTICLE: TestArticle = {
+const BASE_ARTICLE: ArticleMeta = {
   id: "art-1",
   title: "Articolo principale",
   slug: "articolo-principale",
+  author_id: "author-1",
+  publish_at: "2026-06-01T00:00:00Z",
+  updated_at: "2026-06-01T00:00:00Z",
+  spotify_url: null,
   excerpt: "Un estratto interessante",
   cover_image_url: null,
   cover_image_alt: null,
-  publish_at: "2026-06-01T00:00:00Z",
+  meta_title: null,
+  meta_description: null,
+  og_image_url: null,
   reading_time: 5,
   category: null,
   author_profile: null,
+  tags: [],
+  guests: [],
 };
 
-const GRID_ARTICLE: TestArticle = {
+const GRID_ARTICLE: ArticleMeta = {
   ...BASE_ARTICLE,
   id: "art-2",
   title: "Secondo articolo",
   slug: "secondo-articolo",
 };
 
-const EMPTY_RESPONSE: TestResponse = { items: [], total: 0, page: 1, page_size: 13 };
+const EMPTY_RESULT: ArticleListResult<ArticleMeta> = { items: [], total: 0, page: 1, page_size: 13 };
 
-beforeEach(() => {
-  global.fetch = vi.fn();
-  vi.resetModules();
-});
-
-async function renderHomePage(data: TestResponse, page = "1") {
-  (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-    ok: true,
-    json: async () => data,
-  });
+async function renderHomePage(data: ArticleListResult<ArticleMeta>) {
+  getArticleCards.mockReturnValueOnce(data);
   const { default: HomePage } = await import("../page");
-  render(await HomePage({ searchParams: Promise.resolve({ page }) }));
+  render(await HomePage());
 }
 
 describe("HomePage", () => {
   it("renders site name", async () => {
-    await renderHomePage(EMPTY_RESPONSE);
+    await renderHomePage(EMPTY_RESULT);
     expect(screen.getByText(/allarounder/i)).toBeInTheDocument();
   });
 
   it("renders empty state when no articles", async () => {
-    await renderHomePage(EMPTY_RESPONSE);
+    await renderHomePage(EMPTY_RESULT);
     expect(screen.getByText(/nessun articolo pubblicato/i)).toBeInTheDocument();
   });
 
@@ -188,22 +174,4 @@ describe("HomePage", () => {
     );
   });
 
-  it("shows previous page link on page 2", async () => {
-    await renderHomePage(
-      { items: [GRID_ARTICLE], total: 30, page: 2, page_size: 13 },
-      "2",
-    );
-    expect(screen.getByRole("link", { name: /pagina precedente/i })).toHaveAttribute(
-      "href",
-      "/?page=1",
-    );
-  });
-
-  it("no hero on page 2", async () => {
-    await renderHomePage(
-      { items: [GRID_ARTICLE], total: 30, page: 2, page_size: 13 },
-      "2",
-    );
-    expect(screen.queryByRole("region", { name: /articolo in evidenza/i })).toBeNull();
-  });
 });

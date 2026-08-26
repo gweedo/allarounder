@@ -1,44 +1,22 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { notFound } from "next/navigation";
+import { getGuestBySlug, getAllGuestSlugs } from "../../../lib/content";
 
-export const revalidate = 60;
-
-interface Article {
-  id: string;
-  title: string;
-  slug: string;
-  excerpt: string | null;
-  cover_image_url: string | null;
-  cover_image_alt: string | null;
-  reading_time: number | null;
-  publish_at: string;
+export async function generateStaticParams() {
+  return getAllGuestSlugs().map((slug) => ({ slug }));
 }
 
-interface GuestWithArticles {
-  id: string;
-  name: string;
-  slug: string;
-  bio: string | null;
-  photo_url: string | null;
-  links: Record<string, string>;
-  articles: Article[];
-  total: number;
-  page: number;
-  page_size: number;
-}
-
-async function getGuestData(slug: string): Promise<GuestWithArticles | null> {
-  const apiUrl = process.env.API_URL ?? "http://backend:8000";
-  try {
-    const res = await fetch(`${apiUrl}/api/guests/${slug}`, {
-      next: { revalidate: 60 },
-    });
-    if (!res.ok) return null;
-    return (await res.json()) as GuestWithArticles;
-  } catch {
-    return null;
-  }
+function getGuestData(slug: string) {
+  const result = getGuestBySlug(slug);
+  if (!result) return null;
+  return {
+    ...result.detail,
+    articles: result.articles,
+    total: result.articles.length,
+    page: 1,
+    page_size: result.articles.length,
+  };
 }
 
 interface Props {
@@ -47,7 +25,7 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const data = await getGuestData(slug);
+  const data = getGuestData(slug);
   if (!data) return {};
   return {
     title: `${data.name} — Allarounder`,
@@ -58,7 +36,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function GuestPage({ params }: Props) {
   const { slug } = await params;
-  const data = await getGuestData(slug);
+  const data = getGuestData(slug);
   if (!data) notFound();
 
   return (

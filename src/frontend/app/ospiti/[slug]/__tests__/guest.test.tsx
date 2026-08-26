@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 
 vi.mock("next/navigation", () => ({
@@ -7,49 +7,33 @@ vi.mock("next/navigation", () => ({
   },
 }));
 
-const BASE_GUEST = {
+const getGuestBySlug = vi.fn();
+vi.mock("../../../../lib/content", () => ({
+  getGuestBySlug: (slug: string) => getGuestBySlug(slug),
+  getAllGuestSlugs: () => [],
+}));
+
+const BASE_DETAIL = {
   id: "g1",
   name: "Mario Bianchi",
   slug: "mario-bianchi",
-  bio: "Ospite del podcast.",
+  bio: "Ospite del podcast." as string | null,
   photo_url: null as string | null,
   links: {} as Record<string, string>,
-  articles: [] as {
-    id: string;
-    title: string;
-    slug: string;
-    excerpt: string | null;
-    cover_image_url: string | null;
-    cover_image_alt: string | null;
-    reading_time: number | null;
-    publish_at: string;
-  }[],
-  total: 0,
-  page: 1,
-  page_size: 20,
 };
 
-beforeEach(() => {
-  global.fetch = vi.fn();
-});
-
-async function renderGuestPage(data: typeof BASE_GUEST | null) {
+async function renderGuestPage(
+  data: { detail: typeof BASE_DETAIL; articles: Record<string, unknown>[] } | null,
+) {
   const GuestPage = (await import("../page")).default;
-
-  if (!data) {
-    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      ok: false,
-      json: async () => ({}),
-    });
-  } else {
-    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      ok: true,
-      json: async () => data,
-    });
-  }
+  getGuestBySlug.mockReturnValueOnce(data);
 
   try {
-    render(await GuestPage({ params: Promise.resolve({ slug: data?.slug ?? "missing" }) }));
+    render(
+      await GuestPage({
+        params: Promise.resolve({ slug: data?.detail.slug ?? "missing" }),
+      }),
+    );
   } catch (e) {
     if (e instanceof Error && e.message === "NEXT_NOT_FOUND") return "notFound";
     throw e;
@@ -59,19 +43,19 @@ async function renderGuestPage(data: typeof BASE_GUEST | null) {
 
 describe("GuestPage", () => {
   it("renders guest name as heading", async () => {
-    await renderGuestPage(BASE_GUEST);
+    await renderGuestPage({ detail: BASE_DETAIL, articles: [] });
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Mario Bianchi");
   });
 
   it("renders guest bio", async () => {
-    await renderGuestPage(BASE_GUEST);
+    await renderGuestPage({ detail: BASE_DETAIL, articles: [] });
     expect(screen.getByText("Ospite del podcast.")).toBeInTheDocument();
   });
 
   it("renders photo when photo_url is set", async () => {
     await renderGuestPage({
-      ...BASE_GUEST,
-      photo_url: "https://cdn.allarounder.it/guests/mario.jpg",
+      detail: { ...BASE_DETAIL, photo_url: "https://cdn.allarounder.it/guests/mario.jpg" },
+      articles: [],
     });
     const img = document.querySelector("img");
     expect(img).toBeTruthy();
@@ -79,14 +63,13 @@ describe("GuestPage", () => {
   });
 
   it("renders empty state when no articles", async () => {
-    await renderGuestPage(BASE_GUEST);
+    await renderGuestPage({ detail: BASE_DETAIL, articles: [] });
     expect(screen.getByText(/nessun articolo/i)).toBeInTheDocument();
   });
 
   it("renders article list with links", async () => {
     await renderGuestPage({
-      ...BASE_GUEST,
-      total: 1,
+      detail: BASE_DETAIL,
       articles: [
         {
           id: "art-1",
@@ -107,8 +90,8 @@ describe("GuestPage", () => {
 
   it("renders social links", async () => {
     await renderGuestPage({
-      ...BASE_GUEST,
-      links: { Twitter: "https://twitter.com/mario" },
+      detail: { ...BASE_DETAIL, links: { Twitter: "https://twitter.com/mario" } },
+      articles: [],
     });
     const link = screen.getByRole("link", { name: "Twitter" });
     expect(link).toHaveAttribute("href", "https://twitter.com/mario");
@@ -122,10 +105,7 @@ describe("GuestPage", () => {
 
 describe("generateMetadata", () => {
   it("returns title and bio as description when bio is set", async () => {
-    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      ok: true,
-      json: async () => BASE_GUEST,
-    });
+    getGuestBySlug.mockReturnValueOnce({ detail: BASE_DETAIL, articles: [] });
     const { generateMetadata } = await import("../page");
     const meta = await generateMetadata({ params: Promise.resolve({ slug: "mario-bianchi" }) });
     expect(meta.title).toBe("Mario Bianchi — Allarounder");
@@ -133,17 +113,14 @@ describe("generateMetadata", () => {
   });
 
   it("returns fallback description when bio is null", async () => {
-    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({ ...BASE_GUEST, bio: null }),
-    });
+    getGuestBySlug.mockReturnValueOnce({ detail: { ...BASE_DETAIL, bio: null }, articles: [] });
     const { generateMetadata } = await import("../page");
     const meta = await generateMetadata({ params: Promise.resolve({ slug: "mario-bianchi" }) });
     expect(meta.description).toBe("Articoli con Mario Bianchi su Allarounder");
   });
 
   it("returns empty object when guest not found", async () => {
-    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({ ok: false });
+    getGuestBySlug.mockReturnValueOnce(null);
     const { generateMetadata } = await import("../page");
     const meta = await generateMetadata({ params: Promise.resolve({ slug: "missing" }) });
     expect(meta).toEqual({});
