@@ -4,11 +4,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this repository is
 
-This is the **planning and specification workspace and application repo** for **Allarounder**, an Italian written-articles blog that promotes a podcast hosted on Spotify. The repo holds decisions, ADRs, a tech spec, the site/data-model design, a content-team questionnaire — **and the application build is underway**: a `src/` monorepo with `src/backend/` (FastAPI, Python) and `src/frontend/` (Next.js), both with passing test suites, plus `infra/` (Bicep IaC for the Azure environments).
+This is the build repo for **Allarounder**, an Italian written-articles blog that promotes a gymnastics podcast hosted on Spotify. As of **2026-08-26** (ADR-0018) it builds a **static site**: writers author in Google Docs, a CI pipeline turns that into Markdown, and Next.js exports a static site deployed to Cloudflare Pages. There is no backend server, no database, no admin UI, and no authentication anywhere in this stack.
+
+The repo holds two things: the static frontend (`src/frontend/`) and the content pipeline (`src/pipeline/`, in progress — see `NEXT-STEPS-PROMPT.md` for the remaining build tasks). `infra/` (Bicep), `src/backend/` (FastAPI), and Docker Compose are gone; a frozen copy of that pre-pivot application lives at `gweedo/allarounder-legacy` (archived, read-only).
 
 ## The product in one paragraph
 
-The site publishes **written articles in Italian only**; each article links out to the matching **Spotify episode**. The site hosts **no audio** — no player, streaming, or RSS feed. Its purpose is to rank in Italian search (SEO is product-critical) and drive readers to Spotify. The canonical domain is `allarounder.it`; `allarounder.eu` 301-redirects to it.
+The site publishes **written articles in Italian only**; each article optionally links out to the matching **Spotify episode**. The site hosts **no audio** — no player, streaming, or RSS feed. Its purpose is to rank in Italian search (SEO is product-critical) and drive readers to Spotify. The canonical domain is `allarounder.it`; `allarounder.eu` 301-redirects to it.
 
 ## Two-language rule (important)
 
@@ -19,53 +21,44 @@ Keep these separate. Italian belongs in content and content-facing routes; every
 
 ## Documentation map (the repo is its own source of truth)
 
-Before proposing architecture or implementation, read the relevant file rather than inferring. Note all docs live under `docs/`:
+Before proposing architecture or implementation, read the relevant file rather than inferring. All docs live under `docs/`:
 
-- **`docs/README.md`** — documentation index and a one-screen decision summary. Good entry point.
-- **`docs/DECISIONS.md`** — the running decision log: every settled choice with rationale, trade-offs, and status (✅ final / 🔄 provisional / ❓ open / 📦 superseded). **Read this first** for *what* and *why*.
-- **`docs/architecture/adr/`** — Architecture Decision Records (0001–0010), one decision per file, with full rationale, options considered, and consequences. `DECISIONS.md` summarizes; the ADRs are the deep source. See `adr/README.md` for the index.
-- **`docs/architecture/TECH-SPEC.md`** — how the system is built and operated: architecture diagram, backend layering, data-model summary, API surfaces, Azure infra table, CI/CD, testing strategy.
-- **`docs/architecture/SITE-STRUCTURE.md`** — sitemap/URL structure, full field-level data models, complete API endpoint list, article page layout, SEO fields.
-- **`docs/product/PRD.md`** — the Product Requirements Document (Draft v1, 2026-06-17): vision, goals, audience, v1 scope, user stories, data model, API surface, build sequence, and testing decisions. The authoritative *what* and *why*.
-- **`docs/product/content-team-questionnaire.md`** — the content-team answers that informed the PRD.
-- **`podcast-blog-website.plugin`** (project root, outside `docs/`) — a zip bundle of Claude Code skills used during planning (decision-tracker, site-structure-designer, content-guidelines, tech-stack-advisor); not application code.
+- **`docs/DECISIONS.md`** — the running decision log: every settled choice with rationale, trade-offs, and status (✅ final / 🔄 amended / 🔄 provisional / ❓ open / 📦 superseded). **Read this first** for *what* and *why*. The 2026-08-26 "Architecture pivot" entry and its neighbors are the current state; earlier entries about FastAPI/Postgres/Azure/the custom admin UI are marked superseded or amended, not deleted.
+- **`docs/architecture/adr/`** — Architecture Decision Records, one decision per file. **ADR-0018 is the pivot** — read it for the full rationale and what it supersedes. See `adr/README.md` for the index and current status of every ADR.
+- **`docs/architecture/TECH-SPEC.md`** and **`docs/architecture/SITE-STRUCTURE.md`** — describe the **retired** FastAPI/Postgres/Azure architecture and its API surface. Useful for the data-model shape (categories, tags, guests, SEO fields) that `content/index.json` still mirrors, but the API endpoints, backend layering, and infra sections no longer apply. Not yet rewritten for the pivot.
+- **`docs/product/PRD.md`** — the original Product Requirements Document (Draft v1, 2026-06-17). Vision, audience, and v1 content scope (articles, categories, tags, guests, SEO) still apply; its build sequence and API surface sections describe the retired architecture.
+- **`docs/product/content-team-questionnaire.md`** — the content-team answers that informed the PRD, including why the writers need a Google-Docs-native workflow.
 
 When a decision changes, **add a new ADR that supersedes the old one** and update `docs/DECISIONS.md` — do not rewrite decision history.
 
 ## Settled architecture (do not re-litigate without a new ADR)
 
-- **Backend:** Python + **FastAPI** as a headless JSON API (Uvicorn/Gunicorn). SQLAlchemy + Alembic. Pydantic schemas. Two API surfaces: a **public read API** (published content only) and an **authenticated admin API** (OAuth2 password flow + JWT, roles `admin`/`editor`).
-- **Backend structure — pragmatic DDD (ADR-0008):** a single core **Content/Publishing** bounded context, layered `domain` / `application` / `infrastructure` / `interfaces` with a **strict inward dependency rule — the `domain/` layer imports no framework code** (no FastAPI, no SQLAlchemy, no logging library). `Article` is the aggregate root; `Slug`, `SpotifyUrl`, `Seo`, `PublicationStatus`, `Body` (Markdown) are value objects; repository interfaces live in `domain/`, SQLAlchemy implementations in `infrastructure/`. `identity` and `newsletter` are supporting contexts that start minimal.
-- **Frontend:** a **separate Next.js app** rendering the public site with **SSR/ISR** (required for SEO), consuming the public read API. Also hosts the custom admin UI.
-- **Content management:** a **custom-built admin UI** for 3 non-technical writers — *not* a CMS. Flagged as the largest single chunk of build work and the main timeline risk; build the article editor (create/edit/publish, cover image, Spotify link) first, and the taxonomy/guest/author screens as simple CRUD.
-- **Article body:** **Markdown** stored as plain text, rendered to HTML by Next.js, modeled as a `Body` value object. Images are Blob Storage URL references, never embedded HTML (avoids stored-HTML/XSS).
-- **Author vs User (ADR / DECISIONS):** `Author` (public byline: name, bio, photo, links) and `User` (login account: email, hashed password, role) are **separate entities** with an **optional 1:1 link** (`Author.user_id`, nullable) — an Author can exist without a User (guest bylines).
-- **Scheduling:** **read-time filter only** — the public API returns `status = published AND publish_at <= now`. No cron/worker/scheduler in v1; scheduled posts appear within the cache-revalidation window.
-- **Data:** Azure Database for **PostgreSQL** (Flexible Server) for all structured content; **Azure Blob Storage** for images only. **No Episode/audio model** — the Spotify link is a URL field on `Article`.
-- **Infra:** **Azure**, region **Italy North**. Compute on **Azure Container Apps** (one app each for backend and frontend), images in **Azure Container Registry**, edge via **Azure Front Door** (TLS, WAF, `.eu → .it` 301), secrets in **Azure Key Vault**, monitoring via **Azure Monitor / Application Insights**. IaC is **Bicep** in `infra/`.
-- **Observability (ADR-0010):** instrument both apps with **OpenTelemetry** → Azure Monitor / Application Insights (Log Analytics in Italy North). **Structured JSON logs** to stdout (`structlog` backend, `pino` frontend); propagate **W3C `traceparent`** across the frontend→backend hop so a request is traceable end-to-end. INFO+ in prod / DEBUG in dev. **Redact PII & secrets** at the logging boundary (GDPR). Logging stays out of the `domain` layer; tests assert no secrets/PII are logged.
-- **Repo/CI:** single **monorepo** on GitHub; **GitHub Actions** with two **path-filtered** workflows (`src/backend/**`, `src/frontend/**`): lint/test → build image → push to ACR → deploy. **Separate `staging` and `production`** environments, both stamped from the same Bicep with different parameters; verify on staging, then promote. CI authenticates to Azure via **OIDC federated credentials** (no long-lived secrets).
-- **Secrets** are never committed. Key Vault is provisioned via Bicep, but secret *values* are injected through a secure step.
+- **Editorial workflow:** writers author articles in **Google Docs**, indexed by a **Google Sheet** (one row per article: title, Doc link, category, tags, author, guest, Spotify link, cover image, meta description, publish date, status). Publishing is triggered by a **"Pubblica" button** in the Sheet (Apps Script → GitHub `repository_dispatch`), not automatically on save.
+- **Content pipeline (`src/pipeline/`, Python, in progress):** a GitHub Actions job reads the Sheet, exports each Doc, converts HTML → Markdown, validates it against the domain value objects, and writes `content/articles/*.md` + `content/index.json` into `src/frontend/`. Generated content is **committed** — it is the audit trail and the rollback mechanism (`git revert`). See `NEXT-STEPS-PROMPT.md` Task 3 for what's built vs outstanding.
+- **Domain layer (`src/pipeline/domain/`):** framework-free Python, moved from the retired backend. `Article` is the aggregate root; `Slug` (with `from_title`), `Body`, `SpotifyUrl`, `PublicationStatus` are value objects; entities are `Article`, `Author`, `Guest`, `Category`, `Tag`, `StaticPage`. This is the pipeline's build-time content validator — a bad Doc fails the build with an Italian-language error rather than publishing a broken page.
+- **Frontend (`src/frontend/`):** Next.js with **`output: "export"`** — a pure static site, no server. `lib/content.ts` is the filesystem loader (reads `content/index.json` and `content/articles|pages/*.md` via `gray-matter` frontmatter) that replaced every page's old `fetch()` call to the retired backend; its exported types are the content contract the pipeline must emit. `images: { unoptimized: true }` — there is no Image Optimization API under static export. Security headers live in `public/_headers` (Cloudflare Pages convention), not `next.config.ts` (`headers()` does not run under export).
+- **Hosting:** **Cloudflare Pages** (free tier), custom domain `allarounder.it`, with `allarounder.eu` 301-redirecting to it (ADR-0007). No server, no always-on compute.
+- **Article body:** **Markdown**, rendered to sanitized HTML by `lib/markdown.ts` (`remark` → `remark-rehype` → `rehype-sanitize` → `rehype-stringify`). Images referenced by URL, never embedded HTML.
+- **Author vs Guest:** `Author` (site byline) and `Guest` (interviewee/podcast guest) are separate entities, each with their own page (`/autori/[slug]`, `/ospiti/[slug]`).
+- **Scheduling:** the pipeline publishes only rows where `stato = Pubblicato` **and** `data <= now`, checked at build time (a nightly cron re-run picks up future-dated posts — there is no server to run a read-time filter against).
+- **No database, no server, no authentication.** Filtering (by category/tag/author/guest) happens by iterating `content/index.json` at build time, not by querying anything at request time.
+- **Cost ceiling:** **€10/month total**, permanently (ADR-0018). Free tiers only (Cloudflare Pages, GitHub Actions, Google Workspace already owned) — never add a paid service without discussing it first.
 
 ## Development methodology: Test-Driven Development (ADR-0009)
 
-The project mandates **TDD (red → green → refactor)** — tests are written before implementation and live alongside the code. The framework-free `domain/` layer is what makes domain unit tests fast and TDD practical. Test pyramid:
+TDD (red → green → refactor) still applies, scoped to what's left:
 
 | Layer | Scope | Tools |
 |-------|-------|-------|
-| Domain unit | `Article` aggregate, value objects, domain services — no I/O | pytest |
-| Application | Use cases against fake/in-memory repositories | pytest |
-| Integration | Repository impls + migrations against **real PostgreSQL** | pytest + **testcontainers** (needs Docker) |
-| API / contract | Endpoints, auth, OpenAPI conformance | httpx / schemathesis |
-| Frontend unit | Components, hooks | Vitest + React Testing Library |
-| E2E | Critical visitor + editor flows | Playwright |
-
-Both CI workflows run their test suite with a **coverage gate before** building/pushing images.
+| Domain unit | `Article` aggregate, value objects — no I/O | pytest (`src/pipeline/`) |
+| Pipeline | Sheet/Doc parsing, HTML→Markdown conversion, validation (once built) | pytest |
+| Frontend unit | Page components, `lib/content.ts` loaders | Vitest + React Testing Library |
+| E2E | Public-page visitor flows | Playwright (`src/frontend/e2e/`) |
 
 ## v1 scope vs phase 2
 
-- **v1:** articles, categories, **tags**, **guests**, cover images, the Spotify link, the custom admin UI, SEO.
-- **Phase 2 (deferred):** newsletter (signup/subscribers backend) and comments. An external embedded form is the interim option for email capture.
+- **v1:** articles, categories, **tags**, **guests**, cover images, the Spotify link, SEO — all authored in Google Docs/Sheets, no admin UI.
+- **Deferred indefinitely:** newsletter (signup/subscribers), comments, any authenticated surface.
 - **Out of scope entirely:** hosting/streaming audio, RSS feed, i18n/multilingual, public user accounts.
 
 ## Git workflow
@@ -74,19 +67,16 @@ Both CI workflows run their test suite with a **coverage gate before** building/
 
 ## Commands
 
-**Backend** (`src/backend/`, Python venv at `src/backend/.venv`):
-- Tests: `cd src/backend && .venv/bin/python -m pytest -q`
-- Migrations: `cd src/backend && .venv/bin/python -m alembic upgrade head` (see `alembic/versions/`)
-- Run the API: `cd src/backend && .venv/bin/uvicorn app.main:app --reload`
-
 **Frontend** (`src/frontend/`, deps installed via `npm install`):
+- Build (static export → `out/`): `cd src/frontend && npm run build`
 - Tests: `cd src/frontend && npm test`
 - Type check: `cd src/frontend && npm run typecheck`
 - Lint: `cd src/frontend && npm run lint`
-- E2E (needs Docker; see `e2e/global-setup.ts`): `cd src/frontend && npm run test:e2e:integration`
 - Dev server: `cd src/frontend && npm run dev`
+- E2E: `cd src/frontend && npm run test:e2e` (starts its own dev server; no Docker, no backend needed)
 
-Some environments (e.g. sandboxed CI containers) lack Docker — testcontainers-based backend integration tests and Playwright integration e2e then skip/fail locally and are exercised in CI instead.
+**Pipeline domain** (`src/pipeline/`, Python venv at `src/pipeline/.venv`):
+- Tests: `cd src/pipeline && .venv/bin/python -m pytest -q`
 
 The working directory is on Windows; available shells are PowerShell (primary) and a Bash tool for POSIX scripts.
 

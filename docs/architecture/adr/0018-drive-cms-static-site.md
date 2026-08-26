@@ -3,7 +3,8 @@
 **Status:** Accepted
 **Date:** 2026-08-26
 **Deciders:** Guido (solo developer)
-**Supersedes:** ADR-0001 (Backend framework: FastAPI), ADR-0002 (Decoupled frontend: Next.js — SSR), ADR-0003 (Content management: custom admin UI), ADR-0004 (Compute: Azure Container Apps), ADR-0005 (Database: Azure Database for PostgreSQL), ADR-0013 (Security architecture), ADR-0015 (Front Door Standard tier), ADR-0016 (Front Door optional per-environment)
+**Supersedes:** ADR-0001 (Backend framework: FastAPI), ADR-0002 (Decoupled frontend: Next.js — SSR), ADR-0003 (Content management: custom admin UI), ADR-0004 (Compute: Azure Container Apps), ADR-0005 (Database: Azure Database for PostgreSQL), ADR-0010 (Logging & observability: OpenTelemetry → Azure Monitor — no server left to instrument), ADR-0013 (Security architecture), ADR-0015 (Front Door Standard tier), ADR-0016 (Front Door optional per-environment), ADR-0017 (Google SSO and session persistence — no admin auth left to amend)
+**Amends:** ADR-0012 (CI/CD pipeline & deployment strategy) — the blue-green/staging-production/migrations pipeline it describes no longer applies, but its replacement (the Task 3/4 Drive-export pipeline) isn't yet its own ADR
 
 ## Context
 
@@ -36,7 +37,7 @@ What survives from the retired architecture: the public Next.js routes and their
 
 ## Consequences
 
-- **Retired:** the FastAPI HTTP API, the SQLAlchemy/Alembic/Postgres persistence layer, the custom admin UI (article/author/guest/category/tag/pages CRUD screens, Google SSO, session persistence, the Google-Docs-paste-to-Markdown editor feature), Azure Container Apps, Azure Front Door, Azure Key Vault, Bicep IaC, and the two-environment (staging/production) CI/CD pipeline. Roughly two months of July development work is retired with this ADR, including seven feature branches that had never reached `main` — see the "Pre-rebuild application preserved as a frozen repository" decision in `docs/DECISIONS.md` for where that work is archived.
+- **Retired:** the FastAPI HTTP API, the SQLAlchemy/Alembic/Postgres persistence layer, the custom admin UI (article/author/guest/category/tag/pages CRUD screens, Google SSO, session persistence, the Google-Docs-paste-to-Markdown editor feature), Azure Container Apps, Azure Front Door, Azure Key Vault, Bicep IaC, the OpenTelemetry/Azure Monitor instrumentation (no long-running process left to instrument), and the two-environment (staging/production) CI/CD pipeline. Roughly two months of July development work is retired with this ADR, including seven feature branches that had never reached `main` — see the "Pre-rebuild application preserved as a frozen repository" decision in `docs/DECISIONS.md` for where that work is archived.
 - **Publishing is no longer instant.** An article goes live when the pipeline's build finishes (~2 minutes after clicking "Pubblica"), not immediately on save. Scheduled ("future-dated") posts are handled by a nightly cron re-run rather than the read-time filter described in the original scheduling decision.
 - **No more database.** All content is Markdown + JSON committed to the repository. There is no query layer — filtering (by category, tag, author, guest) happens by iterating `content/index.json` at build time.
 - **No more authentication.** There is nothing to authenticate against — writers authenticate with Google, not with this system.

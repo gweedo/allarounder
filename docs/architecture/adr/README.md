@@ -15,13 +15,13 @@ This directory records the significant architectural decisions for the Allaround
 | [0009](0009-test-driven-development.md) | Development methodology: Test-Driven Development | Accepted | 2026-06-14 |
 | [0010](0010-logging-observability.md) | Logging & observability | 📦 Superseded by 0018 | 2026-06-14 |
 | [0011](0011-author-user-separation.md) | Author and User as separate entities (optional 1:1 link) | Accepted | 2026-06-14 |
-| [0012](0012-cicd-pipeline-and-deployment-strategy.md) | CI/CD pipeline & deployment strategy | 📦 Superseded by 0018 | 2026-06-14 |
+| [0012](0012-cicd-pipeline-and-deployment-strategy.md) | CI/CD pipeline & deployment strategy | 🔄 Amended by 0018 (a new pipeline for the static build is Task 3/4 work, not yet its own ADR) | 2026-06-14 |
 | [0013](0013-security-architecture.md) | Security architecture | 📦 Superseded by 0018 | 2026-06-18 |
 | [0014](0014-github-branch-protection.md) | GitHub branch protection for `main` | Accepted | 2026-06-21 |
 | [0015](0015-front-door-standard-tier.md) | Front Door Standard tier (drop managed WAF rule set) — amends 0013 §11 | 📦 Superseded by 0018 | 2026-06-25 |
 | [0016](0016-front-door-optional-per-environment.md) | Front Door optional per-environment; disabled on staging — amends 0015 item 4 | 📦 Superseded by 0018 | 2026-07-01 |
 | [0017](0017-google-sso-and-session-persistence.md) | Google SSO and session persistence for admin login — amends 0013 §1 | 📦 Superseded by 0018 | 2026-07-07 |
-| [0018](0018-drive-cms-static-site.md) | Google Drive as CMS, static site on Cloudflare Pages — supersedes 0001, 0002, 0003, 0004, 0005, 0013, 0015, 0016 | Accepted | 2026-08-26 |
+| [0018](0018-drive-cms-static-site.md) | Google Drive as CMS, static site on Cloudflare Pages — supersedes 0001, 0002, 0003, 0004, 0005, 0010, 0013, 0015, 0016, 0017 | Accepted | 2026-08-26 |
 
 ## Conventions
 

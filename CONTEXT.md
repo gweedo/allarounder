@@ -21,20 +21,8 @@ One of three states an article can be in: `draft` (default, not publicly visible
 _Avoid_: State, visibility, status
 
 **Author**:
-The named person credited as the writer of an article. Has a public byline: name, bio, photo, and optional links. Optionally linked to a User account (nullable). An Author can exist without a User — for guest or external bylines.
-_Avoid_: Writer, contributor, user (when referring to the byline)
-
-**User**:
-A login account with an email, hashed password, and role. Distinct from Author. Roles: `admin` or `editor`.
-_Avoid_: Account, profile (use Author for the public profile)
-
-**Admin**:
-A User role with full access: can manage all articles, users, authors, categories, and tags.
-_Avoid_: Superuser, owner
-
-**Editor**:
-A User role that can create, edit, and publish their own articles. Cannot manage users, authors, categories, or tags.
-_Avoid_: Writer (too broad), contributor
+The named person credited as the writer of an article. Has a public byline: name, bio, photo, and optional links. There is no login system (ADR-0018) — an Author is a byline only, not an account.
+_Avoid_: Writer, contributor, user
 
 **Guest**:
 A named person who appeared on a podcast episode. Has a name, short bio, and optional photo and links. An article references zero or more guests. Not the same as a guest writer — guest writers are modeled as Authors with no User account.
@@ -49,12 +37,8 @@ A validated URL value object on Article pointing to the corresponding Spotify ep
 _Avoid_: Podcast link, episode link
 
 **Cover image**:
-An image associated with an article, uploaded directly to Azure Blob Storage via a short-lived SAS token. Stored on Article as a Blob URL. Optional.
+An image associated with an article, extracted from the source Google Doc by the content pipeline and committed as a local file under `content/images/<slug>/`. Referenced on Article by path. Optional.
 _Avoid_: Thumbnail, hero image, featured image
-
-**Preview**:
-A draft article rendered in the public layout, accessible via a secret token URL. Allows writers to inspect how an article will look before publishing.
-_Avoid_: Draft view, staging view
 
 **Event**:
 A community meetup, competition, or in-person gathering that Allarounder promotes. Has a title, date, location, description, optional cost, optional max capacity, and optional external registration link. Informational only in v1 — no on-site registration or seat management. In-house registration is deferred to a future version.
