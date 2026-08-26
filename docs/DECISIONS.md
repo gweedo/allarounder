@@ -39,7 +39,7 @@ Last updated: 2026-06-14
 - **Decision**: The backend will be built with **FastAPI**, serving a JSON API (headless architecture).
 - **Rationale**: The team wants a robust, scalable foundation that starts as an MVP and can grow into a larger, more complex application. FastAPI is modern, async-first, and fast, with automatic API docs.
 - **Trade-off noted**: FastAPI provides no built-in admin, ORM, or CMS. These must be assembled (SQLAlchemy + Alembic for data) and the editorial experience must be built deliberately (see Custom admin UI below).
-- **Status**: ✅ Final
+- **Status**: 🔄 Amended 2026-08-26 — see “Architecture pivot: Google Drive as CMS”
 - **Decided by**: Team
 
 ### Frontend / rendering: separate Next.js app
@@ -47,7 +47,7 @@ Last updated: 2026-06-14
 - **Decision**: FastAPI serves as a pure API behind a **separate Next.js frontend**. Next.js renders the public site.
 - **Rationale**: Decoupled architecture; flexible and scalable for future growth.
 - **Implication**: SSR (server-side rendering) must be used in Next.js to preserve SEO, which is critical for a blog whose purpose is driving traffic to Spotify.
-- **Status**: ✅ Final
+- **Status**: 🔄 Amended 2026-08-26 — see “Architecture pivot: Google Drive as CMS”
 - **Decided by**: Team
 
 ### Content management: custom admin UI
@@ -55,7 +55,7 @@ Last updated: 2026-06-14
 - **Decision**: The 3 non-technical writers will publish articles through a **custom-built admin UI**, rather than a headless CMS or Markdown-in-Git workflow.
 - **Rationale**: Full control over the editorial experience and data model.
 - **Trade-off noted**: This is the largest single chunk of build work — it rebuilds what Wagtail or a headless CMS would provide for free. It is the main driver of MVP timeline and the biggest risk for a single developer (see Risks).
-- **Status**: ✅ Final
+- **Status**: 📦 Superseded 2026-08-26 — see “Architecture pivot: Google Drive as CMS”
 - **Decided by**: Team
 
 ### Azure compute service: Container Apps
@@ -63,14 +63,14 @@ Last updated: 2026-06-14
 - **Decision**: The application(s) will run on **Azure Container Apps** (containerized).
 - **Rationale**: More control and portability than App Service; fits a headless API + separate frontend model and the goal of scaling into a larger, more complex system.
 - **Implication**: Requires Docker images and container build/deploy pipeline setup.
-- **Status**: ✅ Final
+- **Status**: 📦 Superseded 2026-08-26 — see “Architecture pivot: Google Drive as CMS”
 - **Decided by**: Team
 
 ### Database: Azure Database for PostgreSQL
 - **Date**: 2026-06-14
 - **Decision**: Data will be stored in **Azure Database for PostgreSQL**.
 - **Rationale**: Standard, robust relational database; pairs cleanly with SQLAlchemy/FastAPI.
-- **Status**: ✅ Final
+- **Status**: 📦 Superseded 2026-08-26 — see “Architecture pivot: Google Drive as CMS”
 - **Decided by**: Team
 
 ---
@@ -149,7 +149,7 @@ Last updated: 2026-06-14
 - **Date**: 2026-06-14
 - **Decision**: **GitHub Flow** branching (PR → checks; merge to `main` → staging; **manual approval** → prod). Path-filtered workflows run **lint/type-check → tiered tests** (unit+app+frontend+integration on PR, **80% coverage gate**; Playwright **E2E on staging**) **→ security scans** (pip-audit/npm audit/Dependabot, gitleaks+push protection, Trivy, CodeQL; **block on high/critical**) **→ build** (multi-stage, **immutable git SHA** tag + semver on release, deploy by digest) **→ deploy**. CI authenticates to Azure via **OIDC federated credentials**; apps read secrets via **Key Vault references + managed identity**. **Migrations** run as a **dedicated job before traffic shift** with **expand/contract + roll-forward**. Release uses **blue-green** (deploy green @ 0%, gate on health+smoke, flip 100%, instant revert to blue); **automated rollback** on thresholds (conservative, manual fallback until baselines). **Canary deferred to phase 2.**
 - **Rationale**: Fast, safe, low-ceremony delivery for one developer with a clean path to scale; traceable images + blue-green + expand/contract make rollback trivial; OIDC + managed identity remove all long-lived secrets from CI.
-- **Status**: ✅ Final (see ADR-0012)
+- **Status**: 🔄 Amended 2026-08-26 — see “Architecture pivot: Google Drive as CMS”
 - **Decided by**: Team
 
 ### Repository layout: monorepo
@@ -171,7 +171,7 @@ Last updated: 2026-06-14
 - **Date**: 2026-06-14
 - **Decision**: Writers author articles in a **custom admin UI on the site** (e.g. `allarounder.it/admin`); content lives in the EU Postgres via the FastAPI API. The full authoring landscape (git-based CMS, self-hosted headless CMS, SaaS headless CMS, Notion, Google Docs pipeline) was evaluated and the custom admin was re-affirmed for control and data ownership.
 - **Fallback**: A self-hosted headless CMS (e.g. Payload/Directus) if the custom-admin build effort threatens the timeline.
-- **Status**: ✅ Final (see ADR-0003)
+- **Status**: 📦 Superseded 2026-08-26 — see “Architecture pivot: Google Drive as CMS”
 - **Decided by**: Team
 
 ### Article body format: Markdown
@@ -192,7 +192,7 @@ Last updated: 2026-06-14
 - **Date**: 2026-06-14
 - **Decision**: Scheduled publishing works via a read-time filter — the public API returns only `status = published AND publish_at <= now`. No cron/worker/scheduler service in v1. Modeled as a visibility rule on the `Article` aggregate.
 - **Trade-off accepted**: A scheduled article appears within the cache-revalidation window (a few minutes), not to the exact second. A small revalidation job can be added later if to-the-minute publishing is ever needed.
-- **Status**: ✅ Final
+- **Status**: 🔄 Amended 2026-08-26 — see “Architecture pivot: Google Drive as CMS”
 - **Decided by**: Team
 
 ### v1 scope vs phase 2
@@ -220,7 +220,7 @@ Last updated: 2026-06-14
   - **WAF** — custom per-IP volumetric rate-limit rule (Prevention) on Front Door **Standard** tier. _(Amended by ADR-0015: the managed `Microsoft_DefaultRuleSet_2.1` was withdrawn — managed rule sets are Premium-only — to drop the ~$295/month Premium base fee; see "Front Door Standard tier" below.)_
   - **Secrets** — managed identity for Postgres and Blob (no passwords in Key Vault); JWT signing key is the only Key Vault secret.
   - **Audit logging** — deferred to phase 2.
-- **Status**: ✅ Final (see ADR-0013)
+- **Status**: 📦 Superseded 2026-08-26 — see “Architecture pivot: Google Drive as CMS”
 - **Decided by**: Team
 
 ### Front Door Standard tier (ADR-0015)
@@ -229,7 +229,7 @@ Last updated: 2026-06-14
 - **Rationale**: The managed rule set was the only feature requiring Premium and was running in Detection (log-only) mode — paying the ~$330/month Premium base fee (vs ~$35 on Standard) for a not-yet-enforced, defence-in-depth layer. The attack classes it covered are handled at the app layer (parameterized queries, Markdown sanitization, magic-bytes upload checks, Pydantic validation), and the active edge control (volumetric rate limit) is a custom rule that Standard supports. Saves ~$295/month per environment.
 - **Trade-off**: Loses managed OWASP/bot rule sets and Private Link at the edge. Blob access is unaffected (private container via User Delegation SAS, not Private Link). Re-upgrading to Premium is a non-breaking one-line SKU revert if edge logs later justify it.
 - **Amends**: ADR-0013 §11 (WAF rules).
-- **Status**: ✅ Final (see ADR-0015)
+- **Status**: 📦 Superseded 2026-08-26 — see “Architecture pivot: Google Drive as CMS”
 - **Decided by**: Team
 
 ### Front Door optional per-environment; disabled on staging (ADR-0016)
@@ -238,21 +238,21 @@ Last updated: 2026-06-14
 - **Rationale**: Front Door's jobs (custom-domain TLS, `.eu → .it` redirect, WAF rate-limit rule, image CDN) are production-facing concerns staging doesn't exercise; the ~$35/month Standard-tier base fee (ADR-0015) is flat per environment regardless of use. Part of the v1 infra cost-optimization pass (issue #71/#72).
 - **Trade-off**: Staging can no longer verify the Front Door redirect/TLS/WAF pre-production; that verification now happens directly against production, or by temporarily flipping `enableFrontDoor = true` on staging for a one-off check.
 - **Amends**: ADR-0015 Action Item 4 (staging-first WAF verification is no longer achievable as written).
-- **Status**: ✅ Final (see ADR-0016)
+- **Status**: 📦 Superseded 2026-08-26 — see “Architecture pivot: Google Drive as CMS”
 - **Decided by**: Team
 
 ### Logging & observability: OpenTelemetry → Azure Monitor
 - **Date**: 2026-06-14
 - **Decision**: Instrument both apps with **OpenTelemetry**, exporting to **Azure Monitor / Application Insights** (Log Analytics in Italy North). **Structured JSON logs** to stdout; **W3C trace-context correlation IDs** across the frontend→backend hop; INFO+ in prod / DEBUG in dev; **PII & secret redaction** for GDPR; retention 30–90 days via Bicep. Logging stays out of the `domain` layer (DDD dependency rule); tests assert no secrets/PII are logged.
 - **Rationale**: Vendor-neutral instrumentation, Azure-native and EU-resident, true distributed tracing across both services, low cost/ops — vs the deprecating classic App Insights SDK or an over-heavy third-party stack.
-- **Status**: ✅ Final (see ADR-0010)
+- **Status**: 📦 Superseded 2026-08-26 — see “Architecture pivot: Google Drive as CMS”
 - **Decided by**: Team
 
 ### Environments: separate staging + production
 - **Date**: 2026-06-14 (Front Door verification clause superseded 2026-07-01, ADR-0016)
 - **Decision**: Run a **fully separate staging environment** (its own Container Apps environment, database, and config) in addition to production, both defined via Bicep. Releases are verified on staging, then promoted to production.
 - **Rationale**: Complements TDD — tests verify code, staging verifies the environment (Azure config, Key Vault wiring, migrations against prod-shaped data, inter-service calls). Bicep makes the second environment a parameterized stamp; Container Apps scale-to-zero keeps idle cost low. Provides a safe place to rehearse migrations. _(Amended by ADR-0016: staging no longer runs Front Door — it was a ~$35/month flat fee for production-facing capability (custom domain TLS, `.eu → .it` redirect, WAF) that staging's `*.azurecontainerapps.io` FQDN doesn't need; staging's frontend Container App remains directly reachable over Azure-managed HTTPS without it.)_
-- **Status**: ✅ Final
+- **Status**: 📦 Superseded 2026-08-26 — see “Architecture pivot: Google Drive as CMS”
 - **Decided by**: Team
 
 ### Infrastructure-as-Code: Bicep
@@ -260,7 +260,7 @@ Last updated: 2026-06-14
 - **Decision**: Azure resources are defined as code with **Bicep** (in `infra/`).
 - **Rationale**: Azure-native, no state file to manage (ARM is the source of truth), always current with new Azure features, low cognitive load for a single-cloud, solo-developer project. Terraform's multi-cloud advantage doesn't apply.
 - **Note**: Provision Key Vault via IaC, but inject secret *values* through a secure step — never commit secrets to the Bicep files.
-- **Status**: ✅ Final
+- **Status**: 📦 Superseded 2026-08-26 — see “Architecture pivot: Google Drive as CMS”
 - **Decided by**: Team
 
 ### Architecture approach: Domain-Driven Design (pragmatic)
@@ -277,6 +277,32 @@ Last updated: 2026-06-14
 - **Rationale**: Pairs naturally with DDD (fast domain unit tests), drives clean design, and guards against regressions as the system grows.
 - **Status**: ✅ Final
 - **Decided by**: Team
+
+---
+
+### Architecture pivot: Google Drive as CMS, static site
+- **Date**: 2026-08-26
+- **Decision**: Retire the runtime application. Writers author in Google Docs; a GitHub Actions job exports the Drive folder, validates it, generates Markdown, and publishes a static site to Cloudflare Pages. No server, no database, no admin UI, no authentication.
+- **Rationale**: Three assumptions behind the June architecture no longer hold. The three writers work natively in Google Docs and do not want a custom editor — which removes the user for the single largest build item (ADR-0003). A permanent €10/month ceiling is incompatible with always-on Azure; production was already torn down in July to stay under it. And the developer has 3–6 hours a week, against an architecture sized for far more. Static output also serves the product's SEO goal better than SSR.
+- **Trade-off noted**: Retires the FastAPI HTTP API, Postgres, Container Apps, Bicep and Front Door work, and with it the Azure operational experience. Publishing is no longer instant — an article appears when the build finishes (~2 min). The public Next.js site, its Italian routes, its SEO files and the `domain/content` value objects are all retained; the domain layer becomes the build-time validator.
+- **Status**: ✅ Final
+- **Decided by**: Guido
+
+### Publish trigger: explicit “Pubblica” button
+- **Date**: 2026-08-26
+- **Decision**: Publishing is triggered by a “Pubblica” menu item in the editorial Google Sheet, which calls GitHub's `repository_dispatch` API via Apps Script. A nightly scheduled build handles future-dated posts. Drive push notifications are explicitly rejected.
+- **Rationale**: Drive watch channels expire after at most one day (files) or one week (changes) with no automatic renewal, and carry an empty body, so a real webhook would need a second scheduled job purely to stay alive. An explicit button needs no server, cannot silently expire, and gives writers a visible result — the build writes its outcome back into the Sheet's `esito` column.
+- **Trade-off noted**: Publishing requires a deliberate click rather than happening automatically on save.
+- **Status**: ✅ Final
+- **Decided by**: Guido
+
+### Pre-rebuild application preserved as a frozen repository
+- **Date**: 2026-08-26
+- **Decision**: The full-stack FastAPI + Next.js + Azure application is preserved in a new repository, `gweedo/allarounder-legacy`, archived read-only. `gweedo/allarounder` keeps its name, issues and history and carries the rebuild.
+- **Rationale**: The pivot retires roughly two months of work, including seven feature branches that were never merged. Freezing it in a separate repository keeps it recoverable and browsable without leaving dead code in the working repo.
+- **Trade-off noted**: None material — the archive is 1.1 MB.
+- **Status**: ✅ Final
+- **Decided by**: Guido
 
 ---
 

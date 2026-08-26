@@ -46,3 +46,6 @@ playwright/.auth/
 .e2e-compose-started
 src/frontend/playwright-report/
 src/frontend/test-results/
+
+# Local archive of the pre-rebuild app — not part of the project
+_record/

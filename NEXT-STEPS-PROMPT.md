@@ -1,81 +1,193 @@
-# Next-steps handoff prompt (Allarounder)
+# Next-steps handoff prompt (Allarounder) — rebuild onto Drive + static
 
-Paste the section below into a fresh session to continue. It is self-contained.
+Paste everything below the line into a fresh Claude Code session in this repo.
+It is self-contained. Supersedes the June 2026 version of this file, which
+described the Azure deployment effort that has now been retired.
 
 ---
 
-## Context (where things stand as of 2026-06-25)
+## Context
 
-**Staging is fully working end-to-end:** the database schema is migrated, an admin user exists, and
-admin login works (`https://allarounder-staging-frontend.<env>.azurecontainerapps.io/admin/login`).
-Getting there required a long chain of fixes — see `retrospective-skills-orchestrator-2026-06-25.md`
-and `deploy-incident-2026-06-22.md` for the full account. Production has **not** been promoted and
-carries the same latent issues staging did.
+**Allarounder** is an Italian written-articles blog promoting a gymnastics
+podcast hosted on Spotify. The site hosts no audio; each article optionally
+links to an episode. SEO in Italian search is the product goal.
 
-**Known gotchas to respect (these caused most of the pain — don't relearn them):**
-- **Local `main` is diverged from `origin/main`.** Always branch from `origin/main`
-  (`git checkout -b <name> origin/main`) and read deployed code with `git show origin/main:<path>` —
-  never trust the local working tree. See memory `project-local-main-diverged`.
-- **No direct pushes to `main`** — always branch + PR (memory `feedback-no-push-to-main`).
-- **ACA Multiple-revision mode pins traffic.** `az containerapp update` creates a new revision at
-  **0% traffic**; you must `az containerapp ingress traffic set ... --revision-weight <rev>=100` (or
-  let the blue-green CI deploy do it). Always confirm which revision serves traffic before believing
-  a test.
-- **Bicep image params default to the hello-world placeholder.** A full `az deployment group create`
-  must pass the current `backendImage`/`frontendImage` or it reverts the apps to the placeholder.
-- **Some frontend env/secret state on staging was applied via `az` CLI** (frontend Key Vault role,
-  `jwt-signing-key` secret, `API_URL`, `JWT_SECRET_KEY`) because the full Bicep deploy is currently
-  blocked (see Task 1). The Bicep is the source of truth and already declares all of it; the next
-  successful full deploy reconciles the drift.
+On **2026-08-26** the project pivoted. The June architecture — FastAPI HTTP API,
+custom admin UI, Postgres, Azure Container Apps, Front Door, Bicep — is retired.
+Read `docs/DECISIONS.md` (entries dated 2026-08-26) for the full rationale.
+In short:
 
-## Task 1 — Fix the `acr-pull-assignments` idempotency bug (BLOCKS all full Bicep deploys)
+- The three writers work natively in **Google Docs** and will not move to a
+  custom editor, which removed the user for the largest build item (ADR-0003).
+- A permanent **€10/month ceiling**; production was already torn down in July.
+- The developer has **3–6 hours a week**, against an architecture sized for far more.
 
-A full `az deployment group create --template-file infra/main.bicep ...` currently fails in the
-`acr-pull-assignments` module with `RoleAssignmentExists`: the AcrPull role assignments for the
-backend and frontend identities already exist (from first provisioning) under names that differ from
-the current `guid(acrRef.id, principalId, acrPullRoleId)`, and ARM forbids a second assignment for the
-same principal+role+scope.
+**The new shape:** writers author in Google Docs, with a Google Sheet as the
+editorial index. A GitHub Actions job exports the Drive folder, validates it,
+generates Markdown, and publishes a **static** Next.js site to **Cloudflare
+Pages**. No server, no database, no admin UI, no authentication.
 
-- **Why it matters:** it blocks every future infra change *and* the production promotion (Task 2).
-- **Fix options (pick one, validate with `az bicep build`):**
-  1. Reference the existing assignments as `existing` instead of creating them, or
-  2. Make creation conditional / delete-and-recreate the two conflicting assignments so names converge
-     on the deterministic `guid(...)`.
-- **Acceptance:** `az deployment group create ... --parameters backendImage=<cur> frontendImage=<cur>`
-  on staging completes without `RoleAssignmentExists`, and the staging apps keep their real images,
-  Front Door stays on **Standard** (ADR-0015), and the frontend keeps `API_URL` + `JWT_SECRET_KEY`.
-- Open it as a PR from `origin/main`.
+The full plan, including the Sheet schema and what survives, is in the design
+document — ask the user for the link if you need it.
 
-## Task 2 — Promote to production (same playbook we ran on staging)
+## Hard constraints
 
-Production's DB is almost certainly empty (its migration job silently no-op'd like staging's did), and
-its frontend has the same admin-login gaps. After Task 1 makes full Bicep deploys work:
+- **Never push to `main`.** Branch from `origin/main`, open a PR, let the user merge.
+- **Code, comments, commits, docs are English. Site content and content-facing
+  routes (`/articoli/`, `/argomenti/`) are Italian.** Keep these separate.
+- **Nothing that costs money.** Free tiers only. No Azure, no paid plans.
+- **Decisions supersede, they never get rewritten.** New ADR + update
+  `docs/DECISIONS.md`; never edit decision history in place.
+- **TDD** is the project methodology (ADR-0009). Tests before implementation.
+- **Do not touch `_record/`.** It is a gitignored local archive of the
+  pre-rebuild application. Never delete it, never commit it.
 
-1. **Merge any outstanding PRs**, then approve the **production** environment gate so the production
-   deploy runs (migrations execute there for the first time).
-2. **Verify the schema actually exists** (don't trust "job succeeded"): from the
-   `allarounder-production-backend` Portal console, confirm `alembic_version` is at head and the
-   tables (`users`, `articles`, …) exist.
-3. **Bootstrap the production admin:**
-   `python -m cli create-admin --email <email>` in the production backend console.
-4. **Confirm the production frontend** got the new image (runtime `/api/*` route handler), `API_URL`,
-   `JWT_SECRET_KEY`, and the frontend Key Vault role assignment — then test
-   `POST /api/admin/auth/login` returns `200` + `Set-Cookie` and the browser login works.
-5. Run `./infra/scripts/create-postgres-identity.sh production <prod-pg-server>` if not already applied
-   (the schema-grant step must run once per environment).
+## Gotchas — do not rediscover these
 
-## Task 3 (recommended hardening, not blocking)
+- `src/frontend/middleware.ts` exists (admin auth). **Middleware is incompatible
+  with `output: "export"`.** It must be deleted, not adapted.
+- `next.config.ts` currently sets `output: "standalone"` and a `headers:` block.
+  **`headers:` does not work under static export** — those security headers must
+  move to a Cloudflare `_headers` file or they silently vanish.
+- `images.remotePatterns` points at Azure Blob Storage. Under export, set
+  `images: { unoptimized: true }`; images become local files under `content/`.
+- Public pages currently fetch the backend over HTTP at `${apiUrl}/api/articles/<slug>` and set
+  `export const revalidate = 60`. Both go: replace with a filesystem read, and
+  dynamic routes need `generateStaticParams`.
+- The seven July feature branches are a **linear stack** (`session-persistence` →
+  `admin-shell` → `markdown-lib` → `admin-crud-completion` → `public-styling` →
+  `docs-paste-converter` → `google-sso`). Do not cherry-pick. Merge the tip and
+  you get all of it.
+- `fix/seo-meta-length-validation` is a **local-only branch**, one commit, never
+  pushed. It contains the meta title/description length validation. There is **no
+  `Seo` value object** in the domain layer — this branch is where that logic lives.
+- Stack: Next 15.1 / React 19 / TypeScript, Python 3.13, remark+rehype with
+  `rehype-sanitize` for Markdown.
 
-- Add a **login smoke test** to the deploy pipeline: a real `POST /login` asserting `200` + `Set-Cookie`
-  against the deployed stack (would have caught the entire admin-login marathon).
-- Add a **migration round-trip** check is already in CI (`tests/test_migrations.py`) — keep it.
-- Consider switching the frontend Container App to **single-revision mode** to remove the traffic-pinning
-  footgun, and migrating JWT signing to **RS256** so the frontend middleware never needs the signing
-  secret (see retro §4d).
-- Resolve the local-`main` divergence (reset local `main` to `origin/main`) to stop the stale-branch
-  footgun.
+## Task 0 — Archive the pre-rebuild application
 
-## First actions for the new session
-1. `git fetch origin && git checkout -b fix/acr-pull-idempotency origin/main`
-2. Read `infra/modules/acr-pull-assignments.bicep` and decide the fix approach (Task 1).
-3. Confirm with the user before running any `az deployment group create` against staging/production.
+`_record/` contains a bare mirror (11 branches, 203 commits, including PR refs)
+and a verified bundle.
+
+1. Create an empty `gweedo/allarounder-legacy` on GitHub — no README, no
+   .gitignore, no licence.
+2. `cd _record/allarounder-legacy.git && git remote set-url --push origin
+   https://github.com/gweedo/allarounder-legacy.git && git push --mirror`
+3. Archive it (read-only) via the GitHub API or `gh`.
+
+**Acceptance:** all 11 branches visible on the new repo; it shows as archived.
+
+## Task 1 — Merge the stranded stack into `main`
+
+Roughly 40 commits of July work sit on branches and have never reached `main`.
+Get them into history *before* anything is deleted.
+
+1. PR from `origin/feat/google-sso` (the stack tip) into `main`.
+2. Separately, push and PR `fix/seo-meta-length-validation`.
+3. Resolve conflicts conservatively; do not refactor while merging.
+
+**Acceptance:** `main` contains all seven branches' work plus the SEO validation
+commit. CI green, or failures explained in the PR body.
+
+## Task 2 — Strip to a static site
+
+One PR. Large but mechanical.
+
+**Delete:** `src/backend/` except the domain layer (see below); `src/frontend/app/admin/**`;
+`src/frontend/app/api/[...path]/`; `src/frontend/app/preview/**`;
+`src/frontend/middleware.ts`; `components/AdminShell.tsx`, `GuestForm.tsx`,
+`MarkdownEditor.tsx`; `lib/api.ts`, `lib/upload.ts`; `infra/`;
+`.github/workflows/{backend,frontend,postgres-staging}.yml`; `docker-compose.yml`
+and Dockerfiles; the `jose` and `pino` dependencies.
+
+**Keep and move:** `src/backend/app/domain/content/` → `src/pipeline/domain/`.
+It holds `Slug` (with `from_title`), `Body`, `SpotifyUrl`, `PublicationStatus`,
+and entities `Article`, `Author`, `Guest`, `Category`, `Tag`, `StaticPage`.
+Keep its tests. Strip any framework imports that come with it.
+
+**Keep untouched:** every public route (`app/page.tsx`, `articoli/[slug]`,
+`argomenti/[slug]`, `autori/[slug]`, `ospiti/[slug]`, `tag/[slug]`, `[slug]`),
+`app/sitemap.ts`, `app/robots.ts`, `app/globals.css`, `lib/markdown.ts`.
+
+**Convert:** `output: "export"`, `images: { unoptimized: true }`, headers moved to
+`public/_headers`. Replace each page's `fetch()` with a loader reading
+`content/`. **The TypeScript interfaces already declared in those page files
+define the JSON contract** — the pipeline must emit exactly that shape; do not
+invent a new one. Add `generateStaticParams` to every dynamic route.
+
+Ship it with a few committed sample articles in `content/` so the site builds and
+deploys before the pipeline exists. Deploy to Cloudflare Pages and point
+`allarounder.it` at it, with `allarounder.eu` 301-redirecting (ADR-0007).
+
+Also in this PR: **write ADR-0018** recording the pivot and superseding
+ADR-0001, 0002, 0003, 0004, 0005, 0013, 0015, 0016; update `adr/README.md`; and
+**rewrite `CLAUDE.md`**, which is badly stale — it still claims no application
+code exists.
+
+**Acceptance:** `npm run build` produces static output; the site is live on the
+real domain; `.eu` redirects to `.it`; no reference to FastAPI, Postgres, Azure
+or authentication remains outside `docs/` history.
+
+## Task 3 — The Drive pipeline
+
+`src/pipeline/`, Python 3.13, TDD, running only in CI.
+
+- Google service-account auth (Drive + Sheets, read-only on Drive).
+- Read the editorial Sheet: one row per article, columns `titolo`, `doc`,
+  `categoria`, `tag`, `autore`, `ospite`, `spotify`, `copertina`,
+  `meta_description`, `data`, `stato`, `esito`.
+- Publish only rows where `stato = Pubblicato` **and** `data <= now` — this is the
+  read-time filter from `DECISIONS.md`, now applied at build time.
+- Export each Doc via `files.export` with **`application/zip`** (HTML plus every
+  embedded image in one request — more reliable than the Docs JSON for images).
+  `text/markdown` is available for text-only pieces.
+- Convert HTML → Markdown, extract images to `content/images/<slug>/`, and
+  validate through the domain value objects. `meta_description` must be 140–155
+  characters (see the `fix/seo-meta-length-validation` logic).
+- Emit `content/articles/*.md` and `content/index.json` in the shape the site's
+  TypeScript interfaces already declare. **Commit the generated content** — it is
+  the audit trail and makes rollback a `git revert`.
+- Reject bad input with a clear Italian message rather than emitting a broken page.
+- `.github/workflows/publish.yml`: triggers on `repository_dispatch`, a nightly
+  cron (for future-dated posts), and `workflow_dispatch`.
+
+**Acceptance:** a real Doc becomes a live article. A Doc with a 100-character
+meta description fails the build with a message a non-technical writer can act on.
+
+## Task 4 — The Sheet and the “Pubblica” button
+
+- Produce the Apps Script (in `tools/apps-script/`, committed) providing a
+  **“Pubblica”** menu item that calls GitHub `repository_dispatch`.
+- After the build, write the outcome back into the Sheet's `esito` column —
+  `✓ Pubblicato 14:32` or `✗ meta description troppo corta (128, servono 140–155)`.
+  Errors must be in **Italian**; writers read them.
+- Add a **“Nuovo articolo”** item that creates a Doc from a template and fills in
+  the row.
+- Use data validation (dropdowns) for `categoria`, `autore`, `ospite`, `stato` so
+  values cannot be typo'd. Categories: Interviste, Analisi, Roundtable, Out of the Box.
+- Write `docs/product/editorial-workflow.md` **in Italian** — a one-page guide for
+  the three writers.
+
+**Acceptance:** clicking Pubblica publishes within ~2 minutes and the Sheet shows
+the result.
+
+## Credentials — stop and ask
+
+You cannot obtain these. Ask the user, and do not invent, mock, or commit them:
+
+- Google service-account JSON (Drive + Sheets)
+- The Drive folder ID and the Sheet ID
+- Cloudflare API token and account ID
+- A GitHub PAT for Apps Script to call `repository_dispatch`
+
+Secrets go in GitHub Actions secrets and Apps Script script properties. **Never
+in the repo.**
+
+## Working agreement
+
+- One PR per task. Each PR body: what changed, what it deletes, how it was verified.
+- **Stop and ask** before: deleting anything not listed above, adding a paid
+  service, changing the Sheet schema, or touching `docs/DECISIONS.md` history.
+- Log meaningful decisions in `docs/DECISIONS.md` as you go.
+- Start with Task 0, and confirm with the user before starting Task 2 — it is the
+  destructive one.
