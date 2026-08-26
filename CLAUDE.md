@@ -4,9 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this repository is
 
-This is the **planning and specification workspace** for **Allarounder**, an Italian written-articles blog that promotes a podcast hosted on Spotify. **No application code exists yet** — the repo currently holds decisions, ADRs, a tech spec, the site/data-model design, and a content-team questionnaire. The build has not started.
-
-When building begins, code is intended to live in a `src/` monorepo (`src/backend/` FastAPI, `src/frontend/` Next.js) with `infra/` for Bicep IaC — none of these directories exist yet.
+This is the **planning and specification workspace and application repo** for **Allarounder**, an Italian written-articles blog that promotes a podcast hosted on Spotify. The repo holds decisions, ADRs, a tech spec, the site/data-model design, a content-team questionnaire — **and the application build is underway**: a `src/` monorepo with `src/backend/` (FastAPI, Python) and `src/frontend/` (Next.js), both with passing test suites, plus `infra/` (Bicep IaC for the Azure environments).
 
 ## The product in one paragraph
 
@@ -76,7 +74,19 @@ Both CI workflows run their test suite with a **coverage gate before** building/
 
 ## Commands
 
-No build, test, or run commands exist yet — there is no `src/`, `package.json`, `pyproject.toml`, or `Makefile`. Fill this section in once the backend (pytest, alembic, uvicorn) and frontend (Next.js, vitest, playwright) are scaffolded.
+**Backend** (`src/backend/`, Python venv at `src/backend/.venv`):
+- Tests: `cd src/backend && .venv/bin/python -m pytest -q`
+- Migrations: `cd src/backend && .venv/bin/python -m alembic upgrade head` (see `alembic/versions/`)
+- Run the API: `cd src/backend && .venv/bin/uvicorn app.main:app --reload`
+
+**Frontend** (`src/frontend/`, deps installed via `npm install`):
+- Tests: `cd src/frontend && npm test`
+- Type check: `cd src/frontend && npm run typecheck`
+- Lint: `cd src/frontend && npm run lint`
+- E2E (needs Docker; see `e2e/global-setup.ts`): `cd src/frontend && npm run test:e2e:integration`
+- Dev server: `cd src/frontend && npm run dev`
+
+Some environments (e.g. sandboxed CI containers) lack Docker — testcontainers-based backend integration tests and Playwright integration e2e then skip/fail locally and are exercised in CI instead.
 
 The working directory is on Windows; available shells are PowerShell (primary) and a Bash tool for POSIX scripts.
 

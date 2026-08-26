@@ -1,6 +1,6 @@
 import base64
 
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel, HttpUrl, field_validator
 
 
 class SasRequest(BaseModel):
@@ -23,4 +23,12 @@ class SasRequest(BaseModel):
 
 class SasResponse(BaseModel):
     sas_url: str
+    blob_url: str
+
+
+class ImportRequest(BaseModel):
+    url: HttpUrl
+
+
+class ImportResponse(BaseModel):
     blob_url: str

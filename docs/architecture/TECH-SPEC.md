@@ -192,7 +192,7 @@ erDiagram
 Full endpoint list in `SITE-STRUCTURE.md §3`. Two surfaces:
 
 - **Public read API** — published content only (filters `status = published AND publish_at <= now`): articles (list/detail, paginated), categories, tags, guests, authors, events, pages, search. *(Newsletter subscribe is phase 2.)*
-- **Admin API** (auth required) — login; full CRUD for articles (incl. drafts/scheduled), categories, tags, guests, authors, events, pages; media upload; publish/schedule.
+- **Admin API** (auth required) — login (password, and optionally Google SSO via `GET /api/admin/auth/google/login` + `/callback`, see ADR-0017); full CRUD for articles (incl. drafts/scheduled), categories, tags, guests, authors, events, pages; media upload (direct-to-Blob SAS) and media import (server-side re-upload of an external image URL, e.g. from a Google Docs paste); publish/schedule.
 
 Contract: JSON over REST; paginated responses as `{ items, total, page, page_size }`. The OpenAPI schema is the source of truth for the frontend.
 
@@ -274,6 +274,7 @@ Development follows **Test-Driven Development** (red → green → refactor); te
 - **30-min access token + 14-day rotating refresh token** (`refresh_tokens` table); revoked on logout, password change, or by admin.
 - Backend JWT library: **`PyJWT>=2.8.0`** (Python). Frontend Next.js middleware uses the JavaScript **`jose`** library.
 - Passwords hashed with **argon2**; **12-char minimum**, HaveIBeenPwned breach check, soft lockout after 10 failures (5-min cooldown).
+- **Google SSO** (see ADR-0017), feature-flagged (`GOOGLE_SSO_ENABLED`, default off): a backend-driven OIDC authorization-code + PKCE flow (`GET /api/admin/auth/google/login`, `GET /api/admin/auth/google/callback`) that ends by issuing the same cookies as password login — not a second session system. No self-signup: only emails with an existing `User` row can authenticate this way; accounts link by verified email on first login, then by Google's `sub` claim thereafter.
 
 **Authorization**
 - Roles `admin` and `editor` enforced as FastAPI dependencies (`Depends(require_admin)`, `Depends(require_editor_owns_resource)`).

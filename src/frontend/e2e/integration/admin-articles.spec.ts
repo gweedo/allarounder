@@ -10,7 +10,7 @@ async function createArticle(
 ): Promise<string> {
   await page.goto("/admin/articles/new");
   await page.fill("#title", title);
-  await page.fill("#body", body);
+  await page.getByLabel(/testo markdown/i).fill(body);
 
   // Capture the POST response to get the article id before redirect.
   const [response] = await Promise.all([
@@ -94,5 +94,48 @@ test.describe("Admin articles CRUD", () => {
     await page.goto("/");
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
     await expect(page.locator("h2").first()).toBeVisible();
+  });
+});
+
+test.describe("Admin articles filters", () => {
+  test("status filter tabs and row navigation", async ({ page }) => {
+    const title = `Filter Article ${Date.now()}`;
+    const body = "Articolo per il test dei filtri.";
+
+    const id = await createArticle(page, title, body);
+    await page.goto("/admin/articles");
+    await page.waitForLoadState("networkidle");
+
+    // "Tutti" is the default filter — the new draft is visible.
+    await expect(page.getByText(title)).toBeVisible({ timeout: 10_000 });
+
+    // "Bozze" keeps showing the draft.
+    await Promise.all([
+      page.waitForResponse(
+        (r) => r.url().includes("/api/admin/articles?status=draft"),
+        { timeout: 10_000 },
+      ),
+      page.getByRole("button", { name: "Bozze" }).click(),
+    ]);
+    await expect(page.getByText(title)).toBeVisible({ timeout: 10_000 });
+
+    // "Pubblicati" hides the still-draft article.
+    await Promise.all([
+      page.waitForResponse(
+        (r) => r.url().includes("/api/admin/articles?status=published"),
+        { timeout: 10_000 },
+      ),
+      page.getByRole("button", { name: "Pubblicati" }).click(),
+    ]);
+    await expect(page.getByText(title)).toBeHidden();
+
+    // Back to "Tutti", the title row links to the article's edit page.
+    await Promise.all([
+      page.waitForResponse((r) => r.url().endsWith("/api/admin/articles")),
+      page.getByRole("button", { name: "Tutti" }).click(),
+    ]);
+    await page.getByRole("link", { name: title }).click();
+    await page.waitForURL(`**/admin/articles/${id}`);
+    await expect(page.getByLabel(/^titolo$/i)).toHaveValue(title);
   });
 });

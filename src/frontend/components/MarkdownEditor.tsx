@@ -7,6 +7,9 @@ import {
   useRef,
   useState,
 } from "react";
+import { renderMarkdown } from "../lib/markdown";
+import { convertHtmlToMarkdown } from "../lib/html-to-markdown";
+import { importExternalImage } from "../lib/upload";
 
 // ── Pure helpers (exported for unit testing) ──────────────────────────────────
 
@@ -47,19 +50,18 @@ export function insertLinePrefix(
   return { value: newValue, cursorStart: newCursor, cursorEnd: newCursor };
 }
 
-// ── Remark pipeline (browser-side) ───────────────────────────────────────────
-
-async function toHtml(markdown: string): Promise<string> {
-  const { remark } = await import("remark");
-  const { default: remarkRehype } = await import("remark-rehype");
-  const { default: rehypeSanitize } = await import("rehype-sanitize");
-  const { default: rehypeStringify } = await import("rehype-stringify");
-  const file = await remark()
-    .use(remarkRehype, { allowDangerousHtml: false })
-    .use(rehypeSanitize)
-    .use(rehypeStringify)
-    .process(markdown);
-  return String(file);
+/** Replace the current selection with literal text (used for paste insertion). */
+export function insertText(
+  value: string,
+  start: number,
+  end: number,
+  text: string,
+): InsertResult {
+  const before = value.slice(0, start);
+  const after = value.slice(end);
+  const newValue = `${before}${text}${after}`;
+  const cursor = start + text.length;
+  return { value: newValue, cursorStart: cursor, cursorEnd: cursor };
 }
 
 // ── Component ─────────────────────────────────────────────────────────────────
@@ -68,18 +70,42 @@ interface Props {
   value: string;
   onChange: (value: string) => void;
   onUploadImage?: (file: File) => Promise<string>;
+  /** Called with an Italian warning message when some pasted images failed to import. */
+  onImportWarning?: (message: string) => void;
 }
 
-export default function MarkdownEditor({ value, onChange, onUploadImage }: Props) {
+export default function MarkdownEditor({
+  value,
+  onChange,
+  onUploadImage,
+  onImportWarning,
+}: Props) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
   const [preview, setPreview] = useState("");
+  const [importingImages, setImportingImages] = useState(false);
   const pendingCursor = useRef<{ start: number; end: number } | null>(null);
+
+  // Always-current snapshot of `value`, so async paste-image import (which
+  // can finish well after the paste event, and after further edits) rewrites
+  // whichever text is on screen at that moment, not a stale closure.
+  const valueRef = useRef(value);
+  useEffect(() => {
+    valueRef.current = value;
+  }, [value]);
+
+  // Guards state updates from an in-flight image import racing unmount.
+  const mountedRef = useRef(true);
+  useEffect(() => {
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
 
   // Debounced live preview
   useEffect(() => {
     const id = setTimeout(() => {
-      void toHtml(value).then(setPreview);
+      void renderMarkdown(value).then(setPreview);
     }, 300);
     return () => clearTimeout(id);
   }, [value]);
@@ -95,6 +121,12 @@ export default function MarkdownEditor({ value, onChange, onUploadImage }: Props
 
   const applyInsert = useCallback(
     (result: InsertResult) => {
+      // Update the ref synchronously (not just via the `value`-driven effect
+      // above): a paste-driven image import calls importExternalImage right
+      // after this insert, and an already-resolved mock (or a very fast real
+      // response) can settle before React has re-rendered and flushed the
+      // effect, which would otherwise read a stale value.
+      valueRef.current = result.value;
       onChange(result.value);
       pendingCursor.current = {
         start: result.cursorStart,
@@ -133,6 +165,85 @@ export default function MarkdownEditor({ value, onChange, onUploadImage }: Props
       }
     },
     [onUploadImage, value, applyInsert],
+  );
+
+  // Re-upload transient external image URLs (e.g. Google Docs'
+  // lh7-us.googleusercontent.com links) left in pasted markdown, then rewrite
+  // them in place once each import settles. Runs fire-and-forget so the
+  // editor stays usable while imports are in flight (no blocking spinner).
+  const importPastedImages = useCallback(
+    async (urls: string[]) => {
+      setImportingImages(true);
+      const results = await Promise.allSettled(
+        urls.map((url) => importExternalImage(url)),
+      );
+      if (!mountedRef.current) return;
+
+      let updated = valueRef.current;
+      let failures = 0;
+      results.forEach((result, index) => {
+        if (result.status === "fulfilled") {
+          updated = updated.split(urls[index]).join(result.value);
+        } else {
+          failures += 1;
+        }
+      });
+      if (updated !== valueRef.current) {
+        onChange(updated);
+      }
+      setImportingImages(false);
+      if (failures > 0) {
+        const noun =
+          failures === 1 ? "immagine non importata" : "immagini non importate";
+        onImportWarning?.(
+          `${failures} ${noun}: incolla di nuovo o caricale manualmente.`,
+        );
+      }
+    },
+    [onChange, onImportWarning],
+  );
+
+  // Convert any rich-text (`text/html`) paste to Markdown matching the
+  // toolbar's own conventions, rather than dumping raw HTML or Word/Docs
+  // clutter into the article body. This is intentionally not limited to
+  // Google Docs: rich text pasted from any source is converted. Plain-text
+  // clipboard data is left completely untouched (no preventDefault) so a
+  // normal text paste behaves exactly as the browser default.
+  const handlePaste = useCallback(
+    async (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
+      const html = e.clipboardData.getData("text/html");
+      if (!html || !html.trim()) return;
+
+      e.preventDefault();
+      const plainText = e.clipboardData.getData("text/plain");
+      const [start, end] = sel();
+
+      let markdown = "";
+      let externalImages: string[] = [];
+      try {
+        const converted = await convertHtmlToMarkdown(html);
+        markdown = converted.markdown;
+        externalImages = converted.externalImages;
+      } catch {
+        markdown = "";
+      }
+
+      if (!markdown.trim()) {
+        // Conversion produced nothing usable — fall back to inserting the
+        // plain-text payload ourselves (we already prevented the default).
+        if (plainText) {
+          applyInsert(insertText(valueRef.current, start, end, plainText));
+        }
+        return;
+      }
+
+      applyInsert(insertText(valueRef.current, start, end, markdown));
+
+      if (externalImages.length > 0) {
+        void importPastedImages(externalImages);
+      }
+    },
+    [applyInsert, importPastedImages],
   );
 
   const toolbarBtn = (label: string, action: () => void) => (
@@ -191,11 +302,20 @@ export default function MarkdownEditor({ value, onChange, onUploadImage }: Props
           </>
         )}
       </div>
+      {importingImages && (
+        <p
+          aria-live="polite"
+          style={{ fontSize: "0.85rem", color: "#666", margin: "0 0 0.5rem" }}
+        >
+          Importazione immagini…
+        </p>
+      )}
       <div style={{ display: "flex", gap: "1rem" }}>
         <textarea
           ref={textareaRef}
           value={value}
           onChange={(e) => onChange(e.target.value)}
+          onPaste={(e) => void handlePaste(e)}
           rows={15}
           style={{ flex: 1, fontFamily: "monospace", padding: "0.5rem" }}
           aria-label="Testo Markdown"

@@ -28,3 +28,7 @@ class UserNotFoundError(IdentityError):
 
 class UserInactiveError(IdentityError):
     pass
+
+
+class GoogleAccountMismatchError(IdentityError):
+    """Raised when a user's Google account is already linked to a different sub."""

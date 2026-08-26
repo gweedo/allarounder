@@ -38,4 +38,39 @@ test.describe("Admin authors", () => {
     await page.goto(`/autori/${slug}`);
     await expect(page.getByRole("heading", { level: 1, name })).toBeVisible();
   });
+
+  test("edit author → changes persist round-trip", async ({ page }) => {
+    const name = `Autore Edit ${Date.now()}`;
+    const updatedBio = "Bio aggiornata durante il test di integrazione.";
+
+    await page.goto("/admin/authors");
+    await page.waitForLoadState("networkidle");
+    await page.fill("#author-name", name);
+    await page.getByRole("button", { name: /crea autore/i }).click();
+    await expect(page.getByText(name)).toBeVisible({ timeout: 10_000 });
+
+    // Follow the "Modifica" link for the newly created author
+    const row = page.locator("li").filter({ hasText: name });
+    await row.getByRole("link", { name: /modifica/i }).click();
+    await page.waitForURL(/\/admin\/authors\/[^/]+$/);
+
+    await expect(page.getByLabel(/nome \*/i)).toHaveValue(name);
+    await page.fill("#author-bio", updatedBio);
+
+    await Promise.all([
+      page.waitForResponse(
+        (r) => r.url().includes("/api/admin/authors/") && r.request().method() === "PUT",
+        { timeout: 10_000 },
+      ),
+      page.getByRole("button", { name: /salva/i }).click(),
+    ]);
+
+    // Redirects back to the list
+    await page.waitForURL("**/admin/authors");
+    await expect(page.getByText(name)).toBeVisible({ timeout: 10_000 });
+
+    // Re-open the edit page and verify the bio persisted
+    await page.locator("li").filter({ hasText: name }).getByRole("link", { name: /modifica/i }).click();
+    await expect(page.getByLabel(/^bio$/i)).toHaveValue(updatedBio);
+  });
 });

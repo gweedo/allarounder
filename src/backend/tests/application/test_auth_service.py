@@ -30,6 +30,9 @@ class InMemoryUserRepo:
     def get_by_email(self, email: Email) -> User | None:
         return next((u for u in self._users.values() if u.email == email), None)
 
+    def get_by_google_sub(self, sub: str) -> User | None:
+        return next((u for u in self._users.values() if u.google_sub == sub), None)
+
     def save(self, user: User) -> None:
         self._users[user.id] = user
 
@@ -202,6 +205,34 @@ class TestLogin:
         result = svc.login("ADMIN@EXAMPLE.COM", "verysecurepassword!", _now())
         assert result["access_token"]
 
+    def test_defaults_to_persistent_session(self) -> None:
+        svc, user_repo, _ = _make_service()
+        _seed_user(user_repo)
+        result = svc.login("admin@example.com", "verysecurepassword!", _now())
+        assert result["persistent"] is True
+
+    def test_remember_me_false_stores_non_persistent_token(self) -> None:
+        svc, user_repo, token_repo = _make_service()
+        _seed_user(user_repo)
+        result = svc.login(
+            "admin@example.com", "verysecurepassword!", _now(), remember_me=False
+        )
+        assert result["persistent"] is False
+        stored = token_repo.get_by_hash(_hash_token(result["refresh_token"]))
+        assert stored is not None
+        assert stored.persistent is False
+
+    def test_remember_me_true_stores_persistent_token(self) -> None:
+        svc, user_repo, token_repo = _make_service()
+        _seed_user(user_repo)
+        result = svc.login(
+            "admin@example.com", "verysecurepassword!", _now(), remember_me=True
+        )
+        assert result["persistent"] is True
+        stored = token_repo.get_by_hash(_hash_token(result["refresh_token"]))
+        assert stored is not None
+        assert stored.persistent is True
+
 
 # ── Refresh tests ─────────────────────────────────────────────────────────────
 
@@ -259,6 +290,32 @@ class TestRefresh:
         svc, user_repo, _ = _make_service()
         with pytest.raises(TokenRevokedError):
             svc.refresh("unknown-token", _now())
+
+    def test_rotated_token_inherits_non_persistent_flag(self) -> None:
+        svc, user_repo, token_repo = _make_service()
+        _seed_user(user_repo)
+        now = _now()
+        login_result = svc.login(
+            "admin@example.com", "verysecurepassword!", now, remember_me=False
+        )
+        refresh_result = svc.refresh(login_result["refresh_token"], now)
+        assert refresh_result["persistent"] is False
+        stored = token_repo.get_by_hash(_hash_token(refresh_result["refresh_token"]))
+        assert stored is not None
+        assert stored.persistent is False
+
+    def test_rotated_token_inherits_persistent_flag(self) -> None:
+        svc, user_repo, token_repo = _make_service()
+        _seed_user(user_repo)
+        now = _now()
+        login_result = svc.login(
+            "admin@example.com", "verysecurepassword!", now, remember_me=True
+        )
+        refresh_result = svc.refresh(login_result["refresh_token"], now)
+        assert refresh_result["persistent"] is True
+        stored = token_repo.get_by_hash(_hash_token(refresh_result["refresh_token"]))
+        assert stored is not None
+        assert stored.persistent is True
 
 
 # ── Logout tests ──────────────────────────────────────────────────────────────

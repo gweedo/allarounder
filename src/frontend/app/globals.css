@@ -1,0 +1,687 @@
+/*
+ * Global stylesheet: design tokens + a small set of semantic component
+ * classes shared by the admin UI and the public site. See
+ * docs/DECISIONS.md — "Styling: single global stylesheet with design
+ * tokens" — for the rationale (no Tailwind/CSS-modules/CSS-in-JS).
+ */
+
+:root {
+  /* Color palette — warm, restrained editorial tone */
+  --color-text: #1a1613;
+  --color-text-muted: #6b6560;
+  --color-bg: #fdfbf9;
+  --color-surface: #ffffff;
+  --color-border: #e4dfda;
+  --color-accent: #a8462f;
+  --color-accent-hover: #8a3a27;
+  --color-danger: #b3261e;
+  --color-danger-hover: #922019;
+  --color-danger-bg: #fdecea;
+
+  /* Spacing scale */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+
+  /* Radius */
+  --radius: 6px;
+
+  /* Fonts */
+  --font-sans:
+    system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-serif: Georgia, "Times New Roman", serif; /* article reading face, see .article-body */
+  --font-mono:
+    ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono",
+    monospace;
+
+  /* Type scale */
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.5rem;
+  --text-2xl: 2rem;
+  --text-article: 1.2rem; /* article-body reading size, ~1.15-1.25rem */
+}
+
+/* Minimal reset */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  line-height: 1.5;
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  color: var(--color-text);
+  background: var(--color-bg);
+}
+
+/*
+ * `.admin-shell`/`.admin-bare` (see AdminShell.tsx) now only need the
+ * min-height for their layout — font/color/background come from `body`,
+ * which public pages share as of M5.
+ */
+.admin-shell,
+.admin-bare {
+  min-height: 100vh;
+}
+
+/* Semantic component classes */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  font-size: var(--text-sm);
+  font-family: inherit;
+  border-radius: var(--radius);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.btn-primary {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: #fff;
+}
+
+.btn-primary:not(:disabled):hover {
+  background: var(--color-accent-hover);
+  border-color: var(--color-accent-hover);
+}
+
+.btn-danger {
+  background: var(--color-danger);
+  border-color: var(--color-danger);
+  color: #fff;
+}
+
+.btn-danger:not(:disabled):hover {
+  background: var(--color-danger-hover);
+  border-color: var(--color-danger-hover);
+}
+
+.label {
+  display: block;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  margin-bottom: var(--space-1);
+}
+
+.input {
+  display: block;
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-base);
+  font-family: inherit;
+  color: var(--color-text);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+}
+
+.input:focus {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 1px;
+}
+
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: var(--space-4);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-sm);
+}
+
+.table th,
+.table td {
+  text-align: left;
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.table th {
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.table tbody tr:hover {
+  background: var(--color-bg);
+}
+
+.badge {
+  display: inline-block;
+  padding: var(--space-1) var(--space-2);
+  font-size: var(--text-sm);
+  border-radius: var(--radius);
+  background: var(--color-border);
+  color: var(--color-text);
+}
+
+.alert-error {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius);
+  background: var(--color-danger-bg);
+  color: var(--color-danger);
+  font-size: var(--text-sm);
+}
+
+/*
+ * Article-body typography — the SEO-critical reading experience for
+ * published articles and static pages. Applied to the sanitized HTML
+ * rendered from Markdown (see lib/markdown.ts) wherever it lands:
+ * app/articoli/[slug], app/preview/articles/[token], app/[slug], and the
+ * editor's live preview pane (`.article-body.markdown-preview` in
+ * MarkdownEditor.tsx) — writers preview what readers see.
+ */
+
+.article-body {
+  font-family: var(--font-serif);
+  font-size: var(--text-article);
+  line-height: 1.7;
+  color: var(--color-text);
+}
+
+.article-body > *:first-child {
+  margin-top: 0;
+}
+
+.article-body h1,
+.article-body h2,
+.article-body h3,
+.article-body h4,
+.article-body h5,
+.article-body h6 {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--color-text);
+}
+
+.article-body h2 {
+  margin: var(--space-6) 0 var(--space-3);
+  font-size: var(--text-xl);
+}
+
+.article-body h3 {
+  margin: var(--space-5) 0 var(--space-2);
+  font-size: 1.25rem;
+}
+
+.article-body h4,
+.article-body h5,
+.article-body h6 {
+  margin: var(--space-5) 0 var(--space-2);
+  font-size: var(--text-lg);
+}
+
+.article-body p {
+  margin: 0 0 var(--space-5);
+}
+
+.article-body ul,
+.article-body ol {
+  margin: 0 0 var(--space-5);
+  padding-left: var(--space-6);
+}
+
+.article-body li {
+  margin: 0;
+}
+
+.article-body li + li {
+  margin-top: var(--space-2);
+}
+
+.article-body li > ul,
+.article-body li > ol {
+  margin-top: var(--space-2);
+  margin-bottom: 0;
+}
+
+.article-body blockquote {
+  margin: var(--space-5) 0;
+  padding: var(--space-1) var(--space-5);
+  border-left: 3px solid var(--color-accent);
+  color: var(--color-text-muted);
+  font-style: italic;
+}
+
+.article-body blockquote > *:last-child {
+  margin-bottom: 0;
+}
+
+.article-body a {
+  color: var(--color-accent);
+  text-decoration: underline;
+}
+
+.article-body a:hover,
+.article-body a:focus-visible {
+  color: var(--color-accent-hover);
+}
+
+.article-body img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--radius);
+  margin: var(--space-5) 0;
+}
+
+.article-body code {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  background: var(--color-border);
+  padding: 0.15em 0.4em;
+  border-radius: 4px;
+}
+
+.article-body pre {
+  margin: 0 0 var(--space-5);
+  padding: var(--space-4);
+  background: var(--color-text);
+  color: var(--color-bg);
+  border-radius: var(--radius);
+  overflow-x: auto;
+}
+
+.article-body pre code {
+  background: none;
+  padding: 0;
+  color: inherit;
+  font-size: 0.85em;
+}
+
+.article-body hr {
+  margin: var(--space-6) 0;
+  border: none;
+  border-top: 1px solid var(--color-border);
+}
+
+/* Public page layout */
+
+.page-container {
+  max-width: 70ch;
+  margin: var(--space-6) auto;
+  padding: 0 var(--space-4);
+}
+
+.page-container--wide {
+  max-width: 1100px;
+}
+
+.site-title {
+  margin: 0 0 var(--space-6);
+  font-size: var(--text-xl);
+  font-weight: 700;
+}
+
+.site-title a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.page-header {
+  margin-bottom: var(--space-6);
+}
+
+.page-lede {
+  font-size: var(--text-lg);
+  color: var(--color-text-muted);
+}
+
+.page-count {
+  color: var(--color-text-muted);
+}
+
+.page-banner {
+  margin-bottom: var(--space-5);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid #f59e0b;
+  border-radius: var(--radius);
+  background: #fef3c7;
+  color: #92400e;
+  font-weight: 600;
+}
+
+/* Profile header (author/guest pages) */
+
+.profile-header {
+  display: flex;
+  gap: var(--space-5);
+  align-items: flex-start;
+  margin-bottom: var(--space-6);
+}
+
+.profile-photo {
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.profile-bio {
+  color: var(--color-text-muted);
+}
+
+.profile-links {
+  display: flex;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+}
+
+.profile-links a {
+  color: var(--color-accent);
+  font-size: var(--text-sm);
+  text-decoration: none;
+}
+
+.profile-links a:hover,
+.profile-links a:focus-visible {
+  text-decoration: underline;
+}
+
+/* Article hero + cards (home page) */
+
+.hero {
+  margin-bottom: var(--space-6);
+  padding-bottom: var(--space-5);
+  border-bottom: 2px solid var(--color-text);
+}
+
+.hero-title {
+  margin: 0 0 var(--space-2);
+  font-size: var(--text-2xl);
+}
+
+.hero-excerpt {
+  margin: var(--space-2) 0 var(--space-4);
+  font-size: var(--text-lg);
+  color: var(--color-text-muted);
+}
+
+.hero-cta {
+  display: inline-block;
+  padding: var(--space-2) var(--space-5);
+  border-radius: var(--radius);
+  background: var(--color-text);
+  color: #fff;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.card-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--space-6);
+}
+
+/* Article list (category/author/guest/tag listing pages) */
+
+.article-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-5);
+}
+
+.article-list-item {
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: var(--space-5);
+}
+
+.cover-image {
+  position: relative;
+  width: 100%;
+  margin-bottom: var(--space-3);
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--color-border);
+}
+
+.cover-image img {
+  object-fit: cover;
+}
+
+.category-badge {
+  display: inline-block;
+  margin-bottom: var(--space-2);
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius);
+  background: var(--color-text);
+  color: #fff;
+  font-size: var(--text-sm);
+  text-decoration: none;
+}
+
+.category-badge--muted {
+  background: var(--color-border);
+  color: var(--color-text);
+}
+
+.card-title {
+  margin: 0 0 var(--space-2);
+}
+
+.card-title a,
+.article-title a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.article-title {
+  margin: 0 0 var(--space-1);
+}
+
+.article-excerpt {
+  color: var(--color-text-muted);
+}
+
+.article-meta {
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+.article-meta a {
+  color: var(--color-text-muted);
+  text-decoration: underline;
+}
+
+.tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+}
+
+.tag-pill {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius);
+  background: var(--color-border);
+  color: var(--color-text);
+  font-size: var(--text-sm);
+  text-decoration: none;
+}
+
+.spotify-callout {
+  margin-top: var(--space-6);
+  padding: var(--space-4);
+  border: 1px solid #1db954;
+  border-radius: var(--radius);
+}
+
+.spotify-callout a {
+  color: #1db954;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.pagination-nav {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-4);
+  margin-top: var(--space-6);
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--color-border);
+}
+
+.pagination-nav a {
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+.pagination-status {
+  padding: var(--space-2) 0;
+  color: var(--color-text-muted);
+}
+
+/* Site footer */
+
+.site-footer {
+  margin-top: var(--space-6);
+  padding: var(--space-6) var(--space-4);
+  border-top: 1px solid var(--color-border);
+  text-align: center;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+.site-footer nav a {
+  margin-right: var(--space-5);
+  color: var(--color-text-muted);
+  text-decoration: none;
+}
+
+.site-footer nav a:last-child {
+  margin-right: 0;
+}
+
+.site-footer nav a:hover,
+.site-footer nav a:focus-visible {
+  text-decoration: underline;
+}
+
+.site-footer p {
+  margin-top: var(--space-4);
+}
+
+/* Admin shell layout */
+
+.admin-shell {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+}
+
+.admin-shell-sidebar {
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-4);
+  background: var(--color-surface);
+  border-right: 1px solid var(--color-border);
+}
+
+.admin-shell-brand {
+  font-size: var(--text-lg);
+  font-weight: 700;
+  margin-bottom: var(--space-5);
+}
+
+.admin-shell-nav {
+  flex: 1;
+}
+
+.admin-shell-nav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.admin-shell-nav a {
+  display: block;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius);
+  color: var(--color-text);
+  text-decoration: none;
+  font-size: var(--text-sm);
+}
+
+.admin-shell-nav a:hover {
+  background: var(--color-bg);
+}
+
+.admin-shell-nav a[aria-current="page"] {
+  background: var(--color-accent);
+  color: #fff;
+  font-weight: 600;
+}
+
+.admin-shell-logout {
+  margin-top: var(--space-4);
+  width: 100%;
+}
+
+.admin-shell-content {
+  overflow-y: auto;
+  padding: var(--space-4);
+}
+
+@media (max-width: 768px) {
+  .admin-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-shell-sidebar {
+    flex-direction: row;
+    align-items: center;
+    border-right: none;
+    border-bottom: 1px solid var(--color-border);
+    overflow-x: auto;
+  }
+
+  .admin-shell-brand {
+    margin-bottom: 0;
+    margin-right: var(--space-4);
+    white-space: nowrap;
+  }
+
+  .admin-shell-nav ul {
+    flex-direction: row;
+  }
+
+  .admin-shell-logout {
+    width: auto;
+    margin-top: 0;
+    margin-left: var(--space-2);
+    white-space: nowrap;
+  }
+}

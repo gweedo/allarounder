@@ -62,30 +62,24 @@ export default async function AuthorPage({ params }: Props) {
   if (!data) notFound();
 
   return (
-    <main style={{ maxWidth: 900, margin: "2rem auto", padding: "0 1rem" }}>
-      <header style={{ display: "flex", gap: "1.5rem", alignItems: "flex-start", marginBottom: "2rem" }}>
+    <main className="page-container page-container--wide">
+      <header className="profile-header">
         {data.photo_url && (
           <Image
             src={data.photo_url}
             alt={`Foto di ${data.name}`}
             width={120}
             height={120}
-            style={{ borderRadius: "50%", objectFit: "cover" }}
+            className="profile-photo"
           />
         )}
         <div>
           <h1 style={{ marginBottom: "0.5rem" }}>{data.name}</h1>
-          {data.bio && <p style={{ color: "#555" }}>{data.bio}</p>}
+          {data.bio && <p className="profile-bio">{data.bio}</p>}
           {Object.entries(data.links).length > 0 && (
-            <div style={{ display: "flex", gap: "0.75rem", marginTop: "0.5rem" }}>
+            <div className="profile-links">
               {Object.entries(data.links).map(([label, url]) => (
-                <a
-                  key={label}
-                  href={url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{ color: "#1a73e8", textDecoration: "none", fontSize: "0.9rem" }}
-                >
+                <a key={label} href={url} target="_blank" rel="noopener noreferrer">
                   {label}
                 </a>
               ))}
@@ -93,40 +87,34 @@ export default async function AuthorPage({ params }: Props) {
           )}
         </div>
       </header>
-      <p style={{ color: "#888", marginBottom: "1.5rem" }}>
+      <p className="page-count" style={{ marginBottom: "1.5rem" }}>
         {data.total} {data.total === 1 ? "articolo pubblicato" : "articoli pubblicati"}
       </p>
       {data.articles.length === 0 ? (
         <p>Nessun articolo pubblicato da questo autore.</p>
       ) : (
-        <ul style={{ listStyle: "none", padding: 0, display: "grid", gap: "1.5rem" }}>
+        <ul className="article-list">
           {data.articles.map((article) => (
-            <li
-              key={article.id}
-              style={{ borderBottom: "1px solid #eee", paddingBottom: "1.5rem" }}
-            >
+            <li key={article.id} className="article-list-item">
               {article.cover_image_url && (
-                <div style={{ position: "relative", width: "100%", height: 200 }}>
+                <div className="cover-image" style={{ height: 200 }}>
                   <Image
                     src={article.cover_image_url}
                     alt={article.cover_image_alt ?? `Copertina: ${article.title}`}
                     fill
-                    style={{ objectFit: "cover", borderRadius: 6 }}
+                    style={{ objectFit: "cover" }}
                   />
                 </div>
               )}
-              <h2 style={{ marginTop: "0.75rem" }}>
-                <a
-                  href={`/articoli/${article.slug}`}
-                  style={{ textDecoration: "none", color: "inherit" }}
-                >
-                  {article.title}
-                </a>
+              <h2 className="card-title" style={{ marginTop: "0.75rem" }}>
+                <a href={`/articoli/${article.slug}`}>{article.title}</a>
               </h2>
               {article.excerpt && (
-                <p style={{ color: "#555", marginTop: "0.5rem" }}>{article.excerpt}</p>
+                <p className="article-excerpt" style={{ marginTop: "0.5rem" }}>
+                  {article.excerpt}
+                </p>
               )}
-              <div style={{ color: "#888", fontSize: "0.875rem", marginTop: "0.5rem" }}>
+              <div className="article-meta" style={{ marginTop: "0.5rem" }}>
                 <time dateTime={article.publish_at}>
                   {new Date(article.publish_at).toLocaleDateString("it-IT")}
                 </time>

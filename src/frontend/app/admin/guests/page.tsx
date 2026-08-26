@@ -45,14 +45,20 @@ export default function AdminGuestsPage() {
   if (loading) return <p>Caricamento...</p>;
 
   return (
-    <main style={{ maxWidth: 800, margin: "2rem auto", padding: "0 1rem" }}>
+    <main className="page-container">
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <h1>Ospiti</h1>
         <Link href="/admin/guests/new">
-          <button type="button">Nuovo ospite</button>
+          <button type="button" className="btn btn-primary">
+            Nuovo ospite
+          </button>
         </Link>
       </div>
-      {error && <p role="alert" style={{ color: "red" }}>{error}</p>}
+      {error && (
+        <p role="alert" className="alert-error">
+          {error}
+        </p>
+      )}
       {guests.length === 0 ? (
         <p>Nessun ospite creato.</p>
       ) : (
@@ -65,12 +71,12 @@ export default function AdminGuestsPage() {
                 justifyContent: "space-between",
                 alignItems: "center",
                 padding: "0.75rem 0",
-                borderBottom: "1px solid #eee",
+                borderBottom: "1px solid var(--color-border)",
               }}
             >
               <div>
                 <strong>{guest.name}</strong>
-                <span style={{ color: "#888", fontSize: "0.875rem", marginLeft: "0.5rem" }}>
+                <span className="article-meta" style={{ marginLeft: "0.5rem" }}>
                   /{guest.slug}
                 </span>
               </div>
@@ -78,8 +84,8 @@ export default function AdminGuestsPage() {
                 <Link href={`/admin/guests/${guest.id}`}>Modifica</Link>
                 <button
                   type="button"
+                  className="btn btn-danger"
                   onClick={() => void handleDelete(guest.id)}
-                  style={{ color: "red", background: "none", border: "none", cursor: "pointer" }}
                 >
                   Elimina
                 </button>

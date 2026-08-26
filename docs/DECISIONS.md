@@ -278,6 +278,34 @@ Last updated: 2026-06-14
 - **Status**: ✅ Final
 - **Decided by**: Team
 
+### Session persistence via rotating refresh token + "Ricordami"
+- **Date**: 2026-07-07
+- **Decision**: Writers stay signed in across the 30-minute access-token lifetime via a middleware-driven silent refresh, instead of being bounced to `/admin/login` every time the access token expires. The Next.js admin `middleware.ts` catches a missing/expired `access_token` cookie, calls the backend `/api/admin/auth/refresh` endpoint server-to-server using the `refresh_token` cookie, and relays the rotated `Set-Cookie` headers onto the response before letting the request through. Client-side fetches get the same behavior via a shared `apiFetch` wrapper (`src/frontend/lib/api.ts`) that retries a single 401 after a **single-flight** refresh (concurrent 401s share one in-flight refresh call, not one per request). A **"Ricordami per 14 giorni"** checkbox on the login form (default checked) sends `remember_me` to `/api/admin/auth/login`; the resulting refresh token carries a `persistent` flag (`RefreshToken.persistent`, default `true`) that controls whether the `refresh_token` cookie is a 14-day persistent cookie or a browser-session cookie (no `Max-Age`). The flag is preserved across rotation — `/refresh` re-issues a token that inherits the prior token's `persistent` value — so an unchecked "Ricordami" doesn't silently regain persistence after the first silent refresh.
+- **Rationale**: The access token's short lifetime is a deliberate security trade-off (ADR-0013), but it was logging writers out mid-edit every 30 minutes with no compensating refresh path, which is a usability regression for non-technical content editors. A refresh-token-backed silent refresh keeps the short access-token window while giving writers a session that survives it; the "Ricordami" checkbox lets a writer opt out of persistence (e.g. on a shared machine) by falling back to an ordinary session cookie.
+- **Status**: ✅ Final
+- **Decided by**: Guido + Claude (Milestone 1 of the admin-UX plan)
+
+### Styling: single global stylesheet with design tokens
+- **Date**: 2026-07-07
+- **Decision**: Style the app with one hand-written stylesheet, `src/frontend/app/globals.css`, imported once at the top of the root layout. It defines CSS custom properties as design tokens (color palette, spacing scale, radius, font stacks including a reserved `--font-serif` for article body typography, and a type scale) plus a small set of semantic component classes (`.btn`/`.btn-primary`/`.btn-danger`, `.input`, `.label`, `.card`, `.table`, `.badge`, `.alert-error`) and the `.admin-shell` layout classes used by the new admin sidebar. No Tailwind, CSS Modules, or CSS-in-JS.
+- **Rationale**: Solo-dev pragmatism — zero build config or extra dependencies beyond what Next.js already ships with. A plain stylesheet with tokens is enough for a small admin UI and public site; the SEO-critical `.article-body` typography (arriving in M5) needs a real stylesheet regardless, so introducing one now rather than layering a utility framework or CSS-in-JS on top avoids churn later. Public pages keep their pre-existing inline styles for now (inline styles win over class styles) and will be migrated to the same token system in M5.
+- **Status**: ✅ Final
+- **Decided by**: Guido + Claude (Milestone 2 of the admin-UX plan)
+
+### Google Docs import: paste-first (Phase A)
+- **Date**: 2026-07-07
+- **Decision**: Writers get a Google Docs → Markdown converter built into the admin article editor's paste handler (`src/frontend/lib/html-to-markdown.ts`, wired into `MarkdownEditor`'s `onPaste`), plus a server-side `POST /api/admin/media/import` endpoint that re-uploads any transient image URLs the paste leaves behind (Docs serves pasted images from an expiring `googleusercontent.com` link) to our own Blob Storage. A full Google Drive Picker / Docs API import flow (browsing and pulling a whole Doc by picking it from Drive, rather than copy-pasting its content) is deferred until paste-based import proves insufficient for the writers' workflow.
+- **Rationale**: The three non-technical writers already draft in Google Docs; converting what they paste is a small, self-contained addition to the existing custom admin editor and needs no new Google API scopes, OAuth consent screen, or Drive integration. A full Picker-based import is a materially larger build (Google API client, file browsing UI, auth scope, token storage) that isn't justified until paste is shown to be a poor fit in practice.
+- **Status**: ✅ Final
+- **Decided by**: Guido + Claude (Milestone 6). If Phase B (Drive Picker import) is ever built, it will get its own ADR-0018.
+
+### Google SSO for admin login (backend-driven OIDC)
+- **Date**: 2026-07-07
+- **Decision**: Add Google Sign-In as a second, feature-flagged (`GOOGLE_SSO_ENABLED`, default off) login method for the admin UI, alongside — not instead of — password login. The backend (not NextAuth, not the frontend) owns the full OAuth authorization-code + PKCE flow: `GET /api/admin/auth/google/login` redirects to Google, `GET /api/admin/auth/google/callback` verifies the id_token, calls `AuthService.login_with_google`, and issues the same cookies password login does. Only emails that already have a `User` row can authenticate this way — Google is an authentication method, not a registration channel; there is still no self-signup. Accounts link by verified email on first login, then by the immutable Google `sub` for every login after that.
+- **Rationale**: The team already lives in Google Workspace/Gmail; removing one password for the people who want that is low-risk once it's built to not create a second session system or a signup backdoor. See [ADR-0017](architecture/adr/0017-google-sso-and-session-persistence.md) for the full decision, the NextAuth rejection, and two `SameSite=Strict` cookie gotchas the OAuth redirect chain runs into.
+- **Status**: ✅ Final
+- **Decided by**: Guido + Claude (Milestone 7)
+
 ---
 
 ## 🔄 Provisional / Supporting Decisions

@@ -20,6 +20,7 @@ def _model_to_user(m: UserModel) -> User:
         created_at=m.created_at,
         failed_login_count=m.failed_login_count,
         locked_until=m.locked_until,
+        google_sub=m.google_sub,
     )
 
 
@@ -30,6 +31,7 @@ def _model_to_refresh_token(m: RefreshTokenModel) -> RefreshToken:
         token_hash=m.token_hash,
         expires_at=m.expires_at,
         revoked_at=m.revoked_at,
+        persistent=m.persistent,
     )
 
 
@@ -45,6 +47,10 @@ class SqlUserRepository:
         m = self._session.query(UserModel).filter_by(email=email.value).first()
         return _model_to_user(m) if m else None
 
+    def get_by_google_sub(self, sub: str) -> User | None:
+        m = self._session.query(UserModel).filter_by(google_sub=sub).first()
+        return _model_to_user(m) if m else None
+
     def save(self, user: User) -> None:
         m = self._session.get(UserModel, user.id)
         if m is None:
@@ -54,6 +60,7 @@ class SqlUserRepository:
         m.is_active = user.is_active
         m.failed_login_count = user.failed_login_count
         m.locked_until = user.locked_until
+        m.google_sub = user.google_sub
 
     def add(self, user: User) -> None:
         m = UserModel(
@@ -65,6 +72,7 @@ class SqlUserRepository:
             created_at=user.created_at,
             failed_login_count=user.failed_login_count,
             locked_until=user.locked_until,
+            google_sub=user.google_sub,
         )
         self._session.add(m)
 
@@ -88,6 +96,7 @@ class SqlRefreshTokenRepository:
             token_hash=token.token_hash,
             expires_at=token.expires_at,
             revoked_at=token.revoked_at,
+            persistent=token.persistent,
         )
         self._session.add(m)
 

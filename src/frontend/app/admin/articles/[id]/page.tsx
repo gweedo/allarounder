@@ -280,83 +280,85 @@ export default function EditArticlePage({ params }: Props) {
   if (!article) return <p role="alert">{error ?? "Articolo non trovato."}</p>;
 
   return (
-    <main style={{ maxWidth: 800, margin: "2rem auto", padding: "0 1rem" }}>
+    <main className="page-container page-container--wide">
       <h1>Modifica articolo</h1>
       <p>
         Stato: <strong>{article.status}</strong>
         {article.reading_time && (
-          <span style={{ marginLeft: "1rem", color: "#666" }}>
+          <span className="article-meta" style={{ marginLeft: "1rem" }}>
             {article.reading_time} min di lettura
           </span>
         )}
       </p>
       {error && (
-        <p role="alert" style={{ color: "red" }}>
+        <p role="alert" className="alert-error">
           {error}
         </p>
       )}
       <form onSubmit={handleSave}>
         <div>
-          <label htmlFor="title">Titolo</label>
-          <br />
+          <label htmlFor="title" className="label">
+            Titolo
+          </label>
           <input
             id="title"
             type="text"
+            className="input"
             required
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            style={{ width: "100%", marginTop: "0.25rem" }}
           />
         </div>
         <div style={{ marginTop: "1rem" }}>
-          <label htmlFor="slug">Slug</label>
-          <br />
+          <label htmlFor="slug" className="label">
+            Slug
+          </label>
           {article.slug_locked ? (
             <input
               id="slug"
               type="text"
+              className="input"
               value={slug}
               readOnly
               aria-label="slug (bloccato)"
-              style={{ width: "100%", marginTop: "0.25rem", background: "#eee" }}
+              style={{ background: "var(--color-border)" }}
             />
           ) : (
             <input
               id="slug"
               type="text"
+              className="input"
               value={slug}
               onChange={(e) => setSlug(e.target.value)}
-              style={{ width: "100%", marginTop: "0.25rem" }}
             />
           )}
         </div>
         <div style={{ marginTop: "1rem" }}>
-          <label htmlFor="excerpt">
+          <label htmlFor="excerpt" className="label">
             Estratto ({excerpt.length}/300)
           </label>
-          <br />
           <textarea
             id="excerpt"
+            className="input"
             rows={3}
             maxLength={300}
             value={excerpt}
             onChange={(e) => setExcerpt(e.target.value)}
-            style={{ width: "100%", marginTop: "0.25rem" }}
           />
         </div>
         <div style={{ marginTop: "1rem" }}>
-          <label>Testo (Markdown)</label>
-          <div style={{ marginTop: "0.25rem" }}>
-            <MarkdownEditor
-              value={body}
-              onChange={setBody}
-              onUploadImage={handleBodyImageUpload}
-            />
-          </div>
+          <label className="label">Testo (Markdown)</label>
+          <MarkdownEditor
+            value={body}
+            onChange={setBody}
+            onUploadImage={handleBodyImageUpload}
+            onImportWarning={setError}
+          />
         </div>
         <div style={{ marginTop: "1rem" }}>
-          <label htmlFor="cover-image">Immagine di copertina</label>
-          <br />
+          <label htmlFor="cover-image" className="label">
+            Immagine di copertina
+          </label>
           <input
             id="cover-image"
             ref={fileInputRef}
@@ -366,7 +368,6 @@ export default function EditArticlePage({ params }: Props) {
               const file = e.target.files?.[0];
               if (file) void handleCoverImageUpload(file);
             }}
-            style={{ marginTop: "0.25rem" }}
           />
           {uploadProgress && <span style={{ marginLeft: "0.5rem" }}>{uploadProgress}</span>}
           {coverImageUrl && (
@@ -376,25 +377,27 @@ export default function EditArticlePage({ params }: Props) {
           )}
         </div>
         <div style={{ marginTop: "1rem" }}>
-          <label htmlFor="cover-alt">Alt testo copertina</label>
-          <br />
+          <label htmlFor="cover-alt" className="label">
+            Alt testo copertina
+          </label>
           <input
             id="cover-alt"
             type="text"
+            className="input"
             maxLength={160}
             value={coverImageAlt}
             onChange={(e) => setCoverImageAlt(e.target.value)}
-            style={{ width: "100%", marginTop: "0.25rem" }}
           />
         </div>
         <div style={{ marginTop: "1rem" }}>
-          <label htmlFor="category">Categoria</label>
-          <br />
+          <label htmlFor="category" className="label">
+            Categoria
+          </label>
           <select
             id="category"
+            className="input"
             value={categoryId}
             onChange={(e) => setCategoryId(e.target.value)}
-            style={{ width: "100%", marginTop: "0.25rem" }}
           >
             <option value="">— Nessuna categoria —</option>
             {categories.map((cat) => (
@@ -405,22 +408,12 @@ export default function EditArticlePage({ params }: Props) {
           </select>
         </div>
         <div style={{ marginTop: "1rem" }}>
-          <label htmlFor="tag-input">Tag</label>
-          <br />
-          <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", marginTop: "0.25rem" }}>
+          <label htmlFor="tag-input" className="label">
+            Tag
+          </label>
+          <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
             {tags.map((tag) => (
-              <span
-                key={tag}
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: "0.25rem",
-                  padding: "0.2rem 0.5rem",
-                  background: "#e8e8e8",
-                  borderRadius: "4px",
-                  fontSize: "0.875rem",
-                }}
-              >
+              <span key={tag} className="badge" style={{ display: "inline-flex", alignItems: "center", gap: "0.25rem" }}>
                 #{tag}
                 <button
                   type="button"
@@ -437,6 +430,7 @@ export default function EditArticlePage({ params }: Props) {
             <input
               id="tag-input"
               type="text"
+              className="input"
               value={tagInput}
               onChange={(e) => setTagInput(e.target.value)}
               onKeyDown={(e) => {
@@ -454,6 +448,7 @@ export default function EditArticlePage({ params }: Props) {
             />
             <button
               type="button"
+              className="btn"
               onClick={() => {
                 const name = tagInput.trim().toLowerCase();
                 if (name && !tags.includes(name)) {
@@ -468,12 +463,8 @@ export default function EditArticlePage({ params }: Props) {
         </div>
         <div style={{ marginTop: "1rem" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <label>Ospiti</label>
-            <button
-              type="button"
-              onClick={() => setShowGuestModal(true)}
-              style={{ fontSize: "0.875rem" }}
-            >
+            <label className="label">Ospiti</label>
+            <button type="button" className="btn" onClick={() => setShowGuestModal(true)}>
               + Nuovo ospite
             </button>
           </div>
@@ -482,15 +473,14 @@ export default function EditArticlePage({ params }: Props) {
               {allGuests.map((guest) => (
                 <label
                   key={guest.id}
+                  className="badge"
                   style={{
                     display: "inline-flex",
                     alignItems: "center",
                     gap: "0.25rem",
-                    padding: "0.2rem 0.5rem",
-                    background: guestIds.includes(guest.id) ? "#d0e8ff" : "#f0f0f0",
-                    borderRadius: "4px",
-                    fontSize: "0.875rem",
                     cursor: "pointer",
+                    background: guestIds.includes(guest.id) ? "var(--color-accent)" : "var(--color-border)",
+                    color: guestIds.includes(guest.id) ? "#fff" : "var(--color-text)",
                   }}
                 >
                   <input
@@ -511,75 +501,75 @@ export default function EditArticlePage({ params }: Props) {
           )}
         </div>
         <div style={{ marginTop: "1rem" }}>
-          <label htmlFor="spotify-url">URL Spotify (episodio)</label>
-          <br />
+          <label htmlFor="spotify-url" className="label">
+            URL Spotify (episodio)
+          </label>
           <input
             id="spotify-url"
             type="url"
+            className="input"
             value={spotifyUrl}
             onChange={(e) => setSpotifyUrl(e.target.value)}
             placeholder="https://open.spotify.com/episode/..."
-            style={{ width: "100%", marginTop: "0.25rem" }}
           />
         </div>
-        <fieldset style={{ marginTop: "1.5rem", border: "1px solid #ccc", padding: "1rem" }}>
+        <fieldset style={{ marginTop: "1.5rem", border: "1px solid var(--color-border)", padding: "1rem", borderRadius: "var(--radius)" }}>
           <legend>SEO / Open Graph</legend>
           <div>
-            <label htmlFor="meta-title">
+            <label htmlFor="meta-title" className="label">
               Meta titolo ({metaTitle.length}/60)
             </label>
-            <br />
             <input
               id="meta-title"
               type="text"
+              className="input"
               maxLength={60}
               value={metaTitle}
               onChange={(e) => setMetaTitle(e.target.value)}
-              style={{ width: "100%", marginTop: "0.25rem" }}
             />
           </div>
           <div style={{ marginTop: "0.75rem" }}>
-            <label htmlFor="meta-desc">
+            <label htmlFor="meta-desc" className="label">
               Meta descrizione ({metaDescription.length}/160)
             </label>
-            <br />
             <textarea
               id="meta-desc"
+              className="input"
               rows={3}
               maxLength={160}
               value={metaDescription}
               onChange={(e) => setMetaDescription(e.target.value)}
-              style={{ width: "100%", marginTop: "0.25rem" }}
             />
           </div>
           <div style={{ marginTop: "0.75rem" }}>
-            <label htmlFor="og-image">OG Image URL</label>
-            <br />
+            <label htmlFor="og-image" className="label">
+              OG Image URL
+            </label>
             <input
               id="og-image"
               type="url"
+              className="input"
               value={ogImageUrl}
               onChange={(e) => setOgImageUrl(e.target.value)}
-              style={{ width: "100%", marginTop: "0.25rem" }}
             />
           </div>
         </fieldset>
-        <button type="submit" disabled={saving} style={{ marginTop: "1.5rem" }}>
+        <button type="submit" className="btn btn-primary" disabled={saving} style={{ marginTop: "1.5rem" }}>
           {saving ? "…" : "Salva"}
         </button>
       </form>
       <div style={{ marginTop: "1rem", display: "flex", gap: "1rem" }}>
         {article.status === "draft" && (
-          <button type="button" onClick={handlePublish} disabled={saving}>
+          <button type="button" className="btn" onClick={handlePublish} disabled={saving}>
             Pubblica
           </button>
         )}
         {article.status !== "archived" && (
-          <button type="button" onClick={handleArchive} disabled={saving}>
+          <button type="button" className="btn" onClick={handleArchive} disabled={saving}>
             Archivia
           </button>
         )}
-        <button type="button" onClick={handlePreview} disabled={saving}>
+        <button type="button" className="btn" onClick={handlePreview} disabled={saving}>
           Anteprima
         </button>
       </div>
@@ -599,58 +589,52 @@ export default function EditArticlePage({ params }: Props) {
             zIndex: 1000,
           }}
         >
-          <div
-            style={{
-              background: "#fff",
-              borderRadius: "6px",
-              padding: "1.5rem",
-              width: "100%",
-              maxWidth: "420px",
-            }}
-          >
+          <div className="card" style={{ width: "100%", maxWidth: "420px" }}>
             <h2 id="guest-modal-title" style={{ marginTop: 0 }}>Nuovo ospite</h2>
             {modalError && (
-              <p role="alert" style={{ color: "red" }}>
+              <p role="alert" className="alert-error">
                 {modalError}
               </p>
             )}
             <form onSubmit={handleCreateGuest}>
               <div>
-                <label htmlFor="modal-guest-name">Nome *</label>
-                <br />
+                <label htmlFor="modal-guest-name" className="label">
+                  Nome *
+                </label>
                 <input
                   id="modal-guest-name"
                   type="text"
+                  className="input"
                   required
                   value={modalName}
                   onChange={(e) => setModalName(e.target.value)}
-                  style={{ width: "100%", marginTop: "0.25rem" }}
                 />
               </div>
               <div style={{ marginTop: "1rem" }}>
-                <label htmlFor="modal-guest-bio">Bio</label>
-                <br />
+                <label htmlFor="modal-guest-bio" className="label">
+                  Bio
+                </label>
                 <textarea
                   id="modal-guest-bio"
+                  className="input"
                   rows={3}
                   value={modalBio}
                   onChange={(e) => setModalBio(e.target.value)}
-                  style={{ width: "100%", marginTop: "0.25rem" }}
                 />
               </div>
               <div style={{ marginTop: "1rem", display: "flex", gap: "0.75rem" }}>
-                <button type="submit" disabled={modalSaving}>
+                <button type="submit" className="btn btn-primary" disabled={modalSaving}>
                   {modalSaving ? "…" : "Crea e aggiungi"}
                 </button>
                 <button
                   type="button"
+                  className="btn"
                   onClick={() => {
                     setShowGuestModal(false);
                     setModalName("");
                     setModalBio("");
                     setModalError(null);
                   }}
-                  style={{ background: "none", border: "1px solid #ccc", cursor: "pointer" }}
                 >
                   Annulla
                 </button>

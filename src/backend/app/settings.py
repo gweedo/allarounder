@@ -31,6 +31,21 @@ class Settings(BaseSettings):
     azure_cdn_base_url: str = "https://cdn.allarounder.it/images"
     cors_allowed_origins: str = "http://localhost:3000"
     log_level: str = "DEBUG"
+    google_client_id: str = ""
+    google_client_secret: str = ""
+    google_redirect_uri: str = ""
+    google_sso_enabled: bool = False
+
+    @model_validator(mode="after")
+    def _check_google_sso_config(self) -> "Settings":
+        if self.google_sso_enabled and not (
+            self.google_client_id and self.google_client_secret and self.google_redirect_uri
+        ):
+            raise ValueError(
+                "GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, and GOOGLE_REDIRECT_URI must all be "
+                "set when GOOGLE_SSO_ENABLED is true"
+            )
+        return self
 
 
 @lru_cache

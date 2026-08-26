@@ -1,10 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import { remark } from "remark";
-import remarkRehype from "remark-rehype";
-import rehypeSanitize from "rehype-sanitize";
-import rehypeStringify from "rehype-stringify";
+import { renderMarkdown } from "../../../lib/markdown";
 
 export const revalidate = 60;
 
@@ -67,15 +64,6 @@ async function getArticle(slug: string): Promise<Article | null> {
   }
 }
 
-async function renderMarkdown(markdown: string): Promise<string> {
-  const file = await remark()
-    .use(remarkRehype, { allowDangerousHtml: false })
-    .use(rehypeSanitize)
-    .use(rehypeStringify)
-    .process(markdown);
-  return String(file);
-}
-
 interface Props {
   params: Promise<{ slug: string }>;
 }
@@ -131,25 +119,25 @@ export default async function ArticlePage({ params }: Props) {
   };
 
   return (
-    <main style={{ maxWidth: 800, margin: "2rem auto", padding: "0 1rem" }}>
+    <main className="page-container">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <article>
         {article.cover_image_url && (
-          <div style={{ position: "relative", width: "100%", aspectRatio: "16/9", marginBottom: "1.5rem" }}>
+          <div className="cover-image" style={{ aspectRatio: "16/9", marginBottom: "1.5rem" }}>
             <Image
               src={article.cover_image_url}
               alt={article.cover_image_alt ?? `Copertina articolo: ${article.title}`}
               fill
-              style={{ objectFit: "cover", borderRadius: "8px" }}
+              style={{ objectFit: "cover" }}
               priority
             />
           </div>
         )}
         <h1>{article.title}</h1>
-        <div style={{ color: "#666", marginTop: "0.25rem" }}>
+        <div className="article-meta" style={{ marginTop: "0.25rem" }}>
           <time dateTime={article.publish_at}>
             {new Date(article.publish_at).toLocaleDateString("it-IT")}
           </time>
@@ -161,62 +149,37 @@ export default async function ArticlePage({ params }: Props) {
           {article.author_profile && (
             <span style={{ marginLeft: "1rem" }}>
               di{" "}
-              <a
-                href={`/autori/${article.author_profile.slug}`}
-                style={{ color: "#444", textDecoration: "underline" }}
-              >
+              <a href={`/autori/${article.author_profile.slug}`}>
                 {article.author_profile.name}
               </a>
             </span>
           )}
         </div>
         {article.category && (
-          <p style={{ marginTop: "0.5rem" }}>
-            <a
-              href={`/argomenti/${article.category.slug}`}
-              style={{ color: "#555", textDecoration: "underline", fontSize: "0.9rem" }}
-            >
-              {article.category.name}
-            </a>
+          <p className="article-meta" style={{ marginTop: "0.5rem" }}>
+            <a href={`/argomenti/${article.category.slug}`}>{article.category.name}</a>
           </p>
         )}
         {article.excerpt && (
-          <p style={{ fontStyle: "italic", marginTop: "1rem", color: "#555" }}>
+          <p className="article-excerpt" style={{ fontStyle: "italic", marginTop: "1rem" }}>
             {article.excerpt}
           </p>
         )}
         {article.tags && article.tags.length > 0 && (
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem", marginTop: "1rem" }}>
+          <div className="tag-list">
             {article.tags.map((tag) => (
-              <a
-                key={tag.id}
-                href={`/tag/${tag.slug}`}
-                style={{
-                  display: "inline-block",
-                  padding: "0.2rem 0.6rem",
-                  background: "#f0f0f0",
-                  borderRadius: "4px",
-                  fontSize: "0.8rem",
-                  color: "#444",
-                  textDecoration: "none",
-                }}
-              >
+              <a key={tag.id} href={`/tag/${tag.slug}`} className="tag-pill">
                 #{tag.name}
               </a>
             ))}
           </div>
         )}
         {article.guests && article.guests.length > 0 && (
-          <div style={{ marginTop: "1rem", fontSize: "0.9rem", color: "#555" }}>
+          <div className="article-meta" style={{ marginTop: "1rem" }}>
             <span>Ospiti: </span>
             {article.guests.map((guest, i) => (
               <span key={guest.id}>
-                <a
-                  href={`/ospiti/${guest.slug}`}
-                  style={{ color: "#444", textDecoration: "underline" }}
-                >
-                  {guest.name}
-                </a>
+                <a href={`/ospiti/${guest.slug}`}>{guest.name}</a>
                 {i < article.guests.length - 1 && ", "}
               </span>
             ))}
@@ -227,20 +190,8 @@ export default async function ArticlePage({ params }: Props) {
           dangerouslySetInnerHTML={{ __html: bodyHtml }}
         />
         {article.spotify_url && (
-          <div
-            style={{
-              marginTop: "2rem",
-              padding: "1rem",
-              border: "1px solid #1db954",
-              borderRadius: "8px",
-            }}
-          >
-            <a
-              href={article.spotify_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{ color: "#1db954", textDecoration: "none" }}
-            >
+          <div className="spotify-callout">
+            <a href={article.spotify_url} target="_blank" rel="noopener noreferrer">
               Ascolta su Spotify
             </a>
           </div>

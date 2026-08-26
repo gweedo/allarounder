@@ -12,6 +12,7 @@ from app.interfaces.api.admin.guests.router import router as admin_guests_router
 from app.interfaces.api.admin.media.router import router as media_router
 from app.interfaces.api.admin.pages.router import router as admin_pages_router
 from app.interfaces.api.admin.tags.router import router as admin_tags_router
+from app.interfaces.api.auth.google import router as google_auth_router
 from app.interfaces.api.auth.router import router as auth_router
 from app.interfaces.api.health import router as health_router
 from app.interfaces.api.preview.router import router as preview_router
@@ -61,6 +62,7 @@ app.add_middleware(
 
 app.include_router(health_router)
 app.include_router(auth_router)
+app.include_router(google_auth_router)
 app.include_router(dashboard_router)
 app.include_router(articles_router)
 app.include_router(admin_authors_router)
