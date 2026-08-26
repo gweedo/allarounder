@@ -158,6 +158,30 @@ class TestAdminPageUpdate:
         resp = client.put(f"/api/admin/pages/{uuid.uuid4()}", json={"body": "x"})
         assert resp.status_code == 401
 
+    def test_422_meta_title_too_long(
+        self, client: TestClient, mock_page_repo: MagicMock
+    ) -> None:
+        page = _make_page()
+        mock_page_repo.get_by_id.return_value = page
+        resp = client.put(
+            f"/api/admin/pages/{page.id}",
+            json={"meta_title": "x" * 61},
+            cookies={"access_token": _make_token()},
+        )
+        assert resp.status_code == 422
+
+    def test_422_meta_description_too_long(
+        self, client: TestClient, mock_page_repo: MagicMock
+    ) -> None:
+        page = _make_page()
+        mock_page_repo.get_by_id.return_value = page
+        resp = client.put(
+            f"/api/admin/pages/{page.id}",
+            json={"meta_description": "x" * 161},
+            cookies={"access_token": _make_token()},
+        )
+        assert resp.status_code == 422
+
 
 # ── Public endpoints ──────────────────────────────────────────────────────────
 

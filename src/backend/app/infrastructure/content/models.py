@@ -7,6 +7,7 @@ from sqlalchemy import Boolean, Column, DateTime, Enum, ForeignKey, Integer, Str
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
+from app.domain.content.value_objects import META_DESCRIPTION_MAX_LENGTH, META_TITLE_MAX_LENGTH
 from app.infrastructure.database import Base
 
 
@@ -17,8 +18,10 @@ class StaticPageModel(Base):
     title: Mapped[str] = mapped_column(String(300), nullable=False)
     slug: Mapped[str] = mapped_column(String(100), unique=True, nullable=False, index=True)
     body: Mapped[str] = mapped_column(Text, nullable=False, server_default="")
-    meta_title: Mapped[str | None] = mapped_column(String(60), nullable=True)
-    meta_description: Mapped[str | None] = mapped_column(String(160), nullable=True)
+    meta_title: Mapped[str | None] = mapped_column(String(META_TITLE_MAX_LENGTH), nullable=True)
+    meta_description: Mapped[str | None] = mapped_column(
+        String(META_DESCRIPTION_MAX_LENGTH), nullable=True
+    )
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
 
 article_tags = Table(
@@ -133,8 +136,10 @@ class ArticleModel(Base):
     excerpt: Mapped[str | None] = mapped_column(String(300), nullable=True)
     cover_image_url: Mapped[str | None] = mapped_column(String(2048), nullable=True)
     cover_image_alt: Mapped[str | None] = mapped_column(String(160), nullable=True)
-    meta_title: Mapped[str | None] = mapped_column(String(60), nullable=True)
-    meta_description: Mapped[str | None] = mapped_column(String(160), nullable=True)
+    meta_title: Mapped[str | None] = mapped_column(String(META_TITLE_MAX_LENGTH), nullable=True)
+    meta_description: Mapped[str | None] = mapped_column(
+        String(META_DESCRIPTION_MAX_LENGTH), nullable=True
+    )
     og_image_url: Mapped[str | None] = mapped_column(String(2048), nullable=True)
     reading_time: Mapped[int | None] = mapped_column(Integer, nullable=True)
     category_id: Mapped[uuid.UUID | None] = mapped_column(

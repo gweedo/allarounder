@@ -137,24 +137,26 @@ export default function EditStaticPagePage({ params }: Props) {
           <legend>SEO</legend>
           <div style={{ marginBottom: "0.75rem" }}>
             <label htmlFor="page-meta-title" className="label">
-              Meta title
+              Meta title ({metaTitle.length}/60)
             </label>
             <input
               id="page-meta-title"
               type="text"
               className="input"
+              maxLength={60}
               value={metaTitle}
               onChange={(e) => setMetaTitle(e.target.value)}
             />
           </div>
           <div>
             <label htmlFor="page-meta-desc" className="label">
-              Meta description
+              Meta description ({metaDescription.length}/160)
             </label>
             <textarea
               id="page-meta-desc"
               className="input"
               rows={2}
+              maxLength={160}
               value={metaDescription}
               onChange={(e) => setMetaDescription(e.target.value)}
             />
