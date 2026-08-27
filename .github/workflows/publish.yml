@@ -55,7 +55,10 @@ jobs:
       # Never pushes to main directly (branch protection, "Protect main"
       # ruleset) -- opens a PR instead, which still runs the required checks
       # in ci.yml (including `next build` against the new content) before
-      # anyone merges it.
+      # it merges. The ruleset requires 0 human approvals (status checks
+      # only), so auto-merge lets this PR merge itself once those checks
+      # pass -- no admin bypass, no direct push, but still close to the
+      # original "article is live ~2 minutes after Pubblica" design intent.
       - name: Open content PR
         if: steps.diff.outputs.changed == 'true'
         env:
@@ -72,3 +75,4 @@ jobs:
             --head "$branch" \
             --title "content: publish from the editorial Sheet" \
             --body "Automated publish run. See the Actions log for this run for which rows were published, scheduled, or rejected, and why."
+          gh pr merge "$branch" --auto --squash
