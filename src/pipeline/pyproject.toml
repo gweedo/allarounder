@@ -6,7 +6,12 @@ build-backend = "setuptools.build_meta"
 name = "allarounder-pipeline"
 version = "0.1.0"
 requires-python = ">=3.13"
-dependencies = []
+dependencies = [
+    "google-api-python-client>=2.199.0",
+    "google-auth>=2.57.0",
+    "markdownify>=1.2.3",
+    "pyyaml>=6.0.3",
+]
 
 [project.optional-dependencies]
 dev = [
@@ -14,18 +19,24 @@ dev = [
     "pytest-cov>=5.0.0",
     "mypy>=1.11.0",
     "ruff>=0.6.0",
+    "types-PyYAML>=6.0.0",
 ]
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["domain*"]
+include = ["domain*", "ingest*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "--tb=short"
 
 [tool.coverage.run]
-source = ["domain"]
+source = ["domain", "ingest"]
+omit = ["ingest/cli.py"]
 
 [tool.coverage.report]
 fail_under = 80
+
+[[tool.mypy.overrides]]
+module = ["googleapiclient.*", "google.oauth2.*", "google_auth_httplib2.*"]
+ignore_missing_imports = true

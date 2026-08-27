@@ -1,0 +1,74 @@
+name: Publish content
+
+on:
+  repository_dispatch:
+    types: [publish_request]
+  schedule:
+    # Nightly, catches Pubblicato rows whose `data` has since passed
+    # (CONTENT-CONTRACT.md §3) -- future-dated posts set up in advance.
+    - cron: "0 3 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: publish-content
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  publish:
+    name: Run pipeline
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+
+      - name: Install pipeline
+        working-directory: src/pipeline
+        run: pip install -e .
+
+      - name: Run pipeline
+        working-directory: src/pipeline
+        env:
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+          SHEET_ID: ${{ secrets.SHEET_ID }}
+        run: python -m ingest.cli
+
+      - name: Check for generated content changes
+        id: diff
+        run: |
+          git add src/frontend/content
+          if [ -d src/frontend/public/images ]; then
+            git add src/frontend/public/images
+          fi
+          if git diff --cached --quiet; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      # Never pushes to main directly (branch protection, "Protect main"
+      # ruleset) -- opens a PR instead, which still runs the required checks
+      # in ci.yml (including `next build` against the new content) before
+      # anyone merges it.
+      - name: Open content PR
+        if: steps.diff.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          branch="content/publish-${{ github.run_id }}"
+          git config user.name "allarounder-pipeline"
+          git config user.email "actions@github.com"
+          git checkout -b "$branch"
+          git commit -m "content: publish from the editorial Sheet ($(date -u +%Y-%m-%dT%H:%M:%SZ))"
+          git push origin "$branch"
+          gh pr create \
+            --base main \
+            --head "$branch" \
+            --title "content: publish from the editorial Sheet" \
+            --body "Automated publish run. See the Actions log for this run for which rows were published, scheduled, or rejected, and why."
