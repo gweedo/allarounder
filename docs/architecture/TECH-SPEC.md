@@ -1,5 +1,8 @@
 # Allarounder — Technical Specification
 
+> **Superseded 2026-08-26:** this document describes the retired FastAPI/Postgres/Azure
+> architecture. See [ADR-0018](adr/0018-drive-cms-static-site.md) for the current static-site architecture.
+
 **Status:** Draft
 **Date:** 2026-06-14
 **Owner:** Guido (lead developer)

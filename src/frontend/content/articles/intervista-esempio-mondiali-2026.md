@@ -1,16 +1,16 @@
 ---
-id: article-intervista-federica-bianchi-mondiali-2026
-title: Intervista a Federica Bianchi sui Mondiali 2026
-slug: intervista-federica-bianchi-mondiali-2026
+id: article-intervista-esempio-mondiali-2026
+title: Intervista a Ginnasta Esempio sui Mondiali 2026
+slug: intervista-esempio-mondiali-2026
 author_id: author-guido-s
 publish_at: "2026-08-10T09:00:00Z"
 updated_at: "2026-08-10T09:00:00Z"
 spotify_url: "https://open.spotify.com/episode/3JlVkNIjIJKvINYpDrVFUP"
-excerpt: "Una chiacchierata con Federica Bianchi alla vigilia dei Mondiali 2026: obiettivi, avversarie e il percorso verso la finale."
+excerpt: "Una chiacchierata con Ginnasta Esempio alla vigilia dei Mondiali 2026: obiettivi, avversarie e il percorso verso la finale."
 cover_image_url: null
 cover_image_alt: null
-meta_title: "Federica Bianchi: intervista ai Mondiali 2026"
-meta_description: "Federica Bianchi si racconta alla vigilia dei Mondiali 2026: preparazione, obiettivi e le avversarie da tenere d'occhio nella finale di all-around."
+meta_title: "Ginnasta Esempio: intervista ai Mondiali 2026"
+meta_description: "Ginnasta Esempio si racconta alla vigilia dei Mondiali 2026: preparazione, obiettivi e le avversarie da tenere d'occhio nella finale di all-around."
 og_image_url: null
 reading_time: 4
 author_profile:
@@ -29,11 +29,11 @@ tags:
     name: Esordienti
     slug: esordienti
 guests:
-  - id: guest-federica-bianchi
-    name: Federica Bianchi
-    slug: federica-bianchi
+  - id: guest-ginnasta-esempio
+    name: Ginnasta Esempio
+    slug: ginnasta-esempio
 ---
-Alla vigilia dei Mondiali 2026 abbiamo incontrato Federica Bianchi per parlare
+Alla vigilia dei Mondiali 2026 abbiamo incontrato Ginnasta Esempio per parlare
 di preparazione, obiettivi e delle avversarie da tenere d'occhio nella finale
 di concorso generale.
 
