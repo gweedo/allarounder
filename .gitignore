@@ -47,3 +47,7 @@ src/frontend/test-results/
 
 # Local archive of the pre-rebuild app — not part of the project
 _record/
+
+# clasp binds a local Apps Script project to a real scriptId — never commit
+# that binding; tools/apps-script/.clasp.json.example is the template
+tools/apps-script/.clasp.json

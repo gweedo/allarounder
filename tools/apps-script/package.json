@@ -1,0 +1,12 @@
+{
+  "name": "allarounder-apps-script",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Apps Script source for the Allarounder editorial Google Sheet (Pubblica / Nuovo articolo menu, data validation).",
+  "scripts": {
+    "test": "jest"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
+  }
+}
