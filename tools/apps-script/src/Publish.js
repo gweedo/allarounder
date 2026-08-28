@@ -13,22 +13,29 @@ function handlePubblica() {
     return;
   }
 
-  // Set stato and fire the dispatch as one action (CONTENT-CONTRACT.md §1:
-  // "a writer never has to set the dropdown and click a separate button").
-  sheet.getRange(row, getColumnIndex("stato")).setValue("Pubblicato");
-  SpreadsheetApp.flush();
-
   var sheetId = SpreadsheetApp.getActiveSpreadsheet().getId();
   var triggeredBy = Session.getActiveUser().getEmail();
   var triggeredAt = new Date().toISOString();
   var payload = buildDispatchPayload(sheetId, triggeredBy, triggeredAt, row);
 
+  // Fire the dispatch *before* touching `stato` -- if it fails, the row must
+  // be left exactly as it was. Setting `stato = Pubblicato` first and rolling
+  // back on failure would leave a window where a nightly cron run (which
+  // re-evaluates every Pubblicato row regardless of how it got that way,
+  // CONTENT-CONTRACT.md §3) could publish the row anyway, silently
+  // contradicting the failure the writer was just shown.
   try {
     triggerRepositoryDispatch(payload);
   } catch (err) {
     ui.alert("Pubblicazione non avviata: " + err.message);
     return;
   }
+
+  // Only reachable once the dispatch has actually been accepted
+  // (CONTENT-CONTRACT.md §1: "a writer never has to set the dropdown and
+  // click a separate button" -- this is the one action that does both).
+  sheet.getRange(row, getColumnIndex("stato")).setValue("Pubblicato");
+  SpreadsheetApp.flush();
 
   ui.alert(
     "Pubblicazione avviata. Il sito si aggiornerà tra circa 2 minuti: " +
