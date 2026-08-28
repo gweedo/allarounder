@@ -21,6 +21,11 @@ jobs:
   publish:
     name: Run pipeline
     runs-on: ubuntu-latest
+    env:
+      # Absolute, so it resolves the same regardless of which step's
+      # working-directory wrote or reads it (see docs/DECISIONS.md
+      # "Deferred esito writes and publish-run guards").
+      DEFERRED_ESITO_PATH: ${{ github.workspace }}/src/pipeline/deferred-esito.json
     steps:
       - uses: actions/checkout@v7
 
@@ -31,6 +36,30 @@ jobs:
       - name: Install pipeline
         working-directory: src/pipeline
         run: pip install -e .
+
+      # `gh pr merge --auto --squash` below silently no-ops (or fails) if
+      # either repo setting is off -- fail loudly now, before doing any
+      # work, rather than discovering it after a real Drive export.
+      - name: Verify repo settings auto-merge depends on
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          settings=$(gh api "repos/${{ github.repository }}" --jq '{allow_auto_merge, allow_squash_merge}')
+          auto_merge=$(echo "$settings" | jq -r '.allow_auto_merge')
+          squash=$(echo "$settings" | jq -r '.allow_squash_merge')
+          if [ "$auto_merge" != "true" ] || [ "$squash" != "true" ]; then
+            echo "::error::gh pr merge --auto --squash needs both 'Allow auto-merge' and 'Allow squash merging' enabled (Settings -> General -> Pull Requests). Current: allow_auto_merge=$auto_merge allow_squash_merge=$squash" >&2
+            exit 1
+          fi
+
+      # A stalled content PR (failed check, conflict, auto-merge disabled
+      # mid-flight) is invisible to `index.json`'s skip check, so a naive
+      # run would open a competing branch every night. Fail fast instead --
+      # see ingest/pr_guard.py.
+      - name: Guard against a stalled publish PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python -m ingest.pr_guard
 
       - name: Run pipeline
         working-directory: src/pipeline
@@ -59,7 +88,14 @@ jobs:
       # only), so auto-merge lets this PR merge itself once those checks
       # pass -- no admin bypass, no direct push, but still close to the
       # original "article is live ~2 minutes after Pubblica" design intent.
-      - name: Open content PR
+      #
+      # Waits for the PR to actually report MERGED (ingest/pr_wait.py)
+      # before the step -- and therefore the job -- exits: `concurrency:
+      # group: publish-content` only serialises the job, so a job that
+      # exited right after *enabling* auto-merge could release that slot
+      # before the merge landed, letting the next run branch from a `main`
+      # that doesn't have this run's content yet.
+      - name: Open content PR and wait for it to merge
         if: steps.diff.outputs.changed == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
@@ -70,9 +106,23 @@ jobs:
           git checkout -b "$branch"
           git commit -m "content: publish from the editorial Sheet ($(date -u +%Y-%m-%dT%H:%M:%SZ))"
           git push origin "$branch"
-          gh pr create \
+          pr_url=$(gh pr create \
             --base main \
             --head "$branch" \
             --title "content: publish from the editorial Sheet" \
-            --body "Automated publish run. See the Actions log for this run for which rows were published, scheduled, or rejected, and why."
-          gh pr merge "$branch" --auto --squash
+            --body "Automated publish run. See the Actions log for this run for which rows were published, scheduled, or rejected, and why.")
+          pr_number="${pr_url##*/}"
+          gh pr merge "$pr_number" --auto --squash
+          python -m ingest.pr_wait "$pr_number"
+
+      # Runs whenever the job hasn't already failed: unconditionally when
+      # there was no content diff (nothing to wait on), and after the step
+      # above only once it confirmed the PR actually merged -- if that step
+      # failed (timeout, or the PR was closed unmerged), this is skipped by
+      # GitHub Actions' default `if: success()`, so a success esito is never
+      # written for content that didn't ship. See ingest/deferred_esito.py.
+      - name: Flush deferred esito writes
+        env:
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+          SHEET_ID: ${{ secrets.SHEET_ID }}
+        run: python -m ingest.flush_esito

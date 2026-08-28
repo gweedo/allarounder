@@ -44,6 +44,17 @@ class RowOutcome:
 @dataclass
 class RunReport:
     outcomes: list[RowOutcome] = field(default_factory=list)
+    # `✓ Pubblicato` messages only -- never written to the Sheet by `run()`
+    # itself. The generated content they describe reaches `main` through an
+    # asynchronous, auto-merging PR (`.github/workflows/publish.yml`); until
+    # that PR is confirmed merged, writing the success message here would
+    # repeat the exact bug `_publish_row`'s own skip-check comment warns
+    # about, one layer up -- the Sheet would claim success for content that
+    # never actually shipped if CI failed or auto-merge never completed. The
+    # caller (`ingest/cli.py`) persists these to a file for
+    # `ingest/flush_esito.py` to write once the workflow confirms the merge.
+    # See docs/DECISIONS.md "Deferred esito writes and publish-run guards".
+    deferred: list[RowOutcome] = field(default_factory=list)
 
 
 def _failure_message(exc: Exception) -> str:
@@ -144,9 +155,17 @@ def run(
     content_writer.save_index(content_dir, index)
 
     for row_number, current_esito, message in pending:
-        if should_update(current_esito, message):
+        if not should_update(current_esito, message):
+            continue
+        outcome = RowOutcome(row_number, message)
+        if message.strip().startswith("✓"):
+            # Deferred, not written here -- see RunReport.deferred.
+            report.deferred.append(outcome)
+        else:
+            # `✗`/`⏳` never claim something shipped, so they're safe (and
+            # useful -- writers see errors fast) to write immediately.
             sheets.write_esito(row_number, message)
-            report.outcomes.append(RowOutcome(row_number, message))
+            report.outcomes.append(outcome)
 
     return report
 

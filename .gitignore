@@ -51,3 +51,7 @@ _record/
 # clasp binds a local Apps Script project to a real scriptId — never commit
 # that binding; tools/apps-script/.clasp.json.example is the template
 tools/apps-script/.clasp.json
+
+# Deferred esito writes, written by ingest/cli.py and consumed by
+# ingest/flush_esito.py within the same publish.yml job run
+deferred-esito.json
