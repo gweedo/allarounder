@@ -231,15 +231,32 @@ would not be reachable by a browser at all under `output: "export"`.**
 
 ## 7. `esito` write-back
 
-The pipeline writes to the Sheet's `esito` column after a run — this is the
-only writer of that column; nothing else should ever set it. A single rule
-governs when: **write `esito` only when the message would change from what's
-already there.** This covers every case without enumerating them: a fresh
-publish, a validation failure, a newly-detected future-dated schedule, or a
+The pipeline writes to the Sheet's `esito` column — this is the only writer
+of that column; nothing else should ever set it. A single rule governs when:
+**write `esito` only when the message would change from what's already
+there.** This covers every case without enumerating them: a fresh publish, a
+validation failure, a newly-detected future-dated schedule, or a
 previously-failing row that now succeeds all produce a new message and get
 written; an already-published row that's unchanged, or an already-scheduled
 row still waiting on the same date, do not — so the Sheet doesn't get
 rewritten with an identical message every night.
+
+**`✗`/`⏳` messages are written immediately, during the pipeline run —
+`✓ Pubblicato` is not.** The pipeline run itself only *generates* content on
+disk; that content only reaches the live site once `.github/workflows/
+publish.yml`'s generated-content PR is merged, which happens asynchronously
+(via auto-merge, after `ci.yml`'s required checks pass) and can fail or
+stall. Writing `✓ Pubblicato` during the pipeline run — before that PR is
+confirmed merged — would let the Sheet claim an article shipped when it
+never did, the same class of bug `_publish_row`'s own skip-check guards
+against one layer down. So `orchestrator.run()` (`ingest/orchestrator.py`)
+never writes a success message itself; it returns it as a *deferred*
+outcome, which `ingest/cli.py` persists to a file and
+`ingest/flush_esito.py` writes to the Sheet only once the workflow confirms
+the PR merged (or immediately, if the run produced no content diff to
+merge). A failure or a still-pending schedule never claims something
+shipped, so those are written straight away — writers see them fast. See
+`docs/DECISIONS.md` "Deferred esito writes and publish-run guards".
 
 Format, in Italian, local (Europe/Rome) time:
 

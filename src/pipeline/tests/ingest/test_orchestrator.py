@@ -12,7 +12,6 @@ from __future__ import annotations
 import io
 import json
 import zipfile
-from collections.abc import Iterable
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from pathlib import Path
@@ -21,7 +20,7 @@ import pytest
 
 from ingest.drive_client import parse_export_zip
 from ingest.models import DocExport, SheetRow
-from ingest.orchestrator import run
+from ingest.orchestrator import RunReport, run
 
 NOW = datetime(2026, 8, 27, 12, 0, tzinfo=UTC)
 
@@ -112,9 +111,17 @@ def _run(
     sheets: FakeSheetsClient,
     drive: FakeDriveClient,
     now: datetime = NOW,
-) -> Iterable[object]:
+) -> RunReport:
+    """`report.outcomes` holds `✗`/`⏳` messages, written to `sheets`
+    immediately. `report.deferred` holds `✓ Pubblicato` messages, which
+    `run()` never writes to `sheets` -- see `RunReport.deferred`. In
+    production those only reach the real Sheet after
+    `ingest/flush_esito.py` confirms the content PR merged; a test that
+    feeds a prior run's success esito back in as `_row(esito=...)` (to
+    exercise the skip-check in `_publish_row`) is therefore modelling a run
+    *after* that flush already happened, not the immediate next run."""
     content_dir, public_dir, data_dir = dirs
-    report = run(
+    return run(
         sheets,
         drive,
         content_dir,
@@ -123,7 +130,6 @@ def _run(
         data_dir / "guests.json",
         now,
     )
-    return report.outcomes
 
 
 class TestRun:
@@ -132,10 +138,12 @@ class TestRun:
         sheets = FakeSheetsClient(rows=[_row()])
         drive = FakeDriveClient(docs={"doc-1": "<h1>Titolo</h1><p>Corpo.</p>"})
 
-        outcomes = list(_run(pipeline_dirs, sheets, drive))
+        report = _run(pipeline_dirs, sheets, drive)
 
-        assert len(list(outcomes)) == 1
-        assert sheets.written[2].startswith("✓ Pubblicato")
+        assert report.outcomes == []
+        assert len(report.deferred) == 1
+        assert report.deferred[0].esito.startswith("✓ Pubblicato")
+        assert sheets.written == {}
         index = json.loads((content_dir / "index.json").read_text(encoding="utf-8"))
         assert index["articles"][0]["slug"] == "intervista-a-marco"
         assert (content_dir / "articles" / "intervista-a-marco.md").exists()
@@ -144,9 +152,10 @@ class TestRun:
         sheets = FakeSheetsClient(rows=[_row(stato="Bozza")])
         drive = FakeDriveClient(docs={})
 
-        outcomes = list(_run(pipeline_dirs, sheets, drive))
+        report = _run(pipeline_dirs, sheets, drive)
 
-        assert outcomes == []
+        assert report.outcomes == []
+        assert report.deferred == []
         assert sheets.written == {}
 
     def test_scheduled_row_gets_scheduled_esito(self, pipeline_dirs: tuple[Path, Path, Path]) -> None:
@@ -197,13 +206,14 @@ class TestRun:
     def test_unchanged_success_esito_is_not_rewritten(self, pipeline_dirs: tuple[Path, Path, Path]) -> None:
         drive = FakeDriveClient(docs={"doc-1": "<p>Corpo.</p>"})
         first_sheets = FakeSheetsClient(rows=[_row()])
-        _run(pipeline_dirs, first_sheets, drive)
-        previous_esito = first_sheets.written[2]
+        first_report = _run(pipeline_dirs, first_sheets, drive)
+        previous_esito = first_report.deferred[0].esito
 
         second_sheets = FakeSheetsClient(rows=[_row(esito=previous_esito)])
-        outcomes = list(_run(pipeline_dirs, second_sheets, drive))
+        second_report = _run(pipeline_dirs, second_sheets, drive)
 
-        assert outcomes == []
+        assert second_report.outcomes == []
+        assert second_report.deferred == []
         assert second_sheets.written == {}
 
     def test_cover_image_written_when_present(self, pipeline_dirs: tuple[Path, Path, Path]) -> None:
@@ -243,10 +253,11 @@ class TestRun:
             file_names={share_link: "copertina-mondiali.jpg"},
         )
 
-        _run(pipeline_dirs, sheets, drive)
+        report = _run(pipeline_dirs, sheets, drive)
 
         assert (public_dir / "images" / "intervista-a-marco" / "cover.jpg").exists()
-        assert sheets.written[2].startswith("✓ Pubblicato")
+        assert len(report.deferred) == 1
+        assert report.deferred[0].esito.startswith("✓ Pubblicato")
 
     def test_unchanged_doc_skips_reexport_entirely(self, pipeline_dirs: tuple[Path, Path, Path]) -> None:
         drive = FakeDriveClient(
@@ -254,9 +265,9 @@ class TestRun:
             modified_times={"doc-1": "2026-08-27T00:00:00.000Z"},
         )
         first_sheets = FakeSheetsClient(rows=[_row()])
-        _run(pipeline_dirs, first_sheets, drive)
+        first_report = _run(pipeline_dirs, first_sheets, drive)
         assert drive.export_doc_calls == ["doc-1"]
-        previous_esito = first_sheets.written[2]
+        previous_esito = first_report.deferred[0].esito
 
         # Same Doc, same modifiedTime, on a fresh run (e.g. the nightly
         # cron) -- must not re-export/re-convert an unchanged Doc.
@@ -277,9 +288,9 @@ class TestRun:
             modified_times={"doc-1": "2026-08-27T00:00:00.000Z"},
         )
         first_sheets = FakeSheetsClient(rows=[_row()])
-        _run(pipeline_dirs, first_sheets, drive)
+        first_report = _run(pipeline_dirs, first_sheets, drive)
         assert drive.export_doc_calls == ["doc-1"]
-        previous_esito = first_sheets.written[2]
+        previous_esito = first_report.deferred[0].esito
 
         corrected_meta = (
             "Una nuova descrizione corretta per la SEO, abbastanza lunga da "
@@ -294,14 +305,17 @@ class TestRun:
         # A different time-of-day than the first run's `NOW`, so a genuine
         # re-publish produces a different (and therefore written) esito
         # message -- matching real usage, where wall-clock time has moved on.
-        _run(pipeline_dirs, second_sheets, drive, now=datetime(2026, 8, 27, 15, 45, tzinfo=UTC))
+        second_report = _run(
+            pipeline_dirs, second_sheets, drive, now=datetime(2026, 8, 27, 15, 45, tzinfo=UTC)
+        )
 
         # Reprocessed despite the Doc being unchanged -- the row hash caught
         # the Sheet-side edit.
         assert drive.export_doc_calls == ["doc-1", "doc-1"]
         index = json.loads((content_dir / "index.json").read_text(encoding="utf-8"))
         assert index["articles"][0]["meta_description"] == corrected_meta
-        assert second_sheets.written[2].startswith("✓ Pubblicato")
+        assert len(second_report.deferred) == 1
+        assert second_report.deferred[0].esito.startswith("✓ Pubblicato")
 
     def test_added_whitespace_alone_does_not_trigger_reprocessing(
         self, pipeline_dirs: tuple[Path, Path, Path]
@@ -316,17 +330,18 @@ class TestRun:
             modified_times={"doc-1": "2026-08-27T00:00:00.000Z"},
         )
         first_sheets = FakeSheetsClient(rows=[_row()])
-        _run(pipeline_dirs, first_sheets, drive)
+        first_report = _run(pipeline_dirs, first_sheets, drive)
         assert drive.export_doc_calls == ["doc-1"]
-        previous_esito = first_sheets.written[2]
+        previous_esito = first_report.deferred[0].esito
 
         second_sheets = FakeSheetsClient(
             rows=[_row(esito=previous_esito, titolo="  Intervista a Marco  ")]
         )
-        _run(pipeline_dirs, second_sheets, drive)
+        second_report = _run(pipeline_dirs, second_sheets, drive)
 
         assert drive.export_doc_calls == ["doc-1"]
         assert second_sheets.written == {}
+        assert second_report.deferred == []
 
     def test_unexpected_exception_on_one_row_does_not_abort_other_rows(
         self, pipeline_dirs: tuple[Path, Path, Path]
@@ -347,15 +362,45 @@ class TestRun:
             ]
         )
 
-        _run(pipeline_dirs, sheets, drive)
+        report = _run(pipeline_dirs, sheets, drive)
 
-        assert sheets.written[2].startswith("✓ Pubblicato")
+        assert len(report.deferred) == 1
+        assert report.deferred[0].row_number == 2
+        assert report.deferred[0].esito.startswith("✓ Pubblicato")
         assert sheets.written[3] == (
             "✗ errore imprevisto durante l'importazione — controlla i log della pipeline"
         )
         index = json.loads((content_dir / "index.json").read_text(encoding="utf-8"))
         assert len(index["articles"]) == 1
         assert index["articles"][0]["title"] == "Articolo Buono"
+
+    def test_success_esito_never_reaches_sheets_write_esito(
+        self, pipeline_dirs: tuple[Path, Path, Path]
+    ) -> None:
+        # Regression test for the async-PR bug this deferral fixes: the
+        # generated content only reaches `main` via a PR that merges later
+        # (`.github/workflows/publish.yml`), so `run()` itself must never
+        # call `sheets.write_esito` for a `✓ Pubblicato` message -- only
+        # `ingest/flush_esito.py`, after the merge is confirmed, may. A
+        # failure or a still-pending schedule never claims something
+        # shipped, so those *are* written immediately.
+        sheets = FakeSheetsClient(
+            rows=[
+                _row(row_number=2, titolo="Successo", doc="doc-1"),
+                _row(row_number=3, doc="doc-2", autore="Sconosciuto"),
+                _row(row_number=4, data="2026-09-01"),
+            ]
+        )
+        drive = FakeDriveClient(docs={"doc-1": "<p>Corpo.</p>", "doc-2": "<p>Corpo.</p>"})
+
+        report = _run(pipeline_dirs, sheets, drive)
+
+        assert 2 not in sheets.written
+        assert len(report.deferred) == 1
+        assert report.deferred[0].row_number == 2
+        assert sheets.written[3].startswith("✗")
+        assert sheets.written[4] == "⏳ Programmato per 2026-09-01"
+        assert {o.row_number for o in report.outcomes} == {3, 4}
 
     def test_esito_not_written_when_save_index_fails(
         self, pipeline_dirs: tuple[Path, Path, Path], monkeypatch: pytest.MonkeyPatch

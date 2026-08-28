@@ -18,6 +18,7 @@ from google.oauth2 import service_account
 from googleapiclient.discovery import build
 
 from ingest.config import ConfigError, load_config
+from ingest.deferred_esito import DEFAULT_DEFERRED_ESITO_PATH, write_deferred_outcomes
 from ingest.drive_client import GoogleDriveClient
 from ingest.orchestrator import run
 from ingest.sheets_client import GoogleSheetsClient
@@ -80,6 +81,13 @@ def main() -> int:
     )
     for outcome in report.outcomes:
         print(f"row {outcome.row_number}: {outcome.esito}")
+    if report.deferred:
+        path = Path(os.environ.get("DEFERRED_ESITO_PATH", DEFAULT_DEFERRED_ESITO_PATH))
+        write_deferred_outcomes(path, report.deferred)
+        print(
+            f"deferred {len(report.deferred)} success esito write(s) to {path} "
+            "pending the content PR's merge"
+        )
     return 0
 
 

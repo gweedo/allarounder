@@ -332,6 +332,14 @@ Last updated: 2026-06-14
 - **Status**: ✅ Final
 - **Decided by**: Guido
 
+### Deferred esito writes and publish-run guards
+- **Date**: 2026-08-28
+- **Decision**: `.github/workflows/publish.yml` holds unattended merge access to `main` — it opens a generated-content PR and calls `gh pr merge --auto --squash`, no human in the loop. This is acceptable because the `Protect main` ruleset requires 0 human approvals but still requires all four `ci.yml` checks (including `next build` against the new content) to pass — auto-merge skips a reviewer, never CI. Three sequencing bugs in that flow were fixed the same day it was written, before it had ever run against real credentials: (1) the pipeline wrote `✓ Pubblicato` to the Sheet *during* the run, before the content PR was confirmed merged — if CI failed or auto-merge never completed, the Sheet permanently claimed a publish that never shipped. Fixed by having `orchestrator.run()` return success messages as `RunReport.deferred` instead of writing them; `ingest/cli.py` persists them to a file, and `ingest/flush_esito.py` writes them to the Sheet only after the workflow confirms the PR merged (see `CONTENT-CONTRACT.md` §7). `✗`/`⏳` messages, which never claim a shipped article, are still written immediately. (2) `concurrency: group: publish-content` serialised the job, but the job exited right after enabling auto-merge, before the merge landed — a second run could then branch from a `main` missing the first run's content. Fixed by polling (`ingest/pr_wait.py`) until the PR reports `MERGED` before the job exits, so the concurrency group now spans the whole publish, not just the pipeline step. (3) A stalled PR (failed check, conflict) was invisible to the next run — the article was absent from `index.json`, so nothing skipped it, and the nightly cron opened a competing PR every night. Fixed by `ingest/pr_guard.py`, which fails the run immediately if an open `content/publish-*` PR already exists.
+- **Rationale**: Publishing needs to stay a CI job, not an operational service (ADR-0018) — but "no human in the loop" only stays safe if a stalled or failed run degrades to "nothing happens, safely" rather than "the Sheet lies" or "two runs corrupt each other's output." Each fix targets exactly one of those failure shapes.
+- **Trade-off noted**: A publish run can now take up to ~10 minutes longer (the merge-wait timeout) instead of exiting as soon as auto-merge is *requested* — the actual "article live" latency is unchanged, since the PR was never going to merge faster than CI ran anyway; the job just now waits to find out and report failure instead of claiming success optimistically.
+- **Status**: ✅ Final
+- **Decided by**: Guido + Claude
+
 ---
 
 ## 🔄 Provisional / Supporting Decisions
