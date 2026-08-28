@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, beforeAll } from "vitest";
 import { renderMarkdown } from "../markdown";
 
 // Characterization tests: these pin the exact HTML output of the shared
@@ -7,6 +7,13 @@ import { renderMarkdown } from "../markdown";
 // were captured by running the pre-extraction pipeline verbatim against each input.
 
 describe("renderMarkdown", () => {
+  // The dynamic imports inside renderMarkdown pay a one-time cold-load cost
+  // for the remark/rehype pipeline; pay it here so it doesn't blow the
+  // default per-test timeout on whichever test happens to run first.
+  beforeAll(async () => {
+    await renderMarkdown("");
+  }, 20000);
+
   it("renders a heading", async () => {
     const html = await renderMarkdown("# Titolo\n\n## Sottotitolo");
     expect(html).toBe("<h1>Titolo</h1>\n<h2>Sottotitolo</h2>");

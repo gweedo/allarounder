@@ -1,5 +1,8 @@
 # Allarounder — Site Structure & Data Models (Draft)
 
+> **Superseded 2026-08-26:** this document describes the retired FastAPI/Postgres/Azure
+> architecture. See [ADR-0018](adr/0018-drive-cms-static-site.md) for the current static-site architecture.
+
 Last updated: 2026-06-14
 Stack: FastAPI (headless API) · Next.js (SSR/ISR frontend) · custom admin UI · Azure PostgreSQL (SQLAlchemy) · Azure Blob Storage (images)
 Language: Italian only · Canonical domain: `allarounder.it`

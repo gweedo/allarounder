@@ -1,0 +1,79 @@
+{
+  "articles": [
+    {
+      "id": "article-benvenuti-su-allarounder",
+      "title": "Benvenuti su Allarounder",
+      "slug": "benvenuti-su-allarounder",
+      "author_id": "author-guido-s",
+      "publish_at": "2026-08-01T09:00:00Z",
+      "updated_at": "2026-08-01T09:00:00Z",
+      "spotify_url": "https://open.spotify.com/show/3ntW2xNlrhVLU2LJlUgW9C",
+      "excerpt": "Nasce Allarounder: articoli in italiano sulla ginnastica artistica, a fianco del podcast su Spotify.",
+      "cover_image_url": null,
+      "cover_image_alt": null,
+      "meta_title": "Benvenuti su Allarounder",
+      "meta_description": "Allarounder è il nuovo spazio italiano dedicato alla ginnastica artistica: articoli, interviste e approfondimenti a fianco del podcast su Spotify.",
+      "og_image_url": null,
+      "reading_time": 2,
+      "author_profile": { "id": "author-guido-s", "name": "Guido S.", "slug": "guido-s" },
+      "category": { "id": "cat-interviste", "name": "Interviste", "slug": "interviste" },
+      "tags": [{ "id": "tag-mondiali", "name": "Mondiali", "slug": "mondiali" }],
+      "guests": []
+    },
+    {
+      "id": "article-intervista-esempio-mondiali-2026",
+      "title": "Intervista a Ginnasta Esempio sui Mondiali 2026",
+      "slug": "intervista-esempio-mondiali-2026",
+      "author_id": "author-guido-s",
+      "publish_at": "2026-08-10T09:00:00Z",
+      "updated_at": "2026-08-10T09:00:00Z",
+      "spotify_url": "https://open.spotify.com/episode/3JlVkNIjIJKvINYpDrVFUP",
+      "excerpt": "Una chiacchierata con Ginnasta Esempio alla vigilia dei Mondiali 2026: obiettivi, avversarie e il percorso verso la finale.",
+      "cover_image_url": null,
+      "cover_image_alt": null,
+      "meta_title": "Ginnasta Esempio: intervista ai Mondiali 2026",
+      "meta_description": "Ginnasta Esempio si racconta alla vigilia dei Mondiali 2026: preparazione, obiettivi e le avversarie da tenere d'occhio nella finale di all-around.",
+      "og_image_url": null,
+      "reading_time": 4,
+      "author_profile": { "id": "author-guido-s", "name": "Guido S.", "slug": "guido-s" },
+      "category": { "id": "cat-interviste", "name": "Interviste", "slug": "interviste" },
+      "tags": [
+        { "id": "tag-mondiali", "name": "Mondiali", "slug": "mondiali" },
+        { "id": "tag-esordienti", "name": "Esordienti", "slug": "esordienti" }
+      ],
+      "guests": [{ "id": "guest-ginnasta-esempio", "name": "Ginnasta Esempio", "slug": "ginnasta-esempio" }]
+    }
+  ],
+  "categories": [
+    {
+      "id": "cat-interviste",
+      "name": "Interviste",
+      "slug": "interviste",
+      "description": "Conversazioni con ginnaste, allenatori e protagonisti della ginnastica artistica italiana."
+    }
+  ],
+  "authors": [
+    {
+      "id": "author-guido-s",
+      "name": "Guido S.",
+      "slug": "guido-s",
+      "bio": "Fondatore di Allarounder, scrive di ginnastica artistica dal 2020.",
+      "photo_url": null,
+      "links": {}
+    }
+  ],
+  "guests": [
+    {
+      "id": "guest-ginnasta-esempio",
+      "name": "Ginnasta Esempio",
+      "slug": "ginnasta-esempio",
+      "bio": "Ospite di esempio, dato di prova per la struttura del sito.",
+      "photo_url": null,
+      "links": {}
+    }
+  ],
+  "tags": [
+    { "id": "tag-mondiali", "name": "Mondiali", "slug": "mondiali" },
+    { "id": "tag-esordienti", "name": "Esordienti", "slug": "esordienti" }
+  ]
+}

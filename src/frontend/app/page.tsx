@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-
-export const revalidate = 60;
+import { getArticleCards } from "../lib/content";
 
 export const metadata: Metadata = {
   title: "Allarounder — La voce italiana sulla ginnastica artistica",
@@ -10,63 +9,17 @@ export const metadata: Metadata = {
   alternates: { canonical: "https://allarounder.it" },
 };
 
-interface CategoryRef {
-  id: string;
-  name: string;
-  slug: string;
-}
-
-interface AuthorRef {
-  id: string;
-  name: string;
-  slug: string;
-}
-
-interface ArticleCard {
-  id: string;
-  title: string;
-  slug: string;
-  excerpt: string | null;
-  cover_image_url: string | null;
-  cover_image_alt: string | null;
-  publish_at: string;
-  reading_time: number | null;
-  category: CategoryRef | null;
-  author_profile: AuthorRef | null;
-}
-
-interface ArticleListResponse {
-  items: ArticleCard[];
-  total: number;
-  page: number;
-  page_size: number;
-}
-
 const PAGE_SIZE = 13;
 
-async function getArticles(page: number): Promise<ArticleListResponse> {
-  const apiUrl = process.env.API_URL ?? "http://backend:8000";
-  try {
-    const res = await fetch(
-      `${apiUrl}/api/articles?page=${page}&page_size=${PAGE_SIZE}`,
-      { next: { revalidate: 60 } },
-    );
-    if (!res.ok) return { items: [], total: 0, page, page_size: PAGE_SIZE };
-    return (await res.json()) as ArticleListResponse;
-  } catch {
-    return { items: [], total: 0, page, page_size: PAGE_SIZE };
-  }
-}
+// Static export can only prerender one version of this page, so pagination is
+// fixed at page 1 here — `next build` hard-errors on `searchParams` under
+// `output: "export"`. Path-based pagination (e.g. /pagina/[n] with
+// generateStaticParams) is the way to bring it back once the article count
+// exceeds PAGE_SIZE; out of scope while the sample content fits on one page.
+const page = 1;
 
-interface Props {
-  searchParams: Promise<{ page?: string }>;
-}
-
-export default async function HomePage({ searchParams }: Props) {
-  const { page: pageStr } = await searchParams;
-  const page = Math.max(1, parseInt(pageStr ?? "1", 10) || 1);
-
-  const data = await getArticles(page);
+export default async function HomePage() {
+  const data = getArticleCards(page, PAGE_SIZE);
   const hero = page === 1 ? data.items[0] ?? null : null;
   const grid = page === 1 ? data.items.slice(1) : data.items;
   const totalPages = Math.ceil(data.total / PAGE_SIZE);
