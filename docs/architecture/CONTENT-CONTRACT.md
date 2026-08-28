@@ -100,6 +100,25 @@ committed as generated content. Triggers:
 A row that is `Pubblicato` but whose `data` is still in the future is not an
 error — see §7 for how this is surfaced to the writer instead of silence.
 
+**Eligibility is re-evaluated for every row every run, but re-processing an
+already-published row is skipped only when nothing that feeds its generated
+content has changed.** The pipeline records two things alongside each
+generated article: the Doc's Drive `modifiedTime`, and a hash of every
+content-bearing Sheet field (`titolo`, `categoria`, `tag`, `autore`,
+`ospite`, `spotify`, `copertina`, `meta_description`, `data` — not `stato` or
+`esito`, which are workflow state, not content). A row is skipped — no
+re-export, no re-conversion, no re-download, no Sheet write — only when
+*both* the Doc's `modifiedTime` and that hash are unchanged from what's
+stored, and the Sheet's `esito` already shows success. If either the Doc or
+any content-bearing Sheet field has changed, the row takes the full path and
+regenerates. This is what keeps a Sheet-only correction (fixing a
+`meta_description`, retagging an article, swapping the cover image) landing
+on the very next run, while an untouched article still costs zero Drive
+exports — without this two-part key, a nightly cron would either fully
+reprocess every published article forever (keying on eligibility alone) or
+silently strand Sheet-only corrections until someone also touched the Doc
+(keying on the Doc alone).
+
 **Un-publishing is out of scope for v1.** Changing a previously-published
 row's `stato` away from `Pubblicato`, or moving `data` into the future, does
 **not** retract already-committed content on the next run. Because generated
@@ -163,19 +182,14 @@ produces a broken page.
 | `categoria` | `Category` | Must be one of the four seeded categories (§1) |
 | `autore` | Author registry lookup (§4) | Must match; no inline creation |
 | `spotify` | `SpotifyUrl` | Must match the Spotify URL pattern if present; empty is valid (standalone article) |
-| `meta_description` | — (no dedicated value object yet; see below) | **140–155 characters**, per `docs/product/PRD.md` item 36 |
+| `meta_description` | `MetaDescription` | **140–155 characters**, per `docs/product/PRD.md` item 36 |
 
 **On the meta-description rule:** `src/pipeline/domain/content/value_objects.py`
-currently defines `META_TITLE_MAX_LENGTH = 60` and
-`META_DESCRIPTION_MAX_LENGTH = 160`, carried over from the retired admin API
-(PR #102) where they were storage-width caps, not the product's editorial
-rule. The actual requirement, from the PRD, is a **140–155 character range**
-— tighter than the 160-char code constant and with a minimum the code
-doesn't enforce at all yet. **Stream 1 must add this validation** (a new
-`MetaDescription` value object or equivalent) as part of building the
-pipeline, and should replace or reconcile `META_DESCRIPTION_MAX_LENGTH = 160`
-at the same time — don't leave a 160 constant sitting next to a 140–155 rule
-enforced elsewhere; that's a trap for the next person who touches this file.
+now defines `META_DESCRIPTION_MIN_LENGTH = 140` and
+`META_DESCRIPTION_MAX_LENGTH = 155`, enforced by the `MetaDescription` value
+object and used by `ingest/validate.py`. This replaced the retired admin
+API's storage-width cap (`META_DESCRIPTION_MAX_LENGTH = 160`, from PR #102),
+which enforced neither the right range nor a minimum at all.
 
 **Fields with no Sheet column, derived instead of authored:**
 
@@ -277,7 +291,8 @@ Authoritative source: `src/frontend/lib/content.ts`. Location:
 - `src/frontend/content/index.json` — `{ articles, categories, authors,
   guests, tags }`, matching the `ContentIndex` shape in `content.ts`.
 - `src/frontend/content/articles/<slug>.md` — YAML frontmatter matching
-  `ArticleMeta` (plus the pipeline-only `doc_id`, §2) + Markdown body.
+  `ArticleMeta` (plus the pipeline-only `doc_id` and `row_hash`, §2 and §3) +
+  Markdown body.
 - `src/frontend/content/pages/<slug>.md` — YAML frontmatter matching
   `StaticPage` (minus `body`) + Markdown body.
 
