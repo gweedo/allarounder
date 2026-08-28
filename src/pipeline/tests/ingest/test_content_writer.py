@@ -9,6 +9,7 @@ def _meta(**overrides: object) -> ArticleMeta:
     defaults: dict[str, object] = {
         "id": "article-intervista-a-marco",
         "doc_id": "doc-1",
+        "row_hash": "hash-1",
         "title": "Intervista a Marco",
         "slug": "intervista-a-marco",
         "author_id": "author-guido-s",

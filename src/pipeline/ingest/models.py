@@ -46,10 +46,12 @@ class DocExport:
 @dataclass(frozen=True)
 class ArticleMeta:
     """Mirrors `ArticleMeta` in `src/frontend/lib/content.ts`, plus the
-    pipeline-only `doc_id` field (CONTENT-CONTRACT.md §2, §9)."""
+    pipeline-only `doc_id` and `row_hash` fields (CONTENT-CONTRACT.md §2, §3,
+    §9)."""
 
     id: str
     doc_id: str
+    row_hash: str
     title: str
     slug: str
     author_id: str

@@ -1,11 +1,11 @@
 """Reads/writes generated content: index.json, articles/<slug>.md
 (CONTENT-CONTRACT.md §6, §9).
 
-Authoritative shape: `src/frontend/lib/content.ts`. `doc_id` is an extra
-frontmatter/index field the pipeline uses for identity (CONTENT-CONTRACT.md
-§2) that `content.ts`'s `ArticleMeta` interface doesn't type -- harmless,
-since `content.ts` reads frontmatter via a type assertion, not runtime
-validation.
+Authoritative shape: `src/frontend/lib/content.ts`. `doc_id` and `row_hash`
+are extra frontmatter/index fields the pipeline uses for identity and
+skip-detection (CONTENT-CONTRACT.md §2, §3) that `content.ts`'s `ArticleMeta`
+interface doesn't type -- harmless, since `content.ts` reads frontmatter via
+a type assertion, not runtime validation.
 """
 
 from __future__ import annotations
@@ -54,6 +54,7 @@ def article_meta_dict(meta: ArticleMeta) -> dict[str, Any]:
     return {
         "id": meta.id,
         "doc_id": meta.doc_id,
+        "row_hash": meta.row_hash,
         "title": meta.title,
         "slug": meta.slug,
         "author_id": meta.author_id,

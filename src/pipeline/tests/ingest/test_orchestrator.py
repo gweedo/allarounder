@@ -263,6 +263,69 @@ class TestRun:
         second_sheets = FakeSheetsClient(rows=[_row(esito=previous_esito)])
         _run(pipeline_dirs, second_sheets, drive)
         assert drive.export_doc_calls == ["doc-1"]
+
+    def test_meta_description_edit_with_doc_untouched_regenerates_article(
+        self, pipeline_dirs: tuple[Path, Path, Path]
+    ) -> None:
+        # A Sheet-only correction (the Doc's modifiedTime never changes)
+        # must still reach the site -- the skip check is keyed on the Doc
+        # *and* a hash of the content-bearing Sheet fields, not the Doc
+        # alone.
+        content_dir, _, _ = pipeline_dirs
+        drive = FakeDriveClient(
+            docs={"doc-1": "<p>Corpo.</p>"},
+            modified_times={"doc-1": "2026-08-27T00:00:00.000Z"},
+        )
+        first_sheets = FakeSheetsClient(rows=[_row()])
+        _run(pipeline_dirs, first_sheets, drive)
+        assert drive.export_doc_calls == ["doc-1"]
+        previous_esito = first_sheets.written[2]
+
+        corrected_meta = (
+            "Una nuova descrizione corretta per la SEO, abbastanza lunga da "
+            "rispettare davvero il limite minimo di centoquaranta caratteri "
+            "come richiesto dalle regole."
+        )
+        assert 140 <= len(corrected_meta) <= 155
+        second_sheets = FakeSheetsClient(
+            rows=[_row(esito=previous_esito, meta_description=corrected_meta)]
+        )
+
+        # A different time-of-day than the first run's `NOW`, so a genuine
+        # re-publish produces a different (and therefore written) esito
+        # message -- matching real usage, where wall-clock time has moved on.
+        _run(pipeline_dirs, second_sheets, drive, now=datetime(2026, 8, 27, 15, 45, tzinfo=UTC))
+
+        # Reprocessed despite the Doc being unchanged -- the row hash caught
+        # the Sheet-side edit.
+        assert drive.export_doc_calls == ["doc-1", "doc-1"]
+        index = json.loads((content_dir / "index.json").read_text(encoding="utf-8"))
+        assert index["articles"][0]["meta_description"] == corrected_meta
+        assert second_sheets.written[2].startswith("✓ Pubblicato")
+
+    def test_added_whitespace_alone_does_not_trigger_reprocessing(
+        self, pipeline_dirs: tuple[Path, Path, Path]
+    ) -> None:
+        # The row hash must be computed on stripped values -- otherwise
+        # incidental whitespace (which validate_row already normalizes away
+        # before it reaches generated content) would trigger a spurious
+        # Drive re-export and esito rewrite for a row that produces
+        # byte-identical output.
+        drive = FakeDriveClient(
+            docs={"doc-1": "<p>Corpo.</p>"},
+            modified_times={"doc-1": "2026-08-27T00:00:00.000Z"},
+        )
+        first_sheets = FakeSheetsClient(rows=[_row()])
+        _run(pipeline_dirs, first_sheets, drive)
+        assert drive.export_doc_calls == ["doc-1"]
+        previous_esito = first_sheets.written[2]
+
+        second_sheets = FakeSheetsClient(
+            rows=[_row(esito=previous_esito, titolo="  Intervista a Marco  ")]
+        )
+        _run(pipeline_dirs, second_sheets, drive)
+
+        assert drive.export_doc_calls == ["doc-1"]
         assert second_sheets.written == {}
 
     def test_unexpected_exception_on_one_row_does_not_abort_other_rows(

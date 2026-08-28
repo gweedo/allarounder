@@ -7,6 +7,8 @@ dispatch-triggered run share identical logic.
 
 from __future__ import annotations
 
+import hashlib
+import json
 import sys
 import traceback
 from dataclasses import dataclass, field
@@ -54,6 +56,37 @@ def _failure_message(exc: Exception) -> str:
     if isinstance(exc, (RowValidationError, SlugCollisionError)):
         return str(exc)
     return "errore imprevisto durante l'importazione — controlla i log della pipeline"
+
+
+def _row_content_hash(row: SheetRow) -> str:
+    """A stable fingerprint of every Sheet field that can change what gets
+    generated, independent of the Doc's own content -- `stato` and `esito`
+    are workflow state, not content, and are deliberately excluded. Listed
+    explicitly (not via `getattr` over a name list) so a renamed/removed
+    `SheetRow` field fails at type-check, not as a runtime `AttributeError`
+    inside the broad per-row exception handler, which would otherwise report
+    every row as a generic content failure instead of the real bug. Values
+    are stripped before hashing so a trailing space (already normalized away
+    before it reaches generated content, e.g. by `validate_row`) doesn't
+    trigger a spurious reprocess.
+
+    Keying the skip check (§3) on this *and* the Doc's modifiedTime means an
+    untouched Doc still costs zero Drive exports, but a Sheet-only
+    correction (e.g. fixing a meta_description) is no longer stranded until
+    someone also edits the Doc."""
+    values = [
+        row.titolo,
+        row.categoria,
+        row.tag,
+        row.autore,
+        row.ospite,
+        row.spotify,
+        row.copertina,
+        row.meta_description,
+        row.data,
+    ]
+    payload = json.dumps([v.strip() for v in values], ensure_ascii=False)
+    return hashlib.sha256(payload.encode("utf-8")).hexdigest()
 
 
 def run(
@@ -134,26 +167,27 @@ def _publish_row(
     treat as a per-row failure, never let escape and abort the whole run."""
     doc_id = extract_doc_id(row.doc)
     current_modified = drive.get_modified_time(doc_id)
+    current_row_hash = _row_content_hash(row)
 
     existing = content_writer.find_article_by_doc_id(index["articles"], doc_id)
     if (
         existing is not None
         and existing.get("updated_at") == current_modified
+        and existing.get("row_hash") == current_row_hash
         and row.esito.strip().startswith("✓")
     ):
-        # The Doc hasn't changed since it last published successfully, and
-        # the Sheet already shows that success -- skip the expensive
+        # Neither the Doc's own content (modifiedTime) nor any Sheet field
+        # that feeds generated content (the row hash) has changed since this
+        # row last published successfully -- skip the expensive
         # re-export/re-convert/re-download entirely and reuse the existing
         # esito verbatim (never fabricate a new "publish time" for content
         # that wasn't actually just published -- that's what a modifiedTime-
         # based timestamp would do, and it lies for a scheduled post whose
-        # Doc was last edited long before its real publish moment). Without
-        # this skip, CONTENT-CONTRACT.md §3's "re-evaluate the entire Sheet
-        # every run" rule would force a full reprocess of every published
-        # article, forever, on every nightly cron run. Sheet-only field edits
-        # (titolo, meta_description, tags, ...) made without touching the Doc
-        # itself are not picked up until the Doc changes -- an accepted
-        # trade-off for keeping the recurring cost bounded (CONTENT-CONTRACT.md §3).
+        # Doc was last edited long before its real publish moment). Keying on
+        # *both* signals (CONTENT-CONTRACT.md §3) is what keeps the steady-
+        # state cost at zero Drive exports for an untouched article while
+        # still letting a Sheet-only correction (e.g. fixing a
+        # meta_description) reach the site on the very next run.
         return row.esito.strip()
 
     export = drive.export_doc(doc_id)
@@ -196,6 +230,7 @@ def _publish_row(
     meta = ArticleMeta(
         id=identity.id,
         doc_id=doc_id,
+        row_hash=current_row_hash,
         title=validated.titolo,
         slug=identity.slug,
         author_id=author_ref.id,

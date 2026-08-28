@@ -101,16 +101,23 @@ A row that is `Pubblicato` but whose `data` is still in the future is not an
 error — see §7 for how this is surfaced to the writer instead of silence.
 
 **Eligibility is re-evaluated for every row every run, but re-processing an
-already-published row is skipped when its Doc hasn't changed.** The pipeline
-records each Doc's Drive `modifiedTime` alongside its generated article; on a
-later run, a row whose Doc `modifiedTime` is unchanged *and* whose Sheet
-`esito` already shows success is left exactly as-is — no re-export, no
-re-conversion, no re-download, no Sheet write. Without this, a nightly cron
-would fully reprocess every published article in the catalog forever,
-growing Drive/Sheets API usage and Actions run time without bound as the site
-grows. The accepted trade-off: a Sheet-only field edit (`titolo`,
-`meta_description`, `tag`, ...) made without also touching the Doc is not
-picked up until the Doc itself changes.
+already-published row is skipped only when nothing that feeds its generated
+content has changed.** The pipeline records two things alongside each
+generated article: the Doc's Drive `modifiedTime`, and a hash of every
+content-bearing Sheet field (`titolo`, `categoria`, `tag`, `autore`,
+`ospite`, `spotify`, `copertina`, `meta_description`, `data` — not `stato` or
+`esito`, which are workflow state, not content). A row is skipped — no
+re-export, no re-conversion, no re-download, no Sheet write — only when
+*both* the Doc's `modifiedTime` and that hash are unchanged from what's
+stored, and the Sheet's `esito` already shows success. If either the Doc or
+any content-bearing Sheet field has changed, the row takes the full path and
+regenerates. This is what keeps a Sheet-only correction (fixing a
+`meta_description`, retagging an article, swapping the cover image) landing
+on the very next run, while an untouched article still costs zero Drive
+exports — without this two-part key, a nightly cron would either fully
+reprocess every published article forever (keying on eligibility alone) or
+silently strand Sheet-only corrections until someone also touched the Doc
+(keying on the Doc alone).
 
 **Un-publishing is out of scope for v1.** Changing a previously-published
 row's `stato` away from `Pubblicato`, or moving `data` into the future, does
@@ -284,7 +291,8 @@ Authoritative source: `src/frontend/lib/content.ts`. Location:
 - `src/frontend/content/index.json` — `{ articles, categories, authors,
   guests, tags }`, matching the `ContentIndex` shape in `content.ts`.
 - `src/frontend/content/articles/<slug>.md` — YAML frontmatter matching
-  `ArticleMeta` (plus the pipeline-only `doc_id`, §2) + Markdown body.
+  `ArticleMeta` (plus the pipeline-only `doc_id` and `row_hash`, §2 and §3) +
+  Markdown body.
 - `src/frontend/content/pages/<slug>.md` — YAML frontmatter matching
   `StaticPage` (minus `body`) + Markdown body.
 
