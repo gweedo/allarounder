@@ -1,193 +1,170 @@
-# Next-steps handoff prompt (Allarounder) — rebuild onto Drive + static
+# Next-steps handoff prompt (Allarounder) — Phase D: go live
 
 Paste everything below the line into a fresh Claude Code session in this repo.
-It is self-contained. Supersedes the June 2026 version of this file, which
-described the Azure deployment effort that has now been retired.
+Supersedes every earlier version of this file — the Drive/static rebuild
+(ADR-0018) is fully merged into `main`.
 
 ---
 
 ## Context
 
 **Allarounder** is an Italian written-articles blog promoting a gymnastics
-podcast hosted on Spotify. The site hosts no audio; each article optionally
-links to an episode. SEO in Italian search is the product goal.
+podcast hosted on Spotify, rebuilt onto **Google Drive as CMS + static
+Next.js on Cloudflare Pages** (ADR-0018,
+`docs/architecture/adr/0018-drive-cms-static-site.md`).
 
-On **2026-08-26** the project pivoted. The June architecture — FastAPI HTTP API,
-custom admin UI, Postgres, Azure Container Apps, Front Door, Bicep — is retired.
-Read `docs/DECISIONS.md` (entries dated 2026-08-26) for the full rationale.
-In short:
+`main` now holds the whole rebuild:
 
-- The three writers work natively in **Google Docs** and will not move to a
-  custom editor, which removed the user for the largest build item (ADR-0003).
-- A permanent **€10/month ceiling**; production was already torn down in July.
-- The developer has **3–6 hours a week**, against an architecture sized for far more.
+- The static Next.js site (`src/frontend/`, `output: "export"`), building
+  and passing lint/typecheck/tests/`npm audit --audit-level=high` clean.
+- The content pipeline (`src/pipeline/`, Python) that reads the editorial
+  Sheet, exports each Doc, converts it to Markdown, validates it against the
+  domain layer, and writes `content/articles/*.md` + `content/index.json` —
+  tested (146 pytest cases), `ruff`/`mypy` clean.
+- The Apps Script source (`tools/apps-script/`) for the Sheet's "Pubblica" /
+  "Nuovo articolo" menu, and the `.github/workflows/publish.yml` job it
+  triggers via `repository_dispatch` (plus a nightly cron for future-dated
+  posts).
 
-**The new shape:** writers author in Google Docs, with a Google Sheet as the
-editorial index. A GitHub Actions job exports the Drive folder, validates it,
-generates Markdown, and publishes a **static** Next.js site to **Cloudflare
-Pages**. No server, no database, no admin UI, no authentication.
+All of that has only ever run against **fixture data** (the two sample
+articles in `content/index.json`). **Nothing has touched a real Google Sheet,
+a real Drive folder, or Cloudflare yet** — no credentials exist anywhere in
+this project. ADR-0018's action items 4 and 5 (build the pipeline, build the
+Apps Script integration) are done; **item 6 — point `allarounder.it` at
+Cloudflare Pages — is what's left**, and it was blocked on exactly the
+credentials this phase creates. (ADR-0018's action-item checklist itself
+still shows items 4–5 unchecked — update it if you touch that file, but that
+edit isn't part of this phase's acceptance criteria.)
 
-The full plan, including the Sheet schema and what survives, is in the design
-document — ask the user for the link if you need it.
+Two branches exist outside this history and are intentionally untouched:
+`fix/seo-meta-length-validation` and `docs/pivot-drive-static-archive`. Leave
+them alone unless the user asks about them specifically.
 
-## Hard constraints
+## Hard constraints (unchanged from the rebuild)
 
-- **Never push to `main`.** Branch from `origin/main`, open a PR, let the user merge.
-- **Code, comments, commits, docs are English. Site content and content-facing
-  routes (`/articoli/`, `/argomenti/`) are Italian.** Keep these separate.
-- **Nothing that costs money.** Free tiers only. No Azure, no paid plans.
-- **Decisions supersede, they never get rewritten.** New ADR + update
-  `docs/DECISIONS.md`; never edit decision history in place.
-- **TDD** is the project methodology (ADR-0009). Tests before implementation.
-- **Do not touch `_record/`.** It is a gitignored local archive of the
-  pre-rebuild application. Never delete it, never commit it.
+- **Never push to `main`.** Branch, open a PR, let the required checks
+  (`ci.yml`) run — the `Protect main` ruleset needs 0 approvals, so a PR with
+  green checks can be merged without waiting on a human, but it still has to
+  go through a PR.
+- **Code, comments, commits, docs are English. Site content and
+  content-facing routes (`/articoli/`, `/argomenti/`) are Italian.**
+- **€10/month ceiling, permanently.** Free tiers only: Cloudflare Pages free
+  tier, GitHub Actions free minutes, Google Workspace already owned. Stop
+  and ask before adding anything that could cost money (a paid Cloudflare
+  plan, a Google Cloud project outside the free API quota, etc.).
+- **Never create, commit, or mock credentials yourself.** Every task below
+  that needs a secret (a service-account key, a GitHub PAT, a Cloudflare API
+  token) requires the user to generate it in the relevant console and hand
+  it to you to paste into a secrets UI — GitHub Actions secrets or Apps
+  Script script properties — never into a file that gets committed. If a
+  task is blocked on a credential only the user can create, say so and stop;
+  don't work around it.
+- **Confirm with the user before the DNS cutover specifically.** Everything
+  else in this phase is reversible (a GitHub secret can be rotated, a
+  Cloudflare Pages project can be deleted, a test Sheet row can be deleted).
+  Pointing `allarounder.it`'s DNS at Cloudflare is the one step that's
+  visible to the outside world and not casually reversible — get explicit
+  go-ahead before doing it, even if every earlier step went smoothly.
 
-## Gotchas — do not rediscover these
+## Task D1 — Stand up the editorial Sheet and Apps Script
 
-- `src/frontend/middleware.ts` exists (admin auth). **Middleware is incompatible
-  with `output: "export"`.** It must be deleted, not adapted.
-- `next.config.ts` currently sets `output: "standalone"` and a `headers:` block.
-  **`headers:` does not work under static export** — those security headers must
-  move to a Cloudflare `_headers` file or they silently vanish.
-- `images.remotePatterns` points at Azure Blob Storage. Under export, set
-  `images: { unoptimized: true }`; images become local files under `content/`.
-- Public pages currently fetch the backend over HTTP at `${apiUrl}/api/articles/<slug>` and set
-  `export const revalidate = 60`. Both go: replace with a filesystem read, and
-  dynamic routes need `generateStaticParams`.
-- The seven July feature branches are a **linear stack** (`session-persistence` →
-  `admin-shell` → `markdown-lib` → `admin-crud-completion` → `public-styling` →
-  `docs-paste-converter` → `google-sso`). Do not cherry-pick. Merge the tip and
-  you get all of it.
-- `fix/seo-meta-length-validation` is a **local-only branch**, one commit, never
-  pushed. It contains the meta title/description length validation. There is **no
-  `Seo` value object** in the domain layer — this branch is where that logic lives.
-- Stack: Next 15.1 / React 19 / TypeScript, Python 3.13, remark+rehype with
-  `rehype-sanitize` for Markdown.
+Mostly manual (Google Workspace UI), but you can generate exact content and
+narrate each step. Follow `tools/apps-script/README.md` "Setup (once the
+Sheet exists)" verbatim — it's already written for this:
 
-## Task 0 — Archive the pre-rebuild application
+1. Create the Sheet with columns in the exact order `CONTENT-CONTRACT.md` §1
+   specifies: `titolo, doc, categoria, tag, autore, ospite, spotify,
+   copertina, meta_description, data, stato, esito`.
+2. Bind an Apps Script project to it (Extensions → Apps Script), push
+   `tools/apps-script/src/*` via `clasp` or paste manually.
+3. Set Apps Script script properties: `GITHUB_TOKEN` (fine-grained PAT,
+   `gweedo/allarounder` contents: read, scoped to nothing else), `GITHUB_OWNER`
+   (`gweedo`), `GITHUB_REPO` (`allarounder`). The user creates the PAT; you
+   never see or store it.
+4. Reload the Sheet, run "Configura validazione colonne" once.
 
-`_record/` contains a bare mirror (11 branches, 203 commits, including PR refs)
-and a verified bundle.
+**Acceptance:** the "Allarounder" menu appears in the Sheet; the `categoria`,
+`stato`, `autore` dropdowns validate.
 
-1. Create an empty `gweedo/allarounder-legacy` on GitHub — no README, no
-   .gitignore, no licence.
-2. `cd _record/allarounder-legacy.git && git remote set-url --push origin
-   https://github.com/gweedo/allarounder-legacy.git && git push --mirror`
-3. Archive it (read-only) via the GitHub API or `gh`.
+## Task D2 — Google service account + repo secrets
 
-**Acceptance:** all 11 branches visible on the new repo; it shows as archived.
+The pipeline needs a Google service account with **Drive read-only** and
+**Sheets read/write** (`CONTENT-CONTRACT.md` §8) — the user creates it in
+Google Cloud Console and shares the Sheet and Drive folder with its email.
 
-## Task 1 — Merge the stranded stack into `main`
+1. User creates the service account, downloads the JSON key, shares Sheet +
+   Drive folder with it (Viewer is enough for Drive; the Sheet needs Editor
+   so the pipeline can write `esito`).
+2. User (or you, with the value pasted into the CLI, never into a file) sets
+   two GitHub Actions repo secrets: `GOOGLE_SERVICE_ACCOUNT_JSON` (the full
+   key JSON) and `SHEET_ID` (the spreadsheet ID from its URL) — these are
+   exactly what `src/pipeline/ingest/config.py` and `publish.yml` expect.
 
-Roughly 40 commits of July work sit on branches and have never reached `main`.
-Get them into history *before* anything is deleted.
+**Acceptance:** `gh secret list` shows both names (never their values) set
+on `gweedo/allarounder`.
 
-1. PR from `origin/feat/google-sso` (the stack tip) into `main`.
-2. Separately, push and PR `fix/seo-meta-length-validation`.
-3. Resolve conflicts conservatively; do not refactor while merging.
+## Task D3 — First real pipeline run
 
-**Acceptance:** `main` contains all seven branches' work plus the SEO validation
-commit. CI green, or failures explained in the PR body.
+1. Write one real test article as a Google Doc, add its row to the Sheet
+   (`stato = Bozza` first to check validation, then `Pubblicato`).
+2. Trigger a run: click "Pubblica" in the Sheet (fires
+   `repository_dispatch`) or `gh workflow run publish.yml` for a manual
+   `workflow_dispatch` test first — cheaper to debug from the CLI than from
+   Apps Script's execution log.
+3. Watch the Action run. It opens a `content/publish-<run_id>` branch, PRs
+   it against `main`, and auto-merges once `ci.yml`'s required checks pass
+   (`publish.yml`'s own comment explains why this doesn't violate "never
+   push to main" — it's a PR like any other, just self-merging on green
+   checks under the existing 0-approval ruleset).
+4. Confirm the row's `esito` cell in the Sheet shows success, and that the
+   generated `content/articles/<slug>.md` + `content/index.json` diff in
+   that PR looks right before it merges (watch the first one closely — this
+   is the first time real Drive content has gone through `html_to_markdown`
+   and `validate_row`).
 
-## Task 2 — Strip to a static site
+**Acceptance:** one real article's Markdown and metadata land on `main`
+through the automated PR, matching what's in the Sheet and Doc.
 
-One PR. Large but mechanical.
+## Task D4 — Cloudflare Pages
 
-**Delete:** `src/backend/` except the domain layer (see below); `src/frontend/app/admin/**`;
-`src/frontend/app/api/[...path]/`; `src/frontend/app/preview/**`;
-`src/frontend/middleware.ts`; `components/AdminShell.tsx`, `GuestForm.tsx`,
-`MarkdownEditor.tsx`; `lib/api.ts`, `lib/upload.ts`; `infra/`;
-`.github/workflows/{backend,frontend,postgres-staging}.yml`; `docker-compose.yml`
-and Dockerfiles; the `jose` and `pino` dependencies.
+1. User creates the free Cloudflare account/project if none exists.
+2. Connect the `gweedo/allarounder` repo (or configure via `wrangler` /
+   direct upload if the user prefers not to grant Cloudflare a GitHub App
+   install — ask which).
+3. Build settings: build command `cd src/frontend && npm run build`, output
+   directory `src/frontend/out`, no environment variables needed (per
+   `.env.example`, the frontend build reads only `content/` on disk).
+4. Deploy to Cloudflare's `*.pages.dev` preview URL first. **Do not touch
+   DNS yet.** Check the preview: real pages render, images load, `/articoli/`
+   and `/argomenti/` routes work, `robots.txt`/`sitemap.xml` are sane.
 
-**Keep and move:** `src/backend/app/domain/content/` → `src/pipeline/domain/`.
-It holds `Slug` (with `from_title`), `Body`, `SpotifyUrl`, `PublicationStatus`,
-and entities `Article`, `Author`, `Guest`, `Category`, `Tag`, `StaticPage`.
-Keep its tests. Strip any framework imports that come with it.
+**Acceptance:** the `*.pages.dev` URL serves the site correctly, verified by
+you actually loading it, not just a successful build log.
 
-**Keep untouched:** every public route (`app/page.tsx`, `articoli/[slug]`,
-`argomenti/[slug]`, `autori/[slug]`, `ospiti/[slug]`, `tag/[slug]`, `[slug]`),
-`app/sitemap.ts`, `app/robots.ts`, `app/globals.css`, `lib/markdown.ts`.
+## Task D5 — DNS cutover (needs explicit go-ahead, see constraints above)
 
-**Convert:** `output: "export"`, `images: { unoptimized: true }`, headers moved to
-`public/_headers`. Replace each page's `fetch()` with a loader reading
-`content/`. **The TypeScript interfaces already declared in those page files
-define the JSON contract** — the pipeline must emit exactly that shape; do not
-invent a new one. Add `generateStaticParams` to every dynamic route.
+1. Confirm with the user immediately before this step, even if D1–D4 went
+   without issue.
+2. Point `allarounder.it` at the Cloudflare Pages project (custom domain in
+   the Pages dashboard, or a CNAME/A record per Cloudflare's instructions).
+3. Configure `allarounder.eu` → `allarounder.it` as a 301 redirect (ADR-0007
+   — mechanism is now Cloudflare Page Rules or a small redirect Worker, not
+   Azure Front Door).
+4. Verify both domains resolve correctly and serve real content over HTTPS.
 
-Ship it with a few committed sample articles in `content/` so the site builds and
-deploys before the pipeline exists. Deploy to Cloudflare Pages and point
-`allarounder.it` at it, with `allarounder.eu` 301-redirecting (ADR-0007).
+**Acceptance:** `allarounder.it` serves the static site; `allarounder.eu`
+redirects to it; both over valid HTTPS.
 
-Also in this PR: **write ADR-0018** recording the pivot and superseding
-ADR-0001, 0002, 0003, 0004, 0005, 0013, 0015, 0016; update `adr/README.md`; and
-**rewrite `CLAUDE.md`**, which is badly stale — it still claims no application
-code exists.
+## Do not
 
-**Acceptance:** `npm run build` produces static output; the site is live on the
-real domain; `.eu` redirects to `.it`; no reference to FastAPI, Postgres, Azure
-or authentication remains outside `docs/` history.
+- Create, commit, or mock any credential (service-account key, PAT,
+  Cloudflare token) — the user generates every one of these.
+- Cut over DNS without the explicit go-ahead described above.
+- Modify the `Protect main` ruleset or use an admin bypass.
+- Touch `fix/seo-meta-length-validation` or `docs/pivot-drive-static-archive`
+  unless asked.
+- Add any paid tier or service without discussing the €10/month ceiling
+  first.
 
-## Task 3 — The Drive pipeline
-
-`src/pipeline/`, Python 3.13, TDD, running only in CI.
-
-- Google service-account auth (Drive + Sheets, read-only on Drive).
-- Read the editorial Sheet: one row per article, columns `titolo`, `doc`,
-  `categoria`, `tag`, `autore`, `ospite`, `spotify`, `copertina`,
-  `meta_description`, `data`, `stato`, `esito`.
-- Publish only rows where `stato = Pubblicato` **and** `data <= now` — this is the
-  read-time filter from `DECISIONS.md`, now applied at build time.
-- Export each Doc via `files.export` with **`application/zip`** (HTML plus every
-  embedded image in one request — more reliable than the Docs JSON for images).
-  `text/markdown` is available for text-only pieces.
-- Convert HTML → Markdown, extract images to `content/images/<slug>/`, and
-  validate through the domain value objects. `meta_description` must be 140–155
-  characters (see the `fix/seo-meta-length-validation` logic).
-- Emit `content/articles/*.md` and `content/index.json` in the shape the site's
-  TypeScript interfaces already declare. **Commit the generated content** — it is
-  the audit trail and makes rollback a `git revert`.
-- Reject bad input with a clear Italian message rather than emitting a broken page.
-- `.github/workflows/publish.yml`: triggers on `repository_dispatch`, a nightly
-  cron (for future-dated posts), and `workflow_dispatch`.
-
-**Acceptance:** a real Doc becomes a live article. A Doc with a 100-character
-meta description fails the build with a message a non-technical writer can act on.
-
-## Task 4 — The Sheet and the “Pubblica” button
-
-- Produce the Apps Script (in `tools/apps-script/`, committed) providing a
-  **“Pubblica”** menu item that calls GitHub `repository_dispatch`.
-- After the build, write the outcome back into the Sheet's `esito` column —
-  `✓ Pubblicato 14:32` or `✗ meta description troppo corta (128, servono 140–155)`.
-  Errors must be in **Italian**; writers read them.
-- Add a **“Nuovo articolo”** item that creates a Doc from a template and fills in
-  the row.
-- Use data validation (dropdowns) for `categoria`, `autore`, `ospite`, `stato` so
-  values cannot be typo'd. Categories: Interviste, Analisi, Roundtable, Out of the Box.
-- Write `docs/product/editorial-workflow.md` **in Italian** — a one-page guide for
-  the three writers.
-
-**Acceptance:** clicking Pubblica publishes within ~2 minutes and the Sheet shows
-the result.
-
-## Credentials — stop and ask
-
-You cannot obtain these. Ask the user, and do not invent, mock, or commit them:
-
-- Google service-account JSON (Drive + Sheets)
-- The Drive folder ID and the Sheet ID
-- Cloudflare API token and account ID
-- A GitHub PAT for Apps Script to call `repository_dispatch`
-
-Secrets go in GitHub Actions secrets and Apps Script script properties. **Never
-in the repo.**
-
-## Working agreement
-
-- One PR per task. Each PR body: what changed, what it deletes, how it was verified.
-- **Stop and ask** before: deleting anything not listed above, adding a paid
-  service, changing the Sheet schema, or touching `docs/DECISIONS.md` history.
-- Log meaningful decisions in `docs/DECISIONS.md` as you go.
-- Start with Task 0, and confirm with the user before starting Task 2 — it is the
-  destructive one.
+Report honestly what you did not verify, and stop at any point genuinely
+blocked on a credential or a decision only the user can make.
