@@ -43,6 +43,13 @@ def _slug_ref_dict(ref: SlugRef) -> dict[str, str]:
     return {"id": ref.id, "name": ref.name, "slug": ref.slug}
 
 
+def find_article_by_doc_id(articles: list[dict[str, Any]], doc_id: str) -> dict[str, Any] | None:
+    for article in articles:
+        if article.get("doc_id") == doc_id:
+            return article
+    return None
+
+
 def article_meta_dict(meta: ArticleMeta) -> dict[str, Any]:
     return {
         "id": meta.id,
@@ -88,17 +95,21 @@ def upsert_article(index: dict[str, Any], meta: ArticleMeta) -> None:
 
 
 def upsert_ref(collection: list[dict[str, Any]], ref: SlugRef) -> None:
-    for existing in collection:
+    entry = _slug_ref_dict(ref)
+    for i, existing in enumerate(collection):
         if existing["id"] == ref.id:
+            collection[i] = entry
             return
-    collection.append(_slug_ref_dict(ref))
+    collection.append(entry)
 
 
 def upsert_category(index: dict[str, Any], ref: SlugRef, description: str | None = None) -> None:
-    for existing in index["categories"]:
+    entry = {**_slug_ref_dict(ref), "description": description}
+    for i, existing in enumerate(index["categories"]):
         if existing["id"] == ref.id:
+            index["categories"][i] = entry
             return
-    index["categories"].append({**_slug_ref_dict(ref), "description": description})
+    index["categories"].append(entry)
 
 
 def _upsert_profile(
@@ -108,10 +119,12 @@ def _upsert_profile(
     photo_url: str | None,
     links: dict[str, str],
 ) -> None:
-    for existing in collection:
+    entry = {**_slug_ref_dict(ref), "bio": bio, "photo_url": photo_url, "links": links}
+    for i, existing in enumerate(collection):
         if existing["id"] == ref.id:
+            collection[i] = entry
             return
-    collection.append({**_slug_ref_dict(ref), "bio": bio, "photo_url": photo_url, "links": links})
+    collection.append(entry)
 
 
 def upsert_author(

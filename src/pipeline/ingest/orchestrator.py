@@ -7,6 +7,8 @@ dispatch-triggered run share identical logic.
 
 from __future__ import annotations
 
+import sys
+import traceback
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
@@ -42,6 +44,18 @@ class RunReport:
     outcomes: list[RowOutcome] = field(default_factory=list)
 
 
+def _failure_message(exc: Exception) -> str:
+    """`RowValidationError`/`SlugCollisionError` already carry a specific,
+    Italian, writer-actionable message (CONTENT-CONTRACT.md §7) -- pass those
+    through verbatim. Anything else is an unexpected failure (a Drive API
+    error, a malformed export zip, an image I/O error, ...) whose `str()`
+    might be in English or expose internals neither of which a non-technical
+    writer can act on, so it gets a generic, safe Italian message instead."""
+    if isinstance(exc, (RowValidationError, SlugCollisionError)):
+        return str(exc)
+    return "errore imprevisto durante l'importazione — controlla i log della pipeline"
+
+
 def run(
     sheets: SheetsClient,
     drive: DriveClient,
@@ -56,15 +70,18 @@ def run(
     guests_registry = registries.load_registry(guests_path)
 
     report = RunReport()
+    # (row_number, current esito, new esito) -- the Sheet write is deferred
+    # until *after* `save_index()` below succeeds, so a crash partway through
+    # this loop can never leave the Sheet claiming success for a row whose
+    # content was never actually saved.
+    pending: list[tuple[int, str, str]] = []
 
     for row in sheets.read_rows():
         try:
             eligibility = evaluate(row.stato, row.data, now)
         except ValueError:
             message = format_failure(f'data "{row.data}" non valida — usa il formato AAAA-MM-GG')
-            if should_update(row.esito, message):
-                sheets.write_esito(row.row_number, message)
-                report.outcomes.append(RowOutcome(row.row_number, message))
+            pending.append((row.row_number, row.esito, message))
             continue
 
         if eligibility is Eligibility.NOT_PUBLISHABLE:
@@ -74,16 +91,30 @@ def run(
             message = format_scheduled(row.data)
         else:
             try:
-                _publish_row(row, drive, content_dir, public_dir, index, authors, guests_registry)
-                message = format_success(now)
-            except (RowValidationError, SlugCollisionError, ValueError) as exc:
-                message = format_failure(str(exc))
+                message = _publish_row(
+                    row, drive, content_dir, public_dir, index, authors, guests_registry, now
+                )
+            except Exception as exc:  # noqa: BLE001 -- one bad row must degrade
+                # to a failed esito, never abort the whole run (a Drive API
+                # error, a malformed export zip, or an image I/O failure on
+                # row N must not also cost rows N+1..last their publish). The
+                # Sheet only ever gets a safe, generic Italian message
+                # (_failure_message) -- the real exception goes to the
+                # Actions log, which is exactly what that message tells a
+                # human to go check.
+                print(f"row {row.row_number}: unexpected error while publishing", file=sys.stderr)
+                traceback.print_exc()
+                message = format_failure(_failure_message(exc))
 
-        if should_update(row.esito, message):
-            sheets.write_esito(row.row_number, message)
-            report.outcomes.append(RowOutcome(row.row_number, message))
+        pending.append((row.row_number, row.esito, message))
 
     content_writer.save_index(content_dir, index)
+
+    for row_number, current_esito, message in pending:
+        if should_update(current_esito, message):
+            sheets.write_esito(row_number, message)
+            report.outcomes.append(RowOutcome(row_number, message))
+
     return report
 
 
@@ -95,8 +126,36 @@ def _publish_row(
     index: dict[str, Any],
     authors: list[Profile],
     guests_registry: list[Profile],
-) -> None:
+    now: datetime,
+) -> str:
+    """Returns the success esito message. Raises `RowValidationError` or
+    `SlugCollisionError` on a rejected row; any other exception signals an
+    unexpected failure (Drive/network/image errors) that the caller must
+    treat as a per-row failure, never let escape and abort the whole run."""
     doc_id = extract_doc_id(row.doc)
+    current_modified = drive.get_modified_time(doc_id)
+
+    existing = content_writer.find_article_by_doc_id(index["articles"], doc_id)
+    if (
+        existing is not None
+        and existing.get("updated_at") == current_modified
+        and row.esito.strip().startswith("✓")
+    ):
+        # The Doc hasn't changed since it last published successfully, and
+        # the Sheet already shows that success -- skip the expensive
+        # re-export/re-convert/re-download entirely and reuse the existing
+        # esito verbatim (never fabricate a new "publish time" for content
+        # that wasn't actually just published -- that's what a modifiedTime-
+        # based timestamp would do, and it lies for a scheduled post whose
+        # Doc was last edited long before its real publish moment). Without
+        # this skip, CONTENT-CONTRACT.md §3's "re-evaluate the entire Sheet
+        # every run" rule would force a full reprocess of every published
+        # article, forever, on every nightly cron run. Sheet-only field edits
+        # (titolo, meta_description, tags, ...) made without touching the Doc
+        # itself are not picked up until the Doc changes -- an accepted
+        # trade-off for keeping the recurring cost bounded (CONTENT-CONTRACT.md §3).
+        return row.esito.strip()
+
     export = drive.export_doc(doc_id)
     markdown = html_to_markdown(export.html)
 
@@ -107,7 +166,8 @@ def _publish_row(
     cover_alt: str | None = None
     if validated.cover_image_ref:
         cover_bytes = drive.download_file(validated.cover_image_ref)
-        cover_image = ExtractedImage(filename=validated.cover_image_ref, data=cover_bytes)
+        cover_name = drive.get_file_name(validated.cover_image_ref)
+        cover_image = ExtractedImage(filename=cover_name, data=cover_bytes)
         cover_url = images.write_cover_image(public_dir, identity.slug, cover_image)
         cover_alt = validated.titolo
 
@@ -120,16 +180,17 @@ def _publish_row(
     author_ref = SlugRef(
         id=f"author-{validated.author.slug}", name=validated.author.name, slug=validated.author.slug
     )
+    tag_slugs = [str(Slug.from_title(tag)) for tag in validated.tags]
     tag_refs = [
-        SlugRef(id=f"tag-{Slug.from_title(tag)}", name=tag, slug=str(Slug.from_title(tag)))
-        for tag in validated.tags
+        SlugRef(id=f"tag-{slug}", name=tag, slug=slug)
+        for tag, slug in zip(validated.tags, tag_slugs, strict=True)
     ]
     guest_refs = [
         SlugRef(id=f"guest-{g.slug}", name=g.name, slug=g.slug) for g in validated.guests
     ]
 
     reading_time = Body(body).reading_time_minutes()
-    updated_at = drive.get_modified_time(doc_id)
+    updated_at = current_modified
     publish_at = publish_at_utc(row.data).isoformat().replace("+00:00", "Z")
 
     meta = ArticleMeta(
@@ -166,3 +227,5 @@ def _publish_row(
         content_writer.upsert_guest(
             index, guest_ref, guest_profile.bio, guest_profile.photo_url, guest_profile.links
         )
+
+    return format_success(now)

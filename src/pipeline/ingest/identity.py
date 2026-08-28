@@ -11,6 +11,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from domain.content.value_objects import Slug
+from ingest.content_writer import find_article_by_doc_id
 
 
 class SlugCollisionError(Exception):
@@ -31,9 +32,9 @@ def resolve_identity(
 ) -> ArticleIdentity:
     """`existing_articles` is the current `content/index.json` "articles"
     list (plain dicts, as read from JSON -- CONTENT-CONTRACT.md §9)."""
-    for article in existing_articles:
-        if article.get("doc_id") == doc_id:
-            return ArticleIdentity(id=article["id"], slug=article["slug"], is_new=False)
+    existing = find_article_by_doc_id(existing_articles, doc_id)
+    if existing is not None:
+        return ArticleIdentity(id=existing["id"], slug=existing["slug"], is_new=False)
 
     slug = str(Slug.from_title(titolo))
     for article in existing_articles:

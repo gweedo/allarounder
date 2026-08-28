@@ -55,8 +55,11 @@ class FakeSheetsClient:
 class FakeDriveClient:
     docs: dict[str, str]
     modified_times: dict[str, str] = field(default_factory=dict)
+    file_names: dict[str, str] = field(default_factory=dict)
+    export_doc_calls: list[str] = field(default_factory=list)
 
     def export_doc(self, doc_id: str) -> DocExport:
+        self.export_doc_calls.append(doc_id)
         return parse_export_zip(_build_zip(self.docs[doc_id]))
 
     def get_modified_time(self, doc_id: str) -> str:
@@ -64,6 +67,9 @@ class FakeDriveClient:
 
     def download_file(self, file_ref: str) -> bytes:
         return b"cover-bytes"
+
+    def get_file_name(self, file_ref: str) -> str:
+        return self.file_names.get(file_ref, "cover.png")
 
 
 def _row(**overrides: str) -> SheetRow:
@@ -171,9 +177,16 @@ class TestRun:
         self, pipeline_dirs: tuple[Path, Path, Path]
     ) -> None:
         content_dir, _, _ = pipeline_dirs
-        drive = FakeDriveClient(docs={"doc-1": "<p>Corpo.</p>"})
+        drive = FakeDriveClient(
+            docs={"doc-1": "<p>Corpo.</p>"},
+            modified_times={"doc-1": "2026-08-27T00:00:00.000Z"},
+        )
         _run(pipeline_dirs, FakeSheetsClient(rows=[_row()]), drive)
 
+        # The Doc itself was edited too (a different modifiedTime) -- an
+        # unchanged Doc is skipped entirely (see TestSkipsUnchangedDoc
+        # below), so the title change wouldn't otherwise be picked up.
+        drive.modified_times["doc-1"] = "2026-08-28T00:00:00.000Z"
         _run(pipeline_dirs, FakeSheetsClient(rows=[_row(titolo="Titolo Cambiato")]), drive)
 
         index = json.loads((content_dir / "index.json").read_text(encoding="utf-8"))
@@ -212,3 +225,94 @@ class TestRun:
         _run(pipeline_dirs, colliding_sheets, drive)
 
         assert "già usato" in colliding_sheets.written[2]
+
+    def test_cover_image_with_real_drive_share_link_does_not_crash(
+        self, pipeline_dirs: tuple[Path, Path, Path]
+    ) -> None:
+        # Regression test: `copertina` holds a Drive share URL or bare file
+        # ID (CONTENT-CONTRACT.md §1), never an actual filename. Using it
+        # directly as a filename for extension extraction used to produce a
+        # multi-segment path fragment (e.g. "com/file/d/.../view") from the
+        # URL's only "." and crash writing the file -- the fix resolves the
+        # real filename via `drive.get_file_name` instead.
+        _, public_dir, _ = pipeline_dirs
+        share_link = "https://drive.google.com/file/d/1AbCdEf/view?usp=sharing"
+        sheets = FakeSheetsClient(rows=[_row(copertina=share_link)])
+        drive = FakeDriveClient(
+            docs={"doc-1": "<p>Corpo.</p>"},
+            file_names={share_link: "copertina-mondiali.jpg"},
+        )
+
+        _run(pipeline_dirs, sheets, drive)
+
+        assert (public_dir / "images" / "intervista-a-marco" / "cover.jpg").exists()
+        assert sheets.written[2].startswith("✓ Pubblicato")
+
+    def test_unchanged_doc_skips_reexport_entirely(self, pipeline_dirs: tuple[Path, Path, Path]) -> None:
+        drive = FakeDriveClient(
+            docs={"doc-1": "<p>Corpo.</p>"},
+            modified_times={"doc-1": "2026-08-27T00:00:00.000Z"},
+        )
+        first_sheets = FakeSheetsClient(rows=[_row()])
+        _run(pipeline_dirs, first_sheets, drive)
+        assert drive.export_doc_calls == ["doc-1"]
+        previous_esito = first_sheets.written[2]
+
+        # Same Doc, same modifiedTime, on a fresh run (e.g. the nightly
+        # cron) -- must not re-export/re-convert an unchanged Doc.
+        second_sheets = FakeSheetsClient(rows=[_row(esito=previous_esito)])
+        _run(pipeline_dirs, second_sheets, drive)
+        assert drive.export_doc_calls == ["doc-1"]
+        assert second_sheets.written == {}
+
+    def test_unexpected_exception_on_one_row_does_not_abort_other_rows(
+        self, pipeline_dirs: tuple[Path, Path, Path]
+    ) -> None:
+        content_dir, _, _ = pipeline_dirs
+
+        class ExplodingDriveClient(FakeDriveClient):
+            def export_doc(self, doc_id: str) -> DocExport:
+                if doc_id == "doc-bad":
+                    raise ConnectionError("drive api unreachable")
+                return super().export_doc(doc_id)
+
+        drive = ExplodingDriveClient(docs={"doc-good": "<p>Corpo.</p>", "doc-bad": "<p>Altro.</p>"})
+        sheets = FakeSheetsClient(
+            rows=[
+                _row(row_number=2, titolo="Articolo Buono", doc="doc-good"),
+                _row(row_number=3, titolo="Articolo Rotto", doc="doc-bad"),
+            ]
+        )
+
+        _run(pipeline_dirs, sheets, drive)
+
+        assert sheets.written[2].startswith("✓ Pubblicato")
+        assert sheets.written[3] == (
+            "✗ errore imprevisto durante l'importazione — controlla i log della pipeline"
+        )
+        index = json.loads((content_dir / "index.json").read_text(encoding="utf-8"))
+        assert len(index["articles"]) == 1
+        assert index["articles"][0]["title"] == "Articolo Buono"
+
+    def test_esito_not_written_when_save_index_fails(
+        self, pipeline_dirs: tuple[Path, Path, Path], monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        # If content can't be saved, the Sheet must never claim success for
+        # it -- regression test for the ordering bug where per-row
+        # `write_esito` calls happened before `save_index`, so a crash
+        # partway through left earlier rows' esito claiming success for
+        # content that was never actually persisted.
+        import ingest.content_writer as content_writer_module
+
+        def _boom(*_args: object, **_kwargs: object) -> None:
+            raise OSError("disk full")
+
+        monkeypatch.setattr(content_writer_module, "save_index", _boom)
+
+        sheets = FakeSheetsClient(rows=[_row()])
+        drive = FakeDriveClient(docs={"doc-1": "<p>Corpo.</p>"})
+
+        with pytest.raises(OSError, match="disk full"):
+            _run(pipeline_dirs, sheets, drive)
+
+        assert sheets.written == {}

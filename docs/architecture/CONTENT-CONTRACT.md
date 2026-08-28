@@ -100,6 +100,18 @@ committed as generated content. Triggers:
 A row that is `Pubblicato` but whose `data` is still in the future is not an
 error — see §7 for how this is surfaced to the writer instead of silence.
 
+**Eligibility is re-evaluated for every row every run, but re-processing an
+already-published row is skipped when its Doc hasn't changed.** The pipeline
+records each Doc's Drive `modifiedTime` alongside its generated article; on a
+later run, a row whose Doc `modifiedTime` is unchanged *and* whose Sheet
+`esito` already shows success is left exactly as-is — no re-export, no
+re-conversion, no re-download, no Sheet write. Without this, a nightly cron
+would fully reprocess every published article in the catalog forever,
+growing Drive/Sheets API usage and Actions run time without bound as the site
+grows. The accepted trade-off: a Sheet-only field edit (`titolo`,
+`meta_description`, `tag`, ...) made without also touching the Doc is not
+picked up until the Doc itself changes.
+
 **Un-publishing is out of scope for v1.** Changing a previously-published
 row's `stato` away from `Pubblicato`, or moving `data` into the future, does
 **not** retract already-committed content on the next run. Because generated
@@ -163,19 +175,14 @@ produces a broken page.
 | `categoria` | `Category` | Must be one of the four seeded categories (§1) |
 | `autore` | Author registry lookup (§4) | Must match; no inline creation |
 | `spotify` | `SpotifyUrl` | Must match the Spotify URL pattern if present; empty is valid (standalone article) |
-| `meta_description` | — (no dedicated value object yet; see below) | **140–155 characters**, per `docs/product/PRD.md` item 36 |
+| `meta_description` | `MetaDescription` | **140–155 characters**, per `docs/product/PRD.md` item 36 |
 
 **On the meta-description rule:** `src/pipeline/domain/content/value_objects.py`
-currently defines `META_TITLE_MAX_LENGTH = 60` and
-`META_DESCRIPTION_MAX_LENGTH = 160`, carried over from the retired admin API
-(PR #102) where they were storage-width caps, not the product's editorial
-rule. The actual requirement, from the PRD, is a **140–155 character range**
-— tighter than the 160-char code constant and with a minimum the code
-doesn't enforce at all yet. **Stream 1 must add this validation** (a new
-`MetaDescription` value object or equivalent) as part of building the
-pipeline, and should replace or reconcile `META_DESCRIPTION_MAX_LENGTH = 160`
-at the same time — don't leave a 160 constant sitting next to a 140–155 rule
-enforced elsewhere; that's a trap for the next person who touches this file.
+now defines `META_DESCRIPTION_MIN_LENGTH = 140` and
+`META_DESCRIPTION_MAX_LENGTH = 155`, enforced by the `MetaDescription` value
+object and used by `ingest/validate.py`. This replaced the retired admin
+API's storage-width cap (`META_DESCRIPTION_MAX_LENGTH = 160`, from PR #102),
+which enforced neither the right range nor a minimum at all.
 
 **Fields with no Sheet column, derived instead of authored:**
 

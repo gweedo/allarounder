@@ -92,3 +92,11 @@ class TestValidateRow:
     def test_no_tags_is_valid(self) -> None:
         result = validate_row(_row(tag=""), "Corpo.", AUTHORS, GUESTS)
         assert result.tags == []
+
+    def test_rejects_tag_that_cannot_produce_a_slug(self) -> None:
+        with pytest.raises(RowValidationError, match='tag "!!!" non valido'):
+            validate_row(_row(tag="Mondiali, !!!"), "Corpo.", AUTHORS, GUESTS)
+
+    def test_rejects_guest_name_that_cannot_produce_a_slug(self) -> None:
+        with pytest.raises(RowValidationError, match="ospite non valido"):
+            validate_row(_row(ospite="Marco Bianchi, !!!"), "Corpo.", AUTHORS, GUESTS)

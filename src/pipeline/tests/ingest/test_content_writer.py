@@ -82,6 +82,14 @@ class TestUpsertCategory:
         content_writer.upsert_category(index, ref)
         assert len(index["categories"]) == 1
 
+    def test_updates_existing_entry_on_match(self) -> None:
+        index: dict[str, list[object]] = {"categories": []}
+        ref = SlugRef(id="cat-interviste", name="Interviste", slug="interviste")
+        content_writer.upsert_category(index, ref, description="Vecchia descrizione")
+        content_writer.upsert_category(index, ref, description="Nuova descrizione")
+        assert len(index["categories"]) == 1
+        assert index["categories"][0]["description"] == "Nuova descrizione"  # type: ignore[index]
+
 
 class TestUpsertAuthorAndGuest:
     def test_author_adds_profile_fields(self) -> None:
@@ -97,6 +105,19 @@ class TestUpsertAuthorAndGuest:
         content_writer.upsert_guest(index, ref, None, None, {})
         assert len(index["guests"]) == 1
 
+    def test_guest_bio_added_via_registry_pr_updates_existing_entry(self) -> None:
+        # CONTENT-CONTRACT.md §4: a guest auto-created with bio=None on first
+        # mention must pick up a real bio once one is added to guests.json --
+        # this is the whole point of the registry being enrichment, not a
+        # gate. That only works if upsert_guest genuinely updates on a match.
+        index: dict[str, list[object]] = {"guests": []}
+        ref = SlugRef(id="guest-marco", name="Marco", slug="marco")
+        content_writer.upsert_guest(index, ref, None, None, {})
+        content_writer.upsert_guest(index, ref, "Ospite abituale del podcast.", "https://x/photo.jpg", {})
+        assert len(index["guests"]) == 1
+        assert index["guests"][0]["bio"] == "Ospite abituale del podcast."  # type: ignore[index]
+        assert index["guests"][0]["photo_url"] == "https://x/photo.jpg"  # type: ignore[index]
+
 
 class TestUpsertTag:
     def test_does_not_duplicate(self) -> None:
@@ -105,3 +126,21 @@ class TestUpsertTag:
         content_writer.upsert_tag(index, ref)
         content_writer.upsert_tag(index, ref)
         assert len(index["tags"]) == 1
+
+    def test_updates_name_on_match(self) -> None:
+        index: dict[str, list[object]] = {"tags": []}
+        content_writer.upsert_tag(index, SlugRef(id="tag-mondiali", name="mondiali", slug="mondiali"))
+        content_writer.upsert_tag(index, SlugRef(id="tag-mondiali", name="Mondiali", slug="mondiali"))
+        assert len(index["tags"]) == 1
+        assert index["tags"][0]["name"] == "Mondiali"  # type: ignore[index]
+
+
+class TestFindArticleByDocId:
+    def test_finds_matching_article(self) -> None:
+        articles = [{"id": "article-a", "doc_id": "doc-1"}, {"id": "article-b", "doc_id": "doc-2"}]
+        found = content_writer.find_article_by_doc_id(articles, "doc-2")
+        assert found is not None
+        assert found["id"] == "article-b"
+
+    def test_returns_none_when_absent(self) -> None:
+        assert content_writer.find_article_by_doc_id([], "doc-1") is None

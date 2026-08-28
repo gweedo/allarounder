@@ -34,6 +34,8 @@ class DriveClient(Protocol):
 
     def download_file(self, file_ref: str) -> bytes: ...
 
+    def get_file_name(self, file_ref: str) -> str: ...
+
 
 def parse_export_zip(content: bytes) -> DocExport:
     """The `application/zip` export (CONTENT-CONTRACT.md §6) contains the
@@ -71,3 +73,12 @@ class GoogleDriveClient:
         file_id = extract_doc_id(file_ref)
         content = self._service.files().get_media(fileId=file_id).execute()
         return bytes(content)
+
+    def get_file_name(self, file_ref: str) -> str:
+        """`file_ref` (CONTENT-CONTRACT.md §1's `copertina` cell) is a Drive
+        share URL or bare file ID, never an actual filename -- resolve the
+        real, extension-bearing filename from Drive metadata instead of
+        parsing the ref itself (a share URL has no reliable extension)."""
+        file_id = extract_doc_id(file_ref)
+        metadata = self._service.files().get(fileId=file_id, fields="name").execute()
+        return str(metadata["name"])

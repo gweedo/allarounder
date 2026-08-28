@@ -75,7 +75,19 @@ def validate_row(
         )
 
     guest_names = split_names(row.ospite)
-    resolved_guests = [match_or_create_guest(name, guests_registry) for name in guest_names]
+    try:
+        resolved_guests = [match_or_create_guest(name, guests_registry) for name in guest_names]
+    except ValueError:
+        raise RowValidationError(
+            f'ospite non valido in "{row.ospite}" — usa lettere o numeri'
+        ) from None
+
+    tags = split_names(row.tag)
+    for tag in tags:
+        try:
+            Slug.from_title(tag)
+        except ValueError:
+            raise RowValidationError(f'tag "{tag}" non valido — usa lettere o numeri') from None
 
     spotify_url: str | None = None
     spotify_cell = row.spotify.strip()
@@ -103,7 +115,7 @@ def validate_row(
         category_slug=str(Slug.from_title(categoria)),
         author=author,
         guests=resolved_guests,
-        tags=split_names(row.tag),
+        tags=tags,
         spotify_url=spotify_url,
         meta_description=meta_description,
         cover_image_ref=row.copertina.strip() or None,
