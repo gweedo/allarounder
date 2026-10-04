@@ -4,6 +4,10 @@ on:
   push:
     branches: [main]
   pull_request:
+  # publish.yml dispatches this explicitly on its content PR branch: a PR
+  # opened with GITHUB_TOKEN never triggers `pull_request` runs, so the
+  # required checks would otherwise never report and auto-merge never fire.
+  workflow_dispatch:
 
 concurrency:
   group: ci-${{ github.ref }}

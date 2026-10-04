@@ -16,6 +16,8 @@ concurrency:
 permissions:
   contents: write
   pull-requests: write
+  # `gh workflow run ci.yml` on the content PR branch (see below).
+  actions: write
 
 jobs:
   publish:
@@ -82,12 +84,18 @@ jobs:
           fi
 
       # Never pushes to main directly (branch protection, "Protect main"
-      # ruleset) -- opens a PR instead, which still runs the required checks
+      # ruleset) -- opens a PR instead, which must pass the required checks
       # in ci.yml (including `next build` against the new content) before
       # it merges. The ruleset requires 0 human approvals (status checks
       # only), so auto-merge lets this PR merge itself once those checks
       # pass -- no admin bypass, no direct push, but still close to the
       # original "article is live ~2 minutes after Pubblica" design intent.
+      #
+      # A PR opened with GITHUB_TOKEN does NOT trigger ci.yml's
+      # `pull_request` run (GitHub suppresses runs caused by GITHUB_TOKEN,
+      # except workflow_dispatch/repository_dispatch), so CI is dispatched
+      # explicitly on the branch. Auto-merge is enabled first, so the checks
+      # can't finish before there is anything waiting on them.
       #
       # Waits for the PR to actually report MERGED (ingest/pr_wait.py)
       # before the step -- and therefore the job -- exits: `concurrency:
@@ -113,6 +121,7 @@ jobs:
             --body "Automated publish run. See the Actions log for this run for which rows were published, scheduled, or rejected, and why.")
           pr_number="${pr_url##*/}"
           gh pr merge "$pr_number" --auto --squash
+          gh workflow run ci.yml --ref "$branch"
           python -m ingest.pr_wait "$pr_number"
 
       # Runs whenever the job hasn't already failed: unconditionally when

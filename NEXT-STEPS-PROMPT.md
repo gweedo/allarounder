@@ -78,7 +78,8 @@ Sheet exists)" verbatim — it's already written for this:
 2. Bind an Apps Script project to it (Extensions → Apps Script), push
    `tools/apps-script/src/*` via `clasp` or paste manually.
 3. Set Apps Script script properties: `GITHUB_TOKEN` (fine-grained PAT,
-   `gweedo/allarounder` contents: read, scoped to nothing else), `GITHUB_OWNER`
+   `gweedo/allarounder` Contents: Read and write -- the dispatch endpoint
+   requires write -- scoped to nothing else), `GITHUB_OWNER`
    (`gweedo`), `GITHUB_REPO` (`allarounder`). The user creates the PAT; you
    never see or store it.
 4. Reload the Sheet, run "Configura validazione colonne" once.
