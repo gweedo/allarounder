@@ -59,7 +59,8 @@ Sheet is created. Someone with access to Google Workspace and the
      (Project Settings → "Show appsscript.json").
 4. **Set script properties** (Project Settings → Script Properties, in the
    Apps Script editor): `GITHUB_TOKEN` (a PAT — fine-grained, scoped to
-   `gweedo/allarounder` contents: read, so it can fire `repository_dispatch`;
+   `gweedo/allarounder` with **Contents: Read and write** -- GitHub requires
+   write for `POST /repos/{owner}/{repo}/dispatches`, read-only gets a 403;
    never commit this), `GITHUB_OWNER` (`gweedo`), `GITHUB_REPO`
    (`allarounder`).
 5. **Reload the Sheet.** The "Allarounder" menu should appear (`onOpen`).
