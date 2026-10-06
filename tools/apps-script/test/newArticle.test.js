@@ -1,4 +1,4 @@
-const { buildNewArticleRow } = require("../src/NewArticle");
+const { buildNewArticleRow, requireArticlesFolderId } = require("../src/NewArticle");
 const { COLUMN_ORDER } = require("../src/Columns");
 
 describe("buildNewArticleRow", () => {
@@ -20,5 +20,26 @@ describe("buildNewArticleRow", () => {
         expect(row[i]).toBe("");
       }
     });
+  });
+});
+
+describe("requireArticlesFolderId", () => {
+  const props = (values) => ({ getProperty: (key) => (key in values ? values[key] : null) });
+
+  it("returns the configured folder ID", () => {
+    expect(requireArticlesFolderId(props({ ARTICLES_FOLDER_ID: "folder-123" }))).toBe("folder-123");
+  });
+
+  it("trims surrounding whitespace pasted with the ID", () => {
+    expect(requireArticlesFolderId(props({ ARTICLES_FOLDER_ID: "  folder-123\n" }))).toBe("folder-123");
+  });
+
+  it("throws an Italian error naming the property when it is missing", () => {
+    expect(() => requireArticlesFolderId(props({}))).toThrow(/ARTICLES_FOLDER_ID/);
+    expect(() => requireArticlesFolderId(props({}))).toThrow(/Proprietà dello script mancante/);
+  });
+
+  it("treats a blank value as missing", () => {
+    expect(() => requireArticlesFolderId(props({ ARTICLES_FOLDER_ID: "   " }))).toThrow(/ARTICLES_FOLDER_ID/);
   });
 });

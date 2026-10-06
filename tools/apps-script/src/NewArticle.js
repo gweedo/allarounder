@@ -1,11 +1,22 @@
 // "Nuovo articolo" menu action: creates a Doc and a matching draft row.
 //
-// buildNewArticleRow() is pure and tested; createArticleDoc() and
-// handleNuovoArticolo() call DocumentApp/DriveApp/SpreadsheetApp and are not
-// unit-testable outside the Apps Script runtime.
+// buildNewArticleRow() and requireArticlesFolderId() are pure and tested;
+// createArticleDoc() and handleNuovoArticolo() call DocumentApp/DriveApp/
+// SpreadsheetApp and are not unit-testable outside the Apps Script runtime.
 
 function handleNuovoArticolo() {
   var ui = SpreadsheetApp.getUi();
+
+  // Checked before prompting, so a writer never types a title only to hit a
+  // configuration error.
+  var folderId;
+  try {
+    folderId = requireArticlesFolderId(PropertiesService.getScriptProperties());
+  } catch (err) {
+    ui.alert(err.message);
+    return;
+  }
+
   var response = ui.prompt("Nuovo articolo", "Titolo dell'articolo:", ui.ButtonSet.OK_CANCEL);
   if (response.getSelectedButton() !== ui.Button.OK) {
     return;
@@ -17,7 +28,7 @@ function handleNuovoArticolo() {
     return;
   }
 
-  var doc = createArticleDoc(titolo);
+  var doc = createArticleDoc(titolo, folderId);
   var sheet = SpreadsheetApp.getActiveSheet();
   var row = sheet.getLastRow() + 1;
   var rowValues = buildNewArticleRow(titolo, doc.getUrl());
@@ -37,7 +48,12 @@ function handleNuovoArticolo() {
 //
 // Until then, this creates a bare Doc with a minimal outline from scratch —
 // see tools/apps-script/README.md.
-function createArticleDoc(titolo) {
+//
+// DocumentApp.create() always lands in the creating writer's own My Drive
+// root, which the pipeline's service account cannot read. The Doc is moved
+// into the shared articles folder (ARTICLES_FOLDER_ID) so the service account
+// inherits access through the folder share (CONTENT-CONTRACT.md §8).
+function createArticleDoc(titolo, folderId) {
   var doc = DocumentApp.create(titolo);
   var body = doc.getBody();
   body.appendParagraph(titolo).setHeading(DocumentApp.ParagraphHeading.TITLE);
@@ -48,7 +64,23 @@ function createArticleDoc(titolo) {
   body.appendParagraph("Conclusione").setHeading(DocumentApp.ParagraphHeading.HEADING2);
   body.appendParagraph("");
   doc.saveAndClose();
+  DriveApp.getFileById(doc.getId()).moveTo(DriveApp.getFolderById(folderId));
   return doc;
+}
+
+// Reads the shared articles folder ID from script properties
+// (`props` is PropertiesService.getScriptProperties(), or a stub in tests).
+function requireArticlesFolderId(props) {
+  var value = props.getProperty("ARTICLES_FOLDER_ID");
+  var folderId = value ? String(value).trim() : "";
+  if (!folderId) {
+    throw new Error(
+      "Proprietà dello script mancante (ARTICLES_FOLDER_ID): serve l'ID della cartella " +
+        "condivisa degli articoli. Vai su Estensioni > Apps Script > Impostazioni progetto > " +
+        "Proprietà script."
+    );
+  }
+  return folderId;
 }
 
 // Row shape matches COLUMN_ORDER (Columns.js) exactly. A new article starts
@@ -72,5 +104,5 @@ function buildNewArticleRow(titolo, docUrl) {
 }
 
 if (typeof module !== "undefined") {
-  module.exports = { buildNewArticleRow };
+  module.exports = { buildNewArticleRow, requireArticlesFolderId };
 }

@@ -41,6 +41,10 @@ Sheet is created. Someone with access to Google Workspace and the
    copertina, meta_description, data, stato, esito`. `src/Columns.js`'s
    `COLUMN_ORDER` must match this order exactly, or every dropdown and the
    "Pubblica" action will write to the wrong column.
+   **Name the tab `Articoli`** -- the pipeline reads that tab by name
+   (`SHEET_NAME` in `src/pipeline/ingest/config.py`); a new Sheet's default
+   tab name (`Foglio1`) makes every run fail. Put the Sheet inside the shared
+   articles folder (see `ARTICLES_FOLDER_ID` below).
 2. **Bind an Apps Script project to it**: Extensions → Apps Script, from
    the Sheet itself (this makes it container-bound, so `SpreadsheetApp`
    calls resolve to the right Sheet with no ID to configure).
@@ -62,7 +66,12 @@ Sheet is created. Someone with access to Google Workspace and the
    `gweedo/allarounder` with **Contents: Read and write** -- GitHub requires
    write for `POST /repos/{owner}/{repo}/dispatches`, read-only gets a 403;
    never commit this), `GITHUB_OWNER` (`gweedo`), `GITHUB_REPO`
-   (`allarounder`).
+   (`allarounder`), and `ARTICLES_FOLDER_ID` -- the ID (from its URL) of the
+   shared Drive folder that holds article Docs and is shared with the
+   pipeline's service account. "Nuovo articolo" moves each new Doc there;
+   without it, `DocumentApp.create()` leaves the Doc in the writer's own My
+   Drive, where the pipeline cannot read it. "Nuovo articolo" refuses to run
+   until this property is set.
 5. **Reload the Sheet.** The "Allarounder" menu should appear (`onOpen`).
    Run "Configura validazione colonne" once to install the `categoria`,
    `stato`, and `autore` dropdowns.
