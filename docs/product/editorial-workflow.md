@@ -36,7 +36,7 @@ colonna:
 | **spotify** | Il link all'episodio o al canale Spotify collegato, se c'è. Lascia vuoto per un articolo senza episodio collegato |
 | **copertina** | Il link di condivisione dell'immagine di copertina su Google Drive, se ne hai una |
 | **meta_description** | Una breve descrizione dell'articolo per Google, tra **140 e 155 caratteri esatti** — né di più né di meno. Serve per come l'articolo appare nei risultati di ricerca |
-| **data** | La data in cui l'articolo deve andare online (formato AAAA-MM-GG, es. 2026-09-15). Può essere una data futura: l'articolo resterà in attesa fino a quel giorno |
+| **data** | La data in cui l'articolo deve andare online (formato AAAA-MM-GG, es. 2026-09-15; fai doppio clic sulla cella per scegliere la data dal calendario). Può essere una data futura: l'articolo resterà in attesa fino a quel giorno |
 | **stato** | Bozza (stai ancora scrivendo) o Pronto (finito, in attesa di essere pubblicato): scegli tu dal menu a tendina. Pubblicato viene impostato da solo quando clicchi "Pubblica" — vedi punto 3 |
 | **esito** | Compilata automaticamente dal sistema dopo ogni pubblicazione. Non scriverci mai sopra a mano — vedi punto 4 |
 
