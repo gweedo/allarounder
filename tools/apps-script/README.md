@@ -14,16 +14,18 @@ for the writer-facing guide.
 | `src/Menu.js` | `onOpen()` — adds the "Allarounder" custom menu |
 | `src/Publish.js` | "Pubblica": sets `stato` to `Pubblicato`, fires `repository_dispatch` |
 | `src/NewArticle.js` | "Nuovo articolo": creates a Doc and a draft row |
+| `src/DeleteDraft.js` | "Elimina bozza": trashes a never-published article's Doc and deletes its row |
 | `src/Validation.js` | "Configura validazione colonne": installs the `categoria`/`stato`/`autore` dropdowns |
 | `src/Columns.js` | Column order, category/status/author lists, column-index lookup |
 | `src/Payload.js` | Builds the `repository_dispatch` JSON body |
 | `src/appsscript.json` | Apps Script project manifest |
-| `test/` | Jest tests for the pure logic (`Columns.js`, `Payload.js`, `buildNewArticleRow`) |
+| `test/` | Jest tests for the pure logic (`Columns.js`, `Payload.js`, `buildNewArticleRow`, `requireArticlesFolderId`, `draftDeletionBlocker`, `extractDocId`) |
 
 Files that call `SpreadsheetApp`, `DocumentApp`, `UrlFetchApp`, or
 `PropertiesService` directly (`Publish.js`'s `handlePubblica`/
 `triggerRepositoryDispatch`, `NewArticle.js`'s `handleNuovoArticolo`/
-`createArticleDoc`, all of `Validation.js`, `Menu.js`) are **not** unit
+`createArticleDoc`, `DeleteDraft.js`'s `handleEliminaBozza`, all of
+`Validation.js`, `Menu.js`) are **not** unit
 tested — they only run inside the Apps Script runtime, which nothing in this
 repo can emulate. **This has not been verified against a live Sheet**, because
 no Sheet, Apps Script project, or GitHub PAT exists yet. Run `npm test` for

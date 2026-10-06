@@ -113,6 +113,14 @@ e clicca di nuovo "Pubblica".
 Chiedi a Guido: togliere un articolo già pubblicato richiede un intervento
 manuale sul codice (non è ancora automatizzato dal foglio).
 
+**Ho creato una bozza che non mi serve più: come la elimino?**
+Seleziona una cella della sua riga e apri **Allarounder → Elimina bozza**.
+Dopo la conferma, il documento finisce nel cestino di Drive (da lì si può
+ancora recuperare per 30 giorni) e la riga viene cancellata. Funziona solo
+per articoli mai pubblicati: se lo stato è "Pubblicato", riportalo prima a
+"Bozza"; se l'articolo è già sul sito, chiedi a Guido. Solo il proprietario
+del documento può spostarlo nel cestino.
+
 **Posso modificare un articolo già pubblicato?**
 Sì: modifica il Doc e/o la riga, poi clicca di nuovo "Pubblica" sulla stessa
 riga. Il sito si aggiorna con le modifiche.
