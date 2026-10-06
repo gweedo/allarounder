@@ -74,13 +74,15 @@ Sheet exists)" verbatim — it's already written for this:
 
 1. Create the Sheet with columns in the exact order `CONTENT-CONTRACT.md` §1
    specifies: `titolo, doc, categoria, tag, autore, ospite, spotify,
-   copertina, meta_description, data, stato, esito`.
+   copertina, meta_description, data, stato, esito`, on a tab named
+   `Articoli` (the pipeline reads that tab by name).
 2. Bind an Apps Script project to it (Extensions → Apps Script), push
    `tools/apps-script/src/*` via `clasp` or paste manually.
 3. Set Apps Script script properties: `GITHUB_TOKEN` (fine-grained PAT,
    `gweedo/allarounder` Contents: Read and write -- the dispatch endpoint
    requires write -- scoped to nothing else), `GITHUB_OWNER`
-   (`gweedo`), `GITHUB_REPO` (`allarounder`). The user creates the PAT; you
+   (`gweedo`), `GITHUB_REPO` (`allarounder`), `ARTICLES_FOLDER_ID` (the
+   shared articles folder's ID). The user creates the PAT; you
    never see or store it.
 4. Reload the Sheet, run "Configura validazione colonne" once.
 
