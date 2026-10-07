@@ -81,6 +81,18 @@ def test_missing_publish_token_fails_before_the_pipeline_runs() -> None:
     assert guard < names.index("Run pipeline")
 
 
+def test_repo_settings_check_uses_publish_token() -> None:
+    # The REST API only returns allow_auto_merge/allow_squash_merge to a
+    # token with push access; the read-only GITHUB_TOKEN gets null for both,
+    # which failed the check with both settings on (2026-10-07).
+    [step] = [
+        s
+        for s in _steps(_load("publish.yml"))
+        if s.get("name") == "Verify repo settings auto-merge depends on"
+    ]
+    assert step["env"]["GH_TOKEN"] == PUBLISH_TOKEN
+
+
 def test_github_token_keeps_read_only_permissions() -> None:
     permissions = _load("publish.yml")["permissions"]
     assert permissions == {"contents": "read", "pull-requests": "read"}
