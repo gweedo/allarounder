@@ -13,11 +13,12 @@ concurrency:
   group: publish-content
   cancel-in-progress: false
 
+# GITHUB_TOKEN only reads. Every write -- the push, opening and merging the
+# content PR -- uses PUBLISH_TOKEN, a fine-grained PAT, so the PR is
+# attributed to one human identity end to end (see the content PR step).
 permissions:
-  contents: write
-  pull-requests: write
-  # `gh workflow run ci.yml` on the content PR branch (see below).
-  actions: write
+  contents: read
+  pull-requests: read
 
 jobs:
   publish:
@@ -29,7 +30,23 @@ jobs:
       # "Deferred esito writes and publish-run guards").
       DEFERRED_ESITO_PATH: ${{ github.workspace }}/src/pipeline/deferred-esito.json
     steps:
+      # Fail before any Drive/Sheet work if the token every write depends
+      # on is missing -- otherwise the run would only fail at the push,
+      # after esito failures were already written.
+      - name: Verify PUBLISH_TOKEN is set
+        env:
+          PUBLISH_TOKEN: ${{ secrets.PUBLISH_TOKEN }}
+        run: |
+          if [ -z "$PUBLISH_TOKEN" ]; then
+            echo "::error::Repository secret PUBLISH_TOKEN is not set (fine-grained PAT, gweedo/allarounder only: Contents + Pull requests read/write). See docs/DECISIONS.md." >&2
+            exit 1
+          fi
+
+      # Checked out with PUBLISH_TOKEN so the content branch is pushed as
+      # the token's owner, not github-actions[bot].
       - uses: actions/checkout@v7
+        with:
+          token: ${{ secrets.PUBLISH_TOKEN }}
 
       - uses: actions/setup-python@v7
         with:
@@ -91,11 +108,13 @@ jobs:
       # pass -- no admin bypass, no direct push, but still close to the
       # original "article is live ~2 minutes after Pubblica" design intent.
       #
-      # A PR opened with GITHUB_TOKEN does NOT trigger ci.yml's
-      # `pull_request` run (GitHub suppresses runs caused by GITHUB_TOKEN,
-      # except workflow_dispatch/repository_dispatch), so CI is dispatched
-      # explicitly on the branch. Auto-merge is enabled first, so the checks
-      # can't finish before there is anything waiting on them.
+      # The push, the PR, the merge and the commit's author are all the
+      # PUBLISH_TOKEN owner. A PR from github-actions[bot] can never merge:
+      # its pull_request CI run is held for approval, a separately
+      # dispatched CI run's checks don't attach to the PR, and the ruleset's
+      # "extra approval for unattributed changes" blocks bot-opened PRs and
+      # any push/commit identity that differs from the PR author. Opened by
+      # a user's token, the PR gets the normal pull_request CI run.
       #
       # Waits for the PR to actually report MERGED (ingest/pr_wait.py)
       # before the step -- and therefore the job -- exits: `concurrency:
@@ -106,11 +125,14 @@ jobs:
       - name: Open content PR and wait for it to merge
         if: steps.diff.outputs.changed == 'true'
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ secrets.PUBLISH_TOKEN }}
         run: |
           branch="content/publish-${{ github.run_id }}"
-          git config user.name "allarounder-pipeline"
-          git config user.email "actions@github.com"
+          owner=$(gh api user --jq '"\(.login) \(.id)"')
+          login="${owner% *}"
+          user_id="${owner#* }"
+          git config user.name "$login"
+          git config user.email "${user_id}+${login}@users.noreply.github.com"
           git checkout -b "$branch"
           git commit -m "content: publish from the editorial Sheet ($(date -u +%Y-%m-%dT%H:%M:%SZ))"
           git push origin "$branch"
@@ -121,7 +143,6 @@ jobs:
             --body "Automated publish run. See the Actions log for this run for which rows were published, scheduled, or rejected, and why.")
           pr_number="${pr_url##*/}"
           gh pr merge "$pr_number" --auto --squash
-          gh workflow run ci.yml --ref "$branch"
           python -m ingest.pr_wait "$pr_number"
 
       # Runs whenever the job hasn't already failed: unconditionally when

@@ -102,9 +102,15 @@ Google Cloud Console and shares the Sheet and Drive folder with its email.
    two GitHub Actions repo secrets: `GOOGLE_SERVICE_ACCOUNT_JSON` (the full
    key JSON) and `SHEET_ID` (the spreadsheet ID from its URL) — these are
    exactly what `src/pipeline/ingest/config.py` and `publish.yml` expect.
+3. User creates a fine-grained PAT (`gweedo/allarounder` only, Contents +
+   Pull requests read/write) and sets it as the repo secret
+   `PUBLISH_TOKEN`. `publish.yml` pushes, opens and merges the content PR
+   with it, so the PR is attributed to a human -- a bot-opened PR can never
+   merge (see `docs/DECISIONS.md`, "Deferred esito writes and publish-run
+   guards", 2026-10-07 amendment).
 
-**Acceptance:** `gh secret list` shows both names (never their values) set
-on `gweedo/allarounder`.
+**Acceptance:** `gh secret list` shows all three names (never their values)
+set on `gweedo/allarounder`.
 
 ## Task D3 — First real pipeline run
 
