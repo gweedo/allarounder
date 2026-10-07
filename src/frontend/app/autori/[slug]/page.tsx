@@ -2,9 +2,10 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { getAuthorBySlug, getAllAuthorSlugs } from "../../../lib/content";
+import { slugParams } from "../../../lib/static-params";
 
 export async function generateStaticParams() {
-  return getAllAuthorSlugs().map((slug) => ({ slug }));
+  return slugParams(getAllAuthorSlugs());
 }
 
 function getAuthorData(slug: string) {

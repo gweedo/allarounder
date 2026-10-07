@@ -3,9 +3,10 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import { renderMarkdown } from "../../../lib/markdown";
 import { getArticleBySlug, getAllArticleSlugs } from "../../../lib/content";
+import { slugParams } from "../../../lib/static-params";
 
 export async function generateStaticParams() {
-  return getAllArticleSlugs().map((slug) => ({ slug }));
+  return slugParams(getAllArticleSlugs());
 }
 
 interface Props {
