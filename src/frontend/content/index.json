@@ -15,9 +15,23 @@
       "meta_description": "Allarounder è il nuovo spazio italiano dedicato alla ginnastica artistica: articoli, interviste e approfondimenti a fianco del podcast su Spotify.",
       "og_image_url": null,
       "reading_time": 2,
-      "author_profile": { "id": "author-guido-s", "name": "Guido S.", "slug": "guido-s" },
-      "category": { "id": "cat-interviste", "name": "Interviste", "slug": "interviste" },
-      "tags": [{ "id": "tag-mondiali", "name": "Mondiali", "slug": "mondiali" }],
+      "author_profile": {
+        "id": "author-guido-s",
+        "name": "Guido S.",
+        "slug": "guido-s"
+      },
+      "category": {
+        "id": "cat-interviste",
+        "name": "Interviste",
+        "slug": "interviste"
+      },
+      "tags": [
+        {
+          "id": "tag-mondiali",
+          "name": "Mondiali",
+          "slug": "mondiali"
+        }
+      ],
       "guests": []
     },
     {
@@ -35,13 +49,35 @@
       "meta_description": "Ginnasta Esempio si racconta alla vigilia dei Mondiali 2026: preparazione, obiettivi e le avversarie da tenere d'occhio nella finale di all-around.",
       "og_image_url": null,
       "reading_time": 4,
-      "author_profile": { "id": "author-guido-s", "name": "Guido S.", "slug": "guido-s" },
-      "category": { "id": "cat-interviste", "name": "Interviste", "slug": "interviste" },
+      "author_profile": {
+        "id": "author-guido-s",
+        "name": "Guido S.",
+        "slug": "guido-s"
+      },
+      "category": {
+        "id": "cat-interviste",
+        "name": "Interviste",
+        "slug": "interviste"
+      },
       "tags": [
-        { "id": "tag-mondiali", "name": "Mondiali", "slug": "mondiali" },
-        { "id": "tag-esordienti", "name": "Esordienti", "slug": "esordienti" }
+        {
+          "id": "tag-mondiali",
+          "name": "Mondiali",
+          "slug": "mondiali"
+        },
+        {
+          "id": "tag-esordienti",
+          "name": "Esordienti",
+          "slug": "esordienti"
+        }
       ],
-      "guests": [{ "id": "guest-ginnasta-esempio", "name": "Ginnasta Esempio", "slug": "ginnasta-esempio" }]
+      "guests": [
+        {
+          "id": "guest-ginnasta-esempio",
+          "name": "Ginnasta Esempio",
+          "slug": "ginnasta-esempio"
+        }
+      ]
     }
   ],
   "categories": [
@@ -73,7 +109,15 @@
     }
   ],
   "tags": [
-    { "id": "tag-mondiali", "name": "Mondiali", "slug": "mondiali" },
-    { "id": "tag-esordienti", "name": "Esordienti", "slug": "esordienti" }
+    {
+      "id": "tag-mondiali",
+      "name": "Mondiali",
+      "slug": "mondiali"
+    },
+    {
+      "id": "tag-esordienti",
+      "name": "Esordienti",
+      "slug": "esordienti"
+    }
   ]
 }
