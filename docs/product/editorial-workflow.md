@@ -36,7 +36,7 @@ colonna:
 | **spotify** | Il link all'episodio o al canale Spotify collegato, se c'è. Lascia vuoto per un articolo senza episodio collegato |
 | **copertina** | Il link di condivisione dell'immagine di copertina su Google Drive, se ne hai una |
 | **meta_description** | Una breve descrizione dell'articolo per Google, tra **140 e 155 caratteri esatti** — né di più né di meno. Serve per come l'articolo appare nei risultati di ricerca |
-| **data** | La data in cui l'articolo deve andare online (formato AAAA-MM-GG, es. 2026-09-15). Può essere una data futura: l'articolo resterà in attesa fino a quel giorno |
+| **data** | La data in cui l'articolo deve andare online (formato AAAA-MM-GG, es. 2026-09-15; fai doppio clic sulla cella per scegliere la data dal calendario). Può essere una data futura: l'articolo resterà in attesa fino a quel giorno |
 | **stato** | Bozza (stai ancora scrivendo) o Pronto (finito, in attesa di essere pubblicato): scegli tu dal menu a tendina. Pubblicato viene impostato da solo quando clicchi "Pubblica" — vedi punto 3 |
 | **esito** | Compilata automaticamente dal sistema dopo ogni pubblicazione. Non scriverci mai sopra a mano — vedi punto 4 |
 
@@ -112,6 +112,14 @@ e clicca di nuovo "Pubblica".
 **Ho pubblicato per errore un articolo che non era pronto: come lo tolgo?**
 Chiedi a Guido: togliere un articolo già pubblicato richiede un intervento
 manuale sul codice (non è ancora automatizzato dal foglio).
+
+**Ho creato una bozza che non mi serve più: come la elimino?**
+Seleziona una cella della sua riga e apri **Allarounder → Elimina bozza**.
+Dopo la conferma, il documento finisce nel cestino di Drive (da lì si può
+ancora recuperare per 30 giorni) e la riga viene cancellata. Funziona solo
+per articoli mai pubblicati: se lo stato è "Pubblicato", riportalo prima a
+"Bozza"; se l'articolo è già sul sito, chiedi a Guido. Solo il proprietario
+del documento può spostarlo nel cestino.
 
 **Posso modificare un articolo già pubblicato?**
 Sì: modifica il Doc e/o la riga, poi clicca di nuovo "Pubblica" sulla stessa
