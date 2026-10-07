@@ -17,6 +17,19 @@ class TestExtractDocId:
     def test_strips_whitespace_on_bare_id(self) -> None:
         assert extract_doc_id("  1AbCdEf23456  ") == "1AbCdEf23456"
 
+    def test_extracts_from_open_url(self) -> None:
+        # Apps Script's Document.getUrl() -- what "Nuovo articolo" writes.
+        url = "https://docs.google.com/open?id=1AbCdEf23456"
+        assert extract_doc_id(url) == "1AbCdEf23456"
+
+    def test_extracts_from_id_query_param_among_others(self) -> None:
+        url = "https://drive.google.com/open?usp=sharing&id=1AbCdEf23456"
+        assert extract_doc_id(url) == "1AbCdEf23456"
+
+    def test_rejects_url_without_doc_id(self) -> None:
+        with pytest.raises(ValueError, match="collegamento al documento non valido"):
+            extract_doc_id("https://docs.google.com/document/u/0/")
+
     def test_rejects_empty(self) -> None:
         with pytest.raises(ValueError):
             extract_doc_id("")
