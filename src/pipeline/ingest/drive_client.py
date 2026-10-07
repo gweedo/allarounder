@@ -14,16 +14,21 @@ from typing import Any, Protocol
 from ingest.models import DocExport, ExtractedImage
 
 _DOC_ID_IN_URL = re.compile(r"/d/([a-zA-Z0-9_-]+)")
+# `.../open?id=<id>` -- the form Apps Script's Document.getUrl() returns, so
+# every row "Nuovo articolo" creates uses it.
+_DOC_ID_IN_QUERY = re.compile(r"[?&]id=([a-zA-Z0-9_-]+)")
 
 
 def extract_doc_id(doc_ref: str) -> str:
-    """Accepts a full Docs share URL or a bare Doc ID (CONTENT-CONTRACT.md §1)."""
+    """Accepts a Docs/Drive URL or a bare Doc ID (CONTENT-CONTRACT.md §1)."""
     doc_ref = doc_ref.strip()
-    match = _DOC_ID_IN_URL.search(doc_ref)
+    match = _DOC_ID_IN_URL.search(doc_ref) or _DOC_ID_IN_QUERY.search(doc_ref)
     if match:
         return match.group(1)
     if not doc_ref:
         raise ValueError("collegamento al documento mancante")
+    if "://" in doc_ref:
+        raise ValueError("collegamento al documento non valido")
     return doc_ref
 
 
