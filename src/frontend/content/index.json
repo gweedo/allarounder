@@ -1,7 +1,86 @@
 {
-  "articles": [],
-  "categories": [],
-  "authors": [],
+  "articles": [
+    {
+      "id": "article-never-be-afraid-to-fail",
+      "doc_id": "1N-51tAoTJaKbqKAOy8JcyNOUQFPBcgPjqW4-wxAq4yg",
+      "row_hash": "c3e76d83b27d6fff0fdc6932a008a3aa61d687325cbfc47406a8382b73456a2b",
+      "title": "Never Be Afraid to Fail",
+      "slug": "never-be-afraid-to-fail",
+      "author_id": "author-umberto-zurlini",
+      "publish_at": "2026-10-05T22:00:00Z",
+      "updated_at": "2026-10-09T12:01:40.145Z",
+      "spotify_url": null,
+      "excerpt": "Jalen Brunson e i playoff NBA insegnano ad accettare l'errore: allenare la mente a sbagliare senza paura è ciò che distingue i veri agonisti.",
+      "cover_image_url": null,
+      "cover_image_alt": null,
+      "meta_title": "Never Be Afraid to Fail — Allarounder",
+      "meta_description": "Jalen Brunson e i playoff NBA insegnano ad accettare l'errore: allenare la mente a sbagliare senza paura è ciò che distingue i veri agonisti.",
+      "og_image_url": null,
+      "reading_time": 3,
+      "author_profile": {
+        "id": "author-umberto-zurlini",
+        "name": "Umberto Zurlini",
+        "slug": "umberto-zurlini"
+      },
+      "category": {
+        "id": "cat-out-of-the-box",
+        "name": "Out of the Box",
+        "slug": "out-of-the-box"
+      },
+      "tags": [
+        {
+          "id": "tag-ansia",
+          "name": "ansia",
+          "slug": "ansia"
+        },
+        {
+          "id": "tag-errore",
+          "name": "errore",
+          "slug": "errore"
+        },
+        {
+          "id": "tag-nba",
+          "name": "NBA",
+          "slug": "nba"
+        }
+      ],
+      "guests": []
+    }
+  ],
+  "categories": [
+    {
+      "id": "cat-out-of-the-box",
+      "name": "Out of the Box",
+      "slug": "out-of-the-box",
+      "description": null
+    }
+  ],
+  "authors": [
+    {
+      "id": "author-umberto-zurlini",
+      "name": "Umberto Zurlini",
+      "slug": "umberto-zurlini",
+      "bio": null,
+      "photo_url": null,
+      "links": {}
+    }
+  ],
   "guests": [],
-  "tags": []
+  "tags": [
+    {
+      "id": "tag-ansia",
+      "name": "ansia",
+      "slug": "ansia"
+    },
+    {
+      "id": "tag-errore",
+      "name": "errore",
+      "slug": "errore"
+    },
+    {
+      "id": "tag-nba",
+      "name": "NBA",
+      "slug": "nba"
+    }
+  ]
 }
