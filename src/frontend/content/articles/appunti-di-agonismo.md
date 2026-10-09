@@ -6,7 +6,7 @@ title: Appunti di Agonismo
 slug: appunti-di-agonismo
 author_id: author-chiara-simonelli
 publish_at: '2026-10-05T22:00:00Z'
-updated_at: '2026-10-09T12:50:37.078Z'
+updated_at: '2026-10-09T13:25:38.775Z'
 spotify_url: null
 excerpt: 'Agonismo non è aggressività ma lotta contro la propria pigrizia: dalla fatica
   nello sport alla corteccia aMCC, perché fare cose difficili ci fa bene.'
@@ -37,6 +37,8 @@ tags:
   slug: neuroscienze
 guests: []
 ---
+I
+
 Nella mia testa c’è una voce a cui non riesco ad attribuire un colore ben definito. Certi giorni assume sfumature dorate, così calde e rassicuranti da darmi una sensazione di totale comfort; mi sussurra piano: “Ora puoi mollare, siediti un po’, riposati”. Questi giorni, però, sono rari. La maggior parte delle volte, infatti, questa voce è fredda, metallica; non sussurra, stride. È difficile da ignorare e mi invia un segnale ben preciso: “Puoi farcela, devi farcela. Non è questo il momento di accontentarsi”.
 
 Un colore definito non ce l’ha, è vero, ma un nome forse sì: agonismo. Il mio agonismo. Qualcosa di slegato da una società sportiva o da una competizione imminente, ma che nonostante ciò definisco come la mia olimpiade interiore quotidiana. Ecco cos’è quella voce: è la mentalità agonistica, una inquilina iperattiva che soggiorna nella mia testa da quando, a cinque anni, ho messo piede per la prima volta in una palestra di karate.
@@ -51,7 +53,7 @@ Manca quel crogiolarsi struggente nel risolvere un problema, assaporando la friz
 
 Ma questa fuga costante dalla fatica e dalla frizione ci sta davvero proteggendo o ci sta, in realtà, logorando? E che connessione ha tutto questo con l’agonismo?
 
-## Agonsimo: sfidare sé stessi e gli altri
+## Agonismo: sfidare sé stessi e gli altri
 
 La parola "agonismo" deriva dal greco agōn (ἀγών), che significa "gara" o "lotta". Eppure, come è emerso dal dialogo a Gres Art 671, oggi questo termine è vittima di un enorme fraintendimento. Viene associato all'aggressività cieca, alla volontà di distruggere l’avversario a tutti i costi. Un'associazione di certo non attraente.
 
