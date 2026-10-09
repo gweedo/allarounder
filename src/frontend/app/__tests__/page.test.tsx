@@ -160,18 +160,22 @@ describe("HomePage", () => {
     );
   });
 
-  it("shows pagination when totalPages > 1", async () => {
+  it("links to the full article list instead of paginating", async () => {
     await renderHomePage({
       items: [BASE_ARTICLE],
       total: 30,
       page: 1,
       page_size: 13,
     });
-    expect(screen.getByRole("navigation", { name: /paginazione/i })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /pagina successiva/i })).toHaveAttribute(
+    expect(screen.queryByRole("navigation", { name: /paginazione/i })).toBeNull();
+    expect(screen.getByRole("link", { name: /tutti gli articoli/i })).toHaveAttribute(
       "href",
-      "/?page=2",
+      "/articoli",
     );
   });
 
+  it("does not link to the full list when there are no articles", async () => {
+    await renderHomePage({ items: [], total: 0, page: 1, page_size: 13 });
+    expect(screen.queryByRole("link", { name: /tutti gli articoli/i })).toBeNull();
+  });
 });

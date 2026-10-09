@@ -160,6 +160,42 @@ export function getTagBySlug(slug: string): TaxonomyWithArticles<SlugRef> | null
   return { detail, articles };
 }
 
+// Section index pages (/argomenti, /autori, /ospiti, /tag).
+
+export type WithArticleCount<T> = T & { article_count: number };
+
+function withCounts<T extends { slug: string }>(
+  items: T[],
+  matches: (article: ArticleMeta, slug: string) => boolean,
+): WithArticleCount<T>[] {
+  const articles = readIndex().articles;
+  return items.map((item) => ({
+    ...item,
+    article_count: articles.filter((a) => matches(a, item.slug)).length,
+  }));
+}
+
+function byName<T extends { name: string }>(items: T[]): T[] {
+  return [...items].sort((a, b) => a.name.localeCompare(b.name, "it", { sensitivity: "base" }));
+}
+
+// Index order is the editorial order of the fixed category list.
+export function getCategoryIndex(): WithArticleCount<CategoryDetail>[] {
+  return withCounts(readIndex().categories, (a, slug) => a.category?.slug === slug);
+}
+
+export function getAuthorIndex(): WithArticleCount<ProfileDetail>[] {
+  return byName(withCounts(readIndex().authors, (a, slug) => a.author_profile?.slug === slug));
+}
+
+export function getGuestIndex(): WithArticleCount<ProfileDetail>[] {
+  return byName(withCounts(readIndex().guests, (a, slug) => a.guests.some((g) => g.slug === slug)));
+}
+
+export function getTagIndex(): WithArticleCount<SlugRef>[] {
+  return byName(withCounts(readIndex().tags, (a, slug) => a.tags.some((t) => t.slug === slug)));
+}
+
 export function getAllCategorySlugsForSitemap(): SlugRef[] {
   return readIndex().categories;
 }

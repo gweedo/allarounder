@@ -40,6 +40,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   ];
 
+  // Section roots
+  for (const section of ["articoli", "argomenti", "autori", "ospiti", "tag"]) {
+    entries.push({
+      url: `${BASE}/${section}`,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.6,
+    });
+  }
+
   // Articles
   const { items: articles } = getArticleCards(1, Number.MAX_SAFE_INTEGER);
   for (const a of articles) {
