@@ -11,8 +11,9 @@ Nel foglio Editoriale, apri il menu **Allarounder → Nuovo articolo**. Ti
 verrà chiesto il titolo dell'articolo: dopo averlo confermato, il sistema
 crea automaticamente:
 
-- un nuovo Google Doc con una struttura di partenza (titolo, Introduzione,
-  Sviluppo, Conclusione) — apri il link che compare per iniziare a scrivere;
+- un nuovo Google Doc con una struttura di partenza (Introduzione,
+  Sviluppo, Conclusione — puoi rinominare o eliminare queste sezioni):
+  apri il link che compare per iniziare a scrivere;
 - una nuova riga nel foglio, già compilata con il titolo, il link al Doc e
   lo stato "Bozza".
 
