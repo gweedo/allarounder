@@ -76,6 +76,13 @@ describe("article loaders", () => {
   });
 });
 
+describe("related articles", () => {
+  it("ranks the rest of the index against the given article", () => {
+    const a1 = content.getArticleCards(2, 1).items[0];
+    expect(content.getRelatedArticles(a1, 3).map((a) => a.slug)).toEqual(["a2"]);
+  });
+});
+
 describe("taxonomy loaders", () => {
   it("lists slugs for static params", () => {
     expect(content.getAllCategorySlugs()).toEqual(["interviste", "analisi"]);
