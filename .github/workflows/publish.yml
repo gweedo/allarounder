@@ -44,9 +44,16 @@ jobs:
 
       # Checked out with PUBLISH_TOKEN so the content branch is pushed as
       # the token's owner, not github-actions[bot].
+      #
+      # `ref: main` builds on main as it is when this job *starts*, not the
+      # commit current when the run was triggered (checkout's default). A run
+      # queued behind another in `publish-content` would otherwise regenerate
+      # content on a main missing the earlier run's merge, risking a
+      # conflicting index.json and a stalled content PR.
       - uses: actions/checkout@v7
         with:
           token: ${{ secrets.PUBLISH_TOKEN }}
+          ref: main
 
       - uses: actions/setup-python@v7
         with:
