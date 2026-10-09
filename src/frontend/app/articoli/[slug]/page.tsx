@@ -1,10 +1,19 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { renderMarkdown } from "../../../lib/markdown";
-import { getArticleBySlug, getAllArticleSlugs } from "../../../lib/content";
+import {
+  getArticleBySlug,
+  getAllArticleSlugs,
+  getRelatedArticles,
+} from "../../../lib/content";
+import { SPOTIFY_SHOW_URL } from "../../../lib/site";
 import { formatPublishDate } from "../../../lib/dates";
 import { slugParams } from "../../../lib/static-params";
+
+const BASE = "https://allarounder.it";
+const RELATED_COUNT = 3;
 
 export async function generateStaticParams() {
   return slugParams(getAllArticleSlugs());
@@ -46,7 +55,8 @@ export default async function ArticlePage({ params }: Props) {
   if (!article) notFound();
 
   const bodyHtml = await renderMarkdown(article.body);
-  const url = `https://allarounder.it/articoli/${article.slug}`;
+  const url = `${BASE}/articoli/${article.slug}`;
+  const related = getRelatedArticles(article, RELATED_COUNT);
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -62,8 +72,21 @@ export default async function ArticlePage({ params }: Props) {
     publisher: {
       "@type": "Organization",
       name: "Allarounder",
-      url: "https://allarounder.it",
+      url: BASE,
     },
+  };
+
+  // The last crumb is the page itself, so it carries no `item` URL.
+  const breadcrumbLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { name: "Home", item: BASE },
+      ...(article.category
+        ? [{ name: article.category.name, item: `${BASE}/argomenti/${article.category.slug}` }]
+        : []),
+      { name: article.title },
+    ].map((crumb, i) => ({ "@type": "ListItem", position: i + 1, ...crumb })),
   };
 
   return (
@@ -72,6 +95,25 @@ export default async function ArticlePage({ params }: Props) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
+      />
+      <nav aria-label="Percorso" className="breadcrumb">
+        <ol>
+          <li>
+            <Link href="/">Home</Link>
+          </li>
+          {article.category && (
+            <li>
+              <Link href={`/argomenti/${article.category.slug}`}>{article.category.name}</Link>
+            </li>
+          )}
+          <li>
+            <span aria-current="page">{article.title}</span>
+          </li>
+        </ol>
+      </nav>
       <article>
         {article.cover_image_url && (
           <div className="cover-image" style={{ aspectRatio: "16/9", marginBottom: "1.5rem" }}>
@@ -97,17 +139,12 @@ export default async function ArticlePage({ params }: Props) {
           {article.author_profile && (
             <span style={{ marginLeft: "1rem" }}>
               di{" "}
-              <a href={`/autori/${article.author_profile.slug}`}>
+              <Link href={`/autori/${article.author_profile.slug}`}>
                 {article.author_profile.name}
-              </a>
+              </Link>
             </span>
           )}
         </div>
-        {article.category && (
-          <p className="article-meta" style={{ marginTop: "0.5rem" }}>
-            <a href={`/argomenti/${article.category.slug}`}>{article.category.name}</a>
-          </p>
-        )}
         {article.excerpt && (
           <p className="article-excerpt" style={{ fontStyle: "italic", marginTop: "1rem" }}>
             {article.excerpt}
@@ -116,9 +153,9 @@ export default async function ArticlePage({ params }: Props) {
         {article.tags && article.tags.length > 0 && (
           <div className="tag-list">
             {article.tags.map((tag) => (
-              <a key={tag.id} href={`/tag/${tag.slug}`} className="tag-pill">
+              <Link key={tag.id} href={`/tag/${tag.slug}`} className="tag-pill">
                 #{tag.name}
-              </a>
+              </Link>
             ))}
           </div>
         )}
@@ -127,7 +164,7 @@ export default async function ArticlePage({ params }: Props) {
             <span>Ospiti: </span>
             {article.guests.map((guest, i) => (
               <span key={guest.id}>
-                <a href={`/ospiti/${guest.slug}`}>{guest.name}</a>
+                <Link href={`/ospiti/${guest.slug}`}>{guest.name}</Link>
                 {i < article.guests.length - 1 && ", "}
               </span>
             ))}
@@ -137,14 +174,47 @@ export default async function ArticlePage({ params }: Props) {
           className="article-body"
           dangerouslySetInnerHTML={{ __html: bodyHtml }}
         />
-        {article.spotify_url && (
+        {article.spotify_url ? (
           <div className="spotify-callout">
             <a href={article.spotify_url} target="_blank" rel="noopener noreferrer">
-              Ascolta su Spotify
+              Ascolta l&apos;episodio su Spotify
             </a>
           </div>
+        ) : (
+          SPOTIFY_SHOW_URL && (
+            <div className="spotify-callout">
+              <a href={SPOTIFY_SHOW_URL} target="_blank" rel="noopener noreferrer">
+                Ascolta il podcast su Spotify
+              </a>
+            </div>
+          )
         )}
       </article>
+      {article.category && (
+        <p className="article-more">
+          <Link href={`/argomenti/${article.category.slug}`}>
+            Altri articoli in {article.category.name} →
+          </Link>
+        </p>
+      )}
+      {related.length > 0 && (
+        <section aria-labelledby="leggi-anche" className="related-articles">
+          <h2 id="leggi-anche">Leggi anche</h2>
+          <ul>
+            {related.map((r) => (
+              <li key={r.id}>
+                {r.category && <span className="article-meta">{r.category.name}</span>}
+                <h3 className="card-title">
+                  <Link href={`/articoli/${r.slug}`}>{r.title}</Link>
+                </h3>
+                <time className="article-meta" dateTime={r.publish_at}>
+                  {formatPublishDate(r.publish_at)}
+                </time>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
     </main>
   );
 }

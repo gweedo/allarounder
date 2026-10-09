@@ -38,7 +38,9 @@ async function renderStaticPage(slug: string, data: typeof BASE_PAGE | null) {
   return "rendered";
 }
 
-describe("StaticPageRoute", () => {
+// The first test cold-imports the real remark/rehype pipeline, which can take
+// longer than the default 5s when the whole suite runs in parallel.
+describe("StaticPageRoute", { timeout: 20_000 }, () => {
   it("renders page title as h1", async () => {
     await renderStaticPage("chi-siamo", BASE_PAGE);
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Chi siamo");

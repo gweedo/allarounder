@@ -274,6 +274,8 @@ body {
 .article-body a {
   color: var(--color-accent);
   text-decoration: underline;
+  /* Long reference URLs would otherwise overflow narrow viewports. */
+  overflow-wrap: anywhere;
 }
 
 .article-body a:hover,
@@ -599,6 +601,61 @@ body {
   color: #1db954;
   font-weight: 600;
   text-decoration: none;
+}
+
+/* Article wayfinding: breadcrumb above, next steps below. Structure only;
+   the look belongs to the design review. */
+
+.breadcrumb ol {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-2);
+  margin: 0 0 var(--space-4);
+  padding: 0;
+  list-style: none;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+.breadcrumb li + li::before {
+  content: "›";
+  margin-right: var(--space-2);
+}
+
+.breadcrumb a {
+  color: var(--color-text-muted);
+}
+
+.article-more {
+  margin-top: var(--space-6);
+}
+
+.article-more a {
+  color: var(--color-accent);
+  font-weight: 600;
+}
+
+.related-articles {
+  margin-top: var(--space-6);
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--color-border);
+}
+
+.related-articles ul {
+  display: grid;
+  gap: var(--space-5);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.related-articles .card-title {
+  margin: var(--space-1) 0;
+  font-size: var(--text-lg);
+}
+
+.related-articles span.article-meta {
+  display: block;
 }
 
 .pagination-nav {
