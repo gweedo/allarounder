@@ -3,6 +3,7 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import { renderMarkdown } from "../../../lib/markdown";
 import { getArticleBySlug, getAllArticleSlugs } from "../../../lib/content";
+import { formatPublishDate } from "../../../lib/dates";
 import { slugParams } from "../../../lib/static-params";
 
 export async function generateStaticParams() {
@@ -86,7 +87,7 @@ export default async function ArticlePage({ params }: Props) {
         <h1>{article.title}</h1>
         <div className="article-meta" style={{ marginTop: "0.25rem" }}>
           <time dateTime={article.publish_at}>
-            {new Date(article.publish_at).toLocaleDateString("it-IT")}
+            {formatPublishDate(article.publish_at)}
           </time>
           {article.reading_time && (
             <span style={{ marginLeft: "1rem" }}>

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { getArticleCards } from "../lib/content";
+import { formatPublishDate } from "../lib/dates";
 
 export const metadata: Metadata = {
   title: "Allarounder — La voce italiana sulla ginnastica artistica",
@@ -56,7 +57,7 @@ export default async function HomePage() {
           {hero.excerpt && <p className="hero-excerpt">{hero.excerpt}</p>}
           <div className="article-meta" style={{ marginBottom: "1rem" }}>
             <time dateTime={hero.publish_at}>
-              {new Date(hero.publish_at).toLocaleDateString("it-IT")}
+              {formatPublishDate(hero.publish_at)}
             </time>
             {hero.author_profile && (
               <span style={{ marginLeft: "1rem" }}>
@@ -115,7 +116,7 @@ export default async function HomePage() {
                 )}
                 <div className="article-meta">
                   <time dateTime={article.publish_at}>
-                    {new Date(article.publish_at).toLocaleDateString("it-IT")}
+                    {formatPublishDate(article.publish_at)}
                   </time>
                   {article.author_profile && (
                     <span style={{ marginLeft: "0.75rem" }}>
