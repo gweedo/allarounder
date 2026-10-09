@@ -7,6 +7,7 @@
 import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
+import { rankRelated } from "./related";
 
 const CONTENT_DIR = path.join(process.cwd(), "content");
 
@@ -109,6 +110,10 @@ export function getArticleBySlug(slug: string): Article | null {
   const raw = fs.readFileSync(filePath, "utf-8");
   const { data, content } = matter(raw);
   return { ...(data as ArticleMeta), body: content.trim() };
+}
+
+export function getRelatedArticles(article: ArticleMeta, limit: number): ArticleMeta[] {
+  return rankRelated(article, sortedArticles(), limit);
 }
 
 interface TaxonomyWithArticles<T> {

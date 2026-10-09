@@ -1,6 +1,6 @@
-import { describe, it, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
-import type { Article } from "../../../../lib/content";
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { render, screen, within } from "@testing-library/react";
+import type { Article, ArticleMeta } from "../../../../lib/content";
 
 vi.mock("next/navigation", () => ({
   notFound: () => {
@@ -24,11 +24,28 @@ vi.mock("remark-rehype", () => ({ default: vi.fn() }));
 vi.mock("rehype-sanitize", () => ({ default: vi.fn() }));
 vi.mock("rehype-stringify", () => ({ default: vi.fn() }));
 
+vi.mock("next/link", () => ({
+  default: ({ children, href }: { children: React.ReactNode; href: string }) => (
+    <a href={href}>{children}</a>
+  ),
+}));
+
 const getArticleBySlug = vi.fn();
+const getRelatedArticles = vi.fn((..._args: unknown[]): ArticleMeta[] => []);
 vi.mock("../../../../lib/content", () => ({
   getArticleBySlug: (slug: string) => getArticleBySlug(slug),
   getAllArticleSlugs: () => [],
+  getRelatedArticles: (...args: unknown[]) => getRelatedArticles(...args),
 }));
+
+const site = vi.hoisted(() => ({ SPOTIFY_SHOW_URL: null as string | null }));
+vi.mock("../../../../lib/site", () => site);
+
+beforeEach(() => {
+  site.SPOTIFY_SHOW_URL = null;
+  getRelatedArticles.mockReset();
+  getRelatedArticles.mockReturnValue([]);
+});
 
 const BASE_ARTICLE: Article = {
   id: "abc",
@@ -78,21 +95,91 @@ describe("ArticlePage", () => {
     expect(document.querySelector(".article-body")).toBeTruthy();
   });
 
-  it("does not render Spotify block when spotify_url is null", async () => {
+  it("does not render a Spotify block when neither the episode nor the show URL is set", async () => {
     await renderArticlePage({ ...BASE_ARTICLE, spotify_url: null });
-    expect(screen.queryByText(/ascolta su spotify/i)).toBeNull();
+    expect(screen.queryByRole("link", { name: /spotify/i })).toBeNull();
   });
 
-  it("renders Spotify CTA when spotify_url is set", async () => {
+  it("links to the episode on Spotify when spotify_url is set", async () => {
+    site.SPOTIFY_SHOW_URL = "https://open.spotify.com/show/xyz";
     await renderArticlePage({
       ...BASE_ARTICLE,
       spotify_url: "https://open.spotify.com/episode/abc",
     });
-    expect(screen.getByText(/ascolta su spotify/i)).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /ascolta su spotify/i })).toHaveAttribute(
+    const link = screen.getByRole("link", { name: /ascolta l'episodio su spotify/i });
+    expect(link).toHaveAttribute("href", "https://open.spotify.com/episode/abc");
+    expect(link).toHaveAttribute("rel", "noopener noreferrer");
+    expect(screen.queryByRole("link", { name: /ascolta il podcast/i })).toBeNull();
+  });
+
+  it("falls back to the podcast show when the article has no episode link", async () => {
+    site.SPOTIFY_SHOW_URL = "https://open.spotify.com/show/xyz";
+    await renderArticlePage({ ...BASE_ARTICLE, spotify_url: null });
+    expect(screen.getByRole("link", { name: /ascolta il podcast su spotify/i })).toHaveAttribute(
       "href",
-      "https://open.spotify.com/episode/abc"
+      "https://open.spotify.com/show/xyz",
     );
+  });
+
+  it("suggests related articles under 'Leggi anche'", async () => {
+    getRelatedArticles.mockReturnValue([
+      { ...BASE_ARTICLE, id: "r1", slug: "altro-articolo", title: "Altro articolo" },
+    ]);
+    await renderArticlePage(BASE_ARTICLE);
+    expect(getRelatedArticles).toHaveBeenCalledWith(
+      expect.objectContaining({ slug: "titolo-articolo" }),
+      3,
+    );
+    const section = screen.getByRole("region", { name: "Leggi anche" });
+    expect(within(section).getByRole("link", { name: "Altro articolo" })).toHaveAttribute(
+      "href",
+      "/articoli/altro-articolo",
+    );
+  });
+
+  it("omits 'Leggi anche' when there is nothing else to read", async () => {
+    await renderArticlePage(BASE_ARTICLE);
+    expect(screen.queryByRole("region", { name: "Leggi anche" })).toBeNull();
+  });
+
+  it("links to more articles in the same category after the body", async () => {
+    await renderArticlePage({
+      ...BASE_ARTICLE,
+      category: { id: "c1", name: "Analisi", slug: "analisi" },
+    });
+    expect(screen.getByRole("link", { name: /altri articoli in analisi/i })).toHaveAttribute(
+      "href",
+      "/argomenti/analisi",
+    );
+  });
+
+  it("renders a breadcrumb trail Home › category › article", async () => {
+    await renderArticlePage({
+      ...BASE_ARTICLE,
+      category: { id: "c1", name: "Analisi", slug: "analisi" },
+    });
+    const trail = screen.getByRole("navigation", { name: "Percorso" });
+    const items = within(trail).getAllByRole("listitem");
+    expect(items.map((li) => li.textContent)).toEqual(["Home", "Analisi", "Titolo Articolo"]);
+    expect(within(trail).getByRole("link", { name: "Home" })).toHaveAttribute("href", "/");
+    expect(within(trail).getByRole("link", { name: "Analisi" })).toHaveAttribute("href", "/argomenti/analisi");
+    expect(within(trail).getByText("Titolo Articolo")).toHaveAttribute("aria-current", "page");
+  });
+
+  it("emits BreadcrumbList structured data", async () => {
+    await renderArticlePage({
+      ...BASE_ARTICLE,
+      category: { id: "c1", name: "Analisi", slug: "analisi" },
+    });
+    const blocks = [...document.querySelectorAll('script[type="application/ld+json"]')].map(
+      (el) => JSON.parse(el.textContent ?? "{}"),
+    );
+    const crumbs = blocks.find((b) => b["@type"] === "BreadcrumbList");
+    expect(crumbs.itemListElement.map((i: { name: string; item?: string }) => [i.name, i.item])).toEqual([
+      ["Home", "https://allarounder.it"],
+      ["Analisi", "https://allarounder.it/argomenti/analisi"],
+      ["Titolo Articolo", undefined],
+    ]);
   });
 
   it("renders cover image when cover_image_url is set", async () => {
