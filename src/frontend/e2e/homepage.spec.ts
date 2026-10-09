@@ -21,6 +21,8 @@ test.describe("Homepage", () => {
     await expect(heroHeading).toBeVisible();
 
     await page.getByRole("link", { name: /leggi/i }).first().click();
-    await expect(page).toHaveURL(/\/articoli\//);
+    // `next dev` compiles the article route on first visit, which can take
+    // longer than the default 5s expect timeout on a cold server.
+    await expect(page).toHaveURL(/\/articoli\//, { timeout: 30_000 });
   });
 });
