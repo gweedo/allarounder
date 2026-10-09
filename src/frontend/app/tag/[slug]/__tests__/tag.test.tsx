@@ -86,7 +86,7 @@ describe("generateMetadata", () => {
     getTagBySlug.mockReturnValueOnce({ detail: BASE_DETAIL, articles: [] });
     const { generateMetadata } = await import("../page");
     const meta = await generateMetadata({ params: Promise.resolve({ slug: "calcio" }) });
-    expect(meta.title).toBe("calcio — Allarounder");
+    expect(meta.title).toEqual({ absolute: "calcio — Allarounder" });
     expect(meta.description).toBe('Articoli con il tag "calcio"');
   });
 

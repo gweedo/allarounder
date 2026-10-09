@@ -103,14 +103,14 @@ describe("generateMetadata", () => {
     getStaticPageBySlug.mockReturnValueOnce(BASE_PAGE);
     const { generateMetadata } = await import("../page");
     const meta = await generateMetadata({ params: Promise.resolve({ slug: "chi-siamo" }) });
-    expect(meta.title).toBe("Chi siamo — Allarounder");
+    expect(meta.title).toEqual({ absolute: "Chi siamo — Allarounder" });
   });
 
   it("returns fallback title from page title when meta_title is null", async () => {
     getStaticPageBySlug.mockReturnValueOnce({ ...BASE_PAGE, meta_title: null });
     const { generateMetadata } = await import("../page");
     const meta = await generateMetadata({ params: Promise.resolve({ slug: "chi-siamo" }) });
-    expect(meta.title).toBe("Chi siamo — Allarounder");
+    expect(meta.title).toEqual({ absolute: "Chi siamo — Allarounder" });
   });
 
   it("returns empty object when page not found", async () => {

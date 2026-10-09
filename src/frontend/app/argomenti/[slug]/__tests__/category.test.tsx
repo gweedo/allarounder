@@ -87,7 +87,7 @@ describe("generateMetadata", () => {
     getCategoryBySlug.mockReturnValueOnce({ detail: BASE_DETAIL, articles: [] });
     const { generateMetadata } = await import("../page");
     const meta = await generateMetadata({ params: Promise.resolve({ slug: "interviste" }) });
-    expect(meta.title).toBe("Interviste — Allarounder");
+    expect(meta.title).toEqual({ absolute: "Interviste — Allarounder" });
     expect(meta.description).toBe("Conversazioni con esperti.");
   });
 

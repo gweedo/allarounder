@@ -29,7 +29,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const data = getTagData(slug);
   if (!data) return {};
   return {
-    title: `${data.name} — Allarounder`,
+    title: { absolute: `${data.name} — Allarounder` },
     description: `Articoli con il tag "${data.name}"`,
     alternates: { canonical: `https://allarounder.it/tag/${data.slug}` },
   };
