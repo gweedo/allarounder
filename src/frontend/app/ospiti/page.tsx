@@ -1,12 +1,16 @@
 import type { Metadata } from "next";
 import { getGuestIndex } from "../../lib/content";
+import { emptyPageMetadata } from "../../lib/seo";
 import { TaxonomyIndex } from "../_components/TaxonomyIndex";
 
-export const metadata: Metadata = {
-  title: { absolute: "Ospiti — Allarounder" },
-  description: "Gli ospiti intervistati da Allarounder e dal podcast.",
-  alternates: { canonical: "https://allarounder.it/ospiti" },
-};
+export function generateMetadata(): Metadata {
+  return {
+    title: { absolute: "Ospiti — Allarounder" },
+    description: "Gli ospiti intervistati da Allarounder e dal podcast.",
+    alternates: { canonical: "https://allarounder.it/ospiti" },
+    ...emptyPageMetadata(getGuestIndex().length),
+  };
+}
 
 export default function GuestsIndexPage() {
   return (

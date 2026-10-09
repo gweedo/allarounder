@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getTagBySlug, getAllTagSlugs } from "../../../lib/content";
 import { formatPublishDate } from "../../../lib/dates";
@@ -30,7 +31,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const data = getTagData(slug);
   if (!data) return {};
   return {
-    title: { absolute: `${data.name} — Allarounder` },
+    title: { absolute: `#${data.name} — Allarounder` },
     description: `Articoli con il tag "${data.name}"`,
     alternates: { canonical: `https://allarounder.it/tag/${data.slug}` },
   };
@@ -66,7 +67,7 @@ export default async function TagPage({ params }: Props) {
                 </div>
               )}
               <h2 className="card-title" style={{ marginTop: "0.75rem" }}>
-                <a href={`/articoli/${article.slug}`}>{article.title}</a>
+                <Link href={`/articoli/${article.slug}`}>{article.title}</Link>
               </h2>
               {article.excerpt && (
                 <p className="article-excerpt" style={{ marginTop: "0.5rem" }}>

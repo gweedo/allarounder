@@ -1,12 +1,16 @@
 import type { Metadata } from "next";
 import { getArticleCards } from "../../lib/content";
+import { emptyPageMetadata } from "../../lib/seo";
 import { ArticleList } from "../_components/ArticleList";
 
-export const metadata: Metadata = {
-  title: { absolute: "Articoli — Allarounder" },
-  description: "Tutti gli articoli di Allarounder, dal più recente.",
-  alternates: { canonical: "https://allarounder.it/articoli" },
-};
+export function generateMetadata(): Metadata {
+  return {
+    title: { absolute: "Articoli — Allarounder" },
+    description: "Tutti gli articoli di Allarounder, dal più recente.",
+    alternates: { canonical: "https://allarounder.it/articoli" },
+    ...emptyPageMetadata(getArticleCards(1, 1).total),
+  };
+}
 
 // Every published article on one page, newest first. Path-based pagination
 // (/articoli/pagina/[n]) can follow once the list gets long.

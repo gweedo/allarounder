@@ -321,6 +321,10 @@ Authoritative source: `src/frontend/lib/content.ts`. Location:
 
 - `src/frontend/content/index.json` — `{ articles, categories, authors,
   guests, tags }`, matching the `ContentIndex` shape in `content.ts`.
+  `categories` always holds all four seeded categories (§1), in that order,
+  whether or not any article uses them yet — every run re-seeds the list, so
+  each category has a page from day one. The other collections only list
+  entries that at least one published article references.
 - `src/frontend/content/articles/<slug>.md` — YAML frontmatter matching
   `ArticleMeta` (plus the pipeline-only `doc_id` and `row_hash`, §2 and §3) +
   Markdown body.

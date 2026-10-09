@@ -82,7 +82,6 @@ describe("taxonomy loaders", () => {
     expect(content.getAllAuthorSlugs()).toEqual(["zeta", "alfa"]);
     expect(content.getAllGuestSlugs()).toEqual(["ospite"]);
     expect(content.getAllTagSlugs()).toEqual(["nba", "ansia"]);
-    expect(content.getAllCategorySlugsForSitemap().map((c) => c.slug)).toEqual(["interviste", "analisi"]);
   });
 
   it("resolves each taxonomy to its detail and articles", () => {

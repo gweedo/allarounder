@@ -35,8 +35,9 @@ vi.mock("../../lib/content", () => ({
 describe("section index pages", () => {
   it("/articoli lists every published article", async () => {
     content.articles = [ARTICLE];
-    const { default: Page, metadata } = await import("../articoli/page");
+    const { default: Page, generateMetadata } = await import("../articoli/page");
     render(<Page />);
+    const metadata = generateMetadata();
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Articoli");
     expect(screen.getByRole("link", { name: "Appunti di Agonismo" })).toHaveAttribute(
       "href",
@@ -46,11 +47,12 @@ describe("section index pages", () => {
     expect(metadata.alternates?.canonical).toBe("https://allarounder.it/articoli");
   });
 
-  it("/articoli has an empty state", async () => {
+  it("/articoli has an empty state and stays out of the index while empty", async () => {
     content.articles = [];
-    const { default: Page } = await import("../articoli/page");
+    const { default: Page, generateMetadata } = await import("../articoli/page");
     render(<Page />);
     expect(screen.getByText(/nessun articolo pubblicato/i)).toBeInTheDocument();
+    expect(generateMetadata().robots).toEqual({ index: false, follow: true });
   });
 
   it.each([
@@ -58,17 +60,20 @@ describe("section index pages", () => {
     ["autori", "Autori", "Chiara Simonelli", "/autori/chiara-simonelli"],
     ["tag", "Tag", "#agonismo", "/tag/agonismo"],
   ])("/%s lists its entries", async (dir, title, linkName, href) => {
-    const { default: Page, metadata } = await import(`../${dir}/page.tsx`);
+    const { default: Page, generateMetadata } = await import(`../${dir}/page.tsx`);
     render(<Page />);
+    const metadata = generateMetadata();
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(title);
     expect(screen.getByRole("link", { name: linkName })).toHaveAttribute("href", href);
     expect(metadata.title).toEqual({ absolute: `${title} — Allarounder` });
     expect(metadata.alternates.canonical).toBe(`https://allarounder.it/${dir}`);
+    expect(metadata.robots).toBeUndefined();
   });
 
-  it("/ospiti shows an empty state while there are no guests", async () => {
-    const { default: Page } = await import("../ospiti/page");
+  it("/ospiti shows an empty state and stays out of the index while there are no guests", async () => {
+    const { default: Page, generateMetadata } = await import("../ospiti/page");
     render(<Page />);
+    expect(generateMetadata().robots).toEqual({ index: false, follow: true });
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Ospiti");
     expect(screen.getByText(/nessun ospite/i)).toBeInTheDocument();
   });

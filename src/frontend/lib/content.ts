@@ -196,10 +196,6 @@ export function getTagIndex(): WithArticleCount<SlugRef>[] {
   return byName(withCounts(readIndex().tags, (a, slug) => a.tags.some((t) => t.slug === slug)));
 }
 
-export function getAllCategorySlugsForSitemap(): SlugRef[] {
-  return readIndex().categories;
-}
-
 export interface StaticPage {
   id: string;
   title: string;
