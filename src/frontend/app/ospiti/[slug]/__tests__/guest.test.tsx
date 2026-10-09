@@ -108,7 +108,7 @@ describe("generateMetadata", () => {
     getGuestBySlug.mockReturnValueOnce({ detail: BASE_DETAIL, articles: [] });
     const { generateMetadata } = await import("../page");
     const meta = await generateMetadata({ params: Promise.resolve({ slug: "mario-bianchi" }) });
-    expect(meta.title).toBe("Mario Bianchi — Allarounder");
+    expect(meta.title).toEqual({ absolute: "Mario Bianchi — Allarounder" });
     expect(meta.description).toBe("Ospite del podcast.");
   });
 

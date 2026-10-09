@@ -108,7 +108,7 @@ describe("generateMetadata", () => {
     getAuthorBySlug.mockReturnValueOnce({ detail: BASE_DETAIL, articles: [] });
     const { generateMetadata } = await import("../page");
     const meta = await generateMetadata({ params: Promise.resolve({ slug: "marco-rossi" }) });
-    expect(meta.title).toBe("Marco Rossi — Allarounder");
+    expect(meta.title).toEqual({ absolute: "Marco Rossi — Allarounder" });
     expect(meta.description).toBe("Giornalista sportivo.");
   });
 

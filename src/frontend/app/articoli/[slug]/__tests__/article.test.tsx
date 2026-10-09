@@ -155,14 +155,14 @@ describe("generateMetadata", () => {
     getArticleBySlug.mockReturnValueOnce({ ...BASE_ARTICLE, meta_title: "Titolo SEO Personalizzato" });
     const { generateMetadata } = await import("../page");
     const meta = await generateMetadata({ params: Promise.resolve({ slug: "titolo-articolo" }) });
-    expect(meta.title).toBe("Titolo SEO Personalizzato");
+    expect(meta.title).toEqual({ absolute: "Titolo SEO Personalizzato" });
   });
 
   it("returns fallback title from article title when meta_title is null", async () => {
     getArticleBySlug.mockReturnValueOnce({ ...BASE_ARTICLE, meta_title: null });
     const { generateMetadata } = await import("../page");
     const meta = await generateMetadata({ params: Promise.resolve({ slug: "titolo-articolo" }) });
-    expect(meta.title).toBe("Titolo Articolo — Allarounder");
+    expect(meta.title).toEqual({ absolute: "Titolo Articolo — Allarounder" });
   });
 
   it("populates openGraph images when og_image_url is set", async () => {

@@ -29,7 +29,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const data = getGuestData(slug);
   if (!data) return {};
   return {
-    title: `${data.name} — Allarounder`,
+    title: { absolute: `${data.name} — Allarounder` },
     description: data.bio ?? `Articoli con ${data.name} su Allarounder`,
     alternates: { canonical: `https://allarounder.it/ospiti/${data.slug}` },
   };

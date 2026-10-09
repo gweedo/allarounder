@@ -29,7 +29,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const data = getCategoryData(slug);
   if (!data) return {};
   return {
-    title: `${data.name} — Allarounder`,
+    title: { absolute: `${data.name} — Allarounder` },
     description: data.description ?? undefined,
     alternates: { canonical: `https://allarounder.it/argomenti/${data.slug}` },
   };

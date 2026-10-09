@@ -23,7 +23,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const url = `https://allarounder.it/${page.slug}`;
 
   return {
-    title,
+    // Absolute: `title` already ends in "— Allarounder"; the root layout's
+    // "%s — Allarounder" template would otherwise append it a second time.
+    title: { absolute: title },
     description,
     alternates: { canonical: url },
   };
