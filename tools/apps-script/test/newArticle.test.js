@@ -1,4 +1,4 @@
-const { buildNewArticleRow, requireArticlesFolderId } = require("../src/NewArticle");
+const { buildNewArticleRow, requireArticlesFolderId, buildArticleOutline } = require("../src/NewArticle");
 const { COLUMN_ORDER } = require("../src/Columns");
 
 describe("buildNewArticleRow", () => {
@@ -41,5 +41,29 @@ describe("requireArticlesFolderId", () => {
 
   it("treats a blank value as missing", () => {
     expect(() => requireArticlesFolderId(props({ ARTICLES_FOLDER_ID: "   " }))).toThrow(/ARTICLES_FOLDER_ID/);
+  });
+});
+
+describe("buildArticleOutline", () => {
+  it("does not start the Doc with the article title", () => {
+    // The title comes from the Sheet's `titolo` column and the site renders
+    // it; a title line in the Doc body was published a second time.
+    const outline = buildArticleOutline();
+    expect(outline.some(([, heading]) => heading === "TITLE")).toBe(false);
+    expect(outline[0]).toEqual(["Introduzione", "HEADING2"]);
+  });
+
+  it("gives each section heading an empty paragraph to write in", () => {
+    const outline = buildArticleOutline();
+    outline.forEach(([text, heading], i) => {
+      if (heading === "HEADING2") {
+        expect(outline[i + 1]).toEqual(["", null]);
+      }
+    });
+    expect(outline.filter(([, heading]) => heading === "HEADING2").map(([text]) => text)).toEqual([
+      "Introduzione",
+      "Sviluppo",
+      "Conclusione",
+    ]);
   });
 });

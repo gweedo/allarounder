@@ -1,8 +1,9 @@
 // "Nuovo articolo" menu action: creates a Doc and a matching draft row.
 //
-// buildNewArticleRow() and requireArticlesFolderId() are pure and tested;
-// createArticleDoc() and handleNuovoArticolo() call DocumentApp/DriveApp/
-// SpreadsheetApp and are not unit-testable outside the Apps Script runtime.
+// buildNewArticleRow(), buildArticleOutline() and requireArticlesFolderId()
+// are pure and tested; createArticleDoc() and handleNuovoArticolo() call
+// DocumentApp/DriveApp/SpreadsheetApp and are not unit-testable outside the
+// Apps Script runtime.
 
 function handleNuovoArticolo() {
   var ui = SpreadsheetApp.getUi();
@@ -54,18 +55,34 @@ function handleNuovoArticolo() {
 // into the shared articles folder (ARTICLES_FOLDER_ID) so the service account
 // inherits access through the folder share (CONTENT-CONTRACT.md §8).
 function createArticleDoc(titolo, folderId) {
+  // The file is named after the article (for finding it in Drive), but the
+  // body never repeats the title: the site renders it from the Sheet.
   var doc = DocumentApp.create(titolo);
   var body = doc.getBody();
-  body.appendParagraph(titolo).setHeading(DocumentApp.ParagraphHeading.TITLE);
-  body.appendParagraph("Introduzione").setHeading(DocumentApp.ParagraphHeading.HEADING2);
-  body.appendParagraph("");
-  body.appendParagraph("Sviluppo").setHeading(DocumentApp.ParagraphHeading.HEADING2);
-  body.appendParagraph("");
-  body.appendParagraph("Conclusione").setHeading(DocumentApp.ParagraphHeading.HEADING2);
-  body.appendParagraph("");
+  buildArticleOutline().forEach(function (entry) {
+    var paragraph = body.appendParagraph(entry[0]);
+    if (entry[1]) {
+      paragraph.setHeading(DocumentApp.ParagraphHeading[entry[1]]);
+    }
+  });
   doc.saveAndClose();
   DriveApp.getFileById(doc.getId()).moveTo(DriveApp.getFolderById(folderId));
   return doc;
+}
+
+// Starting outline for a new article Doc, as [text, DocumentApp heading
+// key or null] pairs. No title line: `titolo` lives in the Sheet and the site
+// renders it, so a title in the body was published twice
+// (CONTENT-CONTRACT.md §6).
+function buildArticleOutline() {
+  return [
+    ["Introduzione", "HEADING2"],
+    ["", null],
+    ["Sviluppo", "HEADING2"],
+    ["", null],
+    ["Conclusione", "HEADING2"],
+    ["", null],
+  ];
 }
 
 // Reads the shared articles folder ID from script properties
@@ -104,5 +121,5 @@ function buildNewArticleRow(titolo, docUrl) {
 }
 
 if (typeof module !== "undefined") {
-  module.exports = { buildNewArticleRow, requireArticlesFolderId };
+  module.exports = { buildNewArticleRow, requireArticlesFolderId, buildArticleOutline };
 }
