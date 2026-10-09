@@ -2,9 +2,10 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { getGuestBySlug, getAllGuestSlugs } from "../../../lib/content";
+import { slugParams } from "../../../lib/static-params";
 
 export async function generateStaticParams() {
-  return getAllGuestSlugs().map((slug) => ({ slug }));
+  return slugParams(getAllGuestSlugs());
 }
 
 function getGuestData(slug: string) {

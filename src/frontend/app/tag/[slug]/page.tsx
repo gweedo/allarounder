@@ -2,9 +2,10 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { getTagBySlug, getAllTagSlugs } from "../../../lib/content";
+import { slugParams } from "../../../lib/static-params";
 
 export async function generateStaticParams() {
-  return getAllTagSlugs().map((slug) => ({ slug }));
+  return slugParams(getAllTagSlugs());
 }
 
 function getTagData(slug: string) {
