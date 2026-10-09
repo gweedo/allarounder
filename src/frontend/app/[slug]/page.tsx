@@ -3,7 +3,10 @@ import { notFound } from "next/navigation";
 import { renderMarkdown } from "../../lib/markdown";
 import { getStaticPageBySlug } from "../../lib/content";
 
-const KNOWN_SLUGS = ["chi-siamo", "contatti", "privacy-policy", "cookie-policy"];
+// "contatti" is suspended until the page has a real contact channel; its
+// Markdown stays in content/pages/ so it can come back by re-adding the slug
+// here, to the footer (app/layout.tsx) and to the sitemap.
+const KNOWN_SLUGS = ["chi-siamo", "privacy-policy", "cookie-policy"];
 
 interface Props {
   params: Promise<{ slug: string }>;
