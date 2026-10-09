@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getCategoryBySlug, getAllCategorySlugs } from "../../../lib/content";
 import { formatPublishDate } from "../../../lib/dates";
 import { slugParams } from "../../../lib/static-params";
+import { emptyPageMetadata } from "../../../lib/seo";
 
 export async function generateStaticParams() {
   return slugParams(getAllCategorySlugs());
@@ -33,6 +35,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: { absolute: `${data.name} — Allarounder` },
     description: data.description ?? undefined,
     alternates: { canonical: `https://allarounder.it/argomenti/${data.slug}` },
+    ...emptyPageMetadata(data.total),
   };
 }
 
@@ -67,7 +70,7 @@ export default async function CategoryPage({ params }: Props) {
                 </div>
               )}
               <h2 className="card-title" style={{ marginTop: "0.75rem" }}>
-                <a href={`/articoli/${article.slug}`}>{article.title}</a>
+                <Link href={`/articoli/${article.slug}`}>{article.title}</Link>
               </h2>
               {article.excerpt && (
                 <p className="article-excerpt" style={{ marginTop: "0.5rem" }}>

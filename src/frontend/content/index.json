@@ -95,6 +95,24 @@
   ],
   "categories": [
     {
+      "id": "cat-interviste",
+      "name": "Interviste",
+      "slug": "interviste",
+      "description": null
+    },
+    {
+      "id": "cat-analisi",
+      "name": "Analisi",
+      "slug": "analisi",
+      "description": null
+    },
+    {
+      "id": "cat-roundtable",
+      "name": "Roundtable",
+      "slug": "roundtable",
+      "description": null
+    },
+    {
       "id": "cat-out-of-the-box",
       "name": "Out of the Box",
       "slug": "out-of-the-box",

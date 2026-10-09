@@ -10,20 +10,13 @@ export const metadata: Metadata = {
   alternates: { canonical: "https://allarounder.it" },
 };
 
-const PAGE_SIZE = 13;
-
-// Static export can only prerender one version of this page, so pagination is
-// fixed at page 1 here — `next build` hard-errors on `searchParams` under
-// `output: "export"`. Path-based pagination (e.g. /pagina/[n] with
-// generateStaticParams) is the way to bring it back once the article count
-// exceeds PAGE_SIZE; out of scope while the sample content fits on one page.
-const page = 1;
+// Hero + grid of the latest articles; the full list lives at /articoli.
+const LATEST_COUNT = 13;
 
 export default async function HomePage() {
-  const data = getArticleCards(page, PAGE_SIZE);
-  const hero = page === 1 ? data.items[0] ?? null : null;
-  const grid = page === 1 ? data.items.slice(1) : data.items;
-  const totalPages = Math.ceil(data.total / PAGE_SIZE);
+  const data = getArticleCards(1, LATEST_COUNT);
+  const hero = data.items[0] ?? null;
+  const grid = data.items.slice(1);
 
   return (
     <main id="contenuto" className="page-container page-container--wide">
@@ -136,18 +129,10 @@ export default async function HomePage() {
         </p>
       )}
 
-      {totalPages > 1 && (
-        <nav aria-label="Paginazione" className="pagination-nav">
-          {page > 1 && (
-            <Link href={`/?page=${page - 1}`}>← Pagina precedente</Link>
-          )}
-          <span className="pagination-status">
-            {page} / {totalPages}
-          </span>
-          {page < totalPages && (
-            <Link href={`/?page=${page + 1}`}>Pagina successiva →</Link>
-          )}
-        </nav>
+      {data.total > 0 && (
+        <p className="article-more">
+          <Link href="/articoli">Tutti gli articoli →</Link>
+        </p>
       )}
     </main>
   );

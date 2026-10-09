@@ -1,10 +1,10 @@
 import type { MetadataRoute } from "next";
 import {
   getArticleCards,
-  getAllCategorySlugsForSitemap,
-  getAllTagSlugs,
-  getAllAuthorSlugs,
-  getAllGuestSlugs,
+  getCategoryIndex,
+  getTagIndex,
+  getAuthorIndex,
+  getGuestIndex,
 } from "../lib/content";
 
 export const dynamic = "force-static";
@@ -40,8 +40,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   ];
 
-  // Articles
+  // Empty pages are noindex (lib/seo.ts), so only pages with articles are
+  // listed. A section root is listed when it has at least one entry.
   const { items: articles } = getArticleCards(1, Number.MAX_SAFE_INTEGER);
+  const sections = [
+    { path: "argomenti", items: getCategoryIndex(), changeFrequency: "weekly", priority: 0.6 },
+    { path: "tag", items: getTagIndex(), changeFrequency: "weekly", priority: 0.5 },
+    { path: "autori", items: getAuthorIndex(), changeFrequency: "monthly", priority: 0.5 },
+    { path: "ospiti", items: getGuestIndex(), changeFrequency: "monthly", priority: 0.4 },
+  ] as const;
+
+  if (articles.length > 0) {
+    entries.push({ url: `${BASE}/articoli`, changeFrequency: "daily", priority: 0.7 });
+  }
   for (const a of articles) {
     entries.push({
       url: `${BASE}/articoli/${a.slug}`,
@@ -51,40 +62,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     });
   }
 
-  // Categories
-  for (const c of getAllCategorySlugsForSitemap()) {
-    entries.push({
-      url: `${BASE}/argomenti/${c.slug}`,
-      changeFrequency: "weekly",
-      priority: 0.6,
-    });
-  }
-
-  // Tags
-  for (const slug of getAllTagSlugs()) {
-    entries.push({
-      url: `${BASE}/tag/${slug}`,
-      changeFrequency: "weekly",
-      priority: 0.5,
-    });
-  }
-
-  // Authors
-  for (const slug of getAllAuthorSlugs()) {
-    entries.push({
-      url: `${BASE}/autori/${slug}`,
-      changeFrequency: "monthly",
-      priority: 0.5,
-    });
-  }
-
-  // Guests
-  for (const slug of getAllGuestSlugs()) {
-    entries.push({
-      url: `${BASE}/ospiti/${slug}`,
-      changeFrequency: "monthly",
-      priority: 0.4,
-    });
+  for (const { path, items, changeFrequency, priority } of sections) {
+    const nonEmpty = items.filter((item) => item.article_count > 0);
+    if (nonEmpty.length > 0) {
+      entries.push({ url: `${BASE}/${path}`, changeFrequency, priority });
+    }
+    for (const item of nonEmpty) {
+      entries.push({ url: `${BASE}/${path}/${item.slug}`, changeFrequency, priority });
+    }
   }
 
   return entries;

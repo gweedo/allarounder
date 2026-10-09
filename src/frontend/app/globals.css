@@ -418,6 +418,28 @@ body {
   color: var(--color-text-muted);
 }
 
+/* Section roots (/argomenti, /autori, /ospiti, /tag). Structure only. */
+
+.taxonomy-index {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+  gap: var(--space-5);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.taxonomy-index li {
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+}
+
+.taxonomy-index .article-excerpt {
+  margin: 0 0 var(--space-2);
+}
+
 .page-banner {
   margin-bottom: var(--space-5);
   padding: var(--space-3) var(--space-4);

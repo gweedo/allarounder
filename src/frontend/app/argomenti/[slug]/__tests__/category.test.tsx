@@ -101,6 +101,20 @@ describe("generateMetadata", () => {
     expect(meta.description).toBeUndefined();
   });
 
+  it("keeps an empty category out of search results but lets crawlers follow its links", async () => {
+    getCategoryBySlug.mockReturnValueOnce({ detail: BASE_DETAIL, articles: [] });
+    const { generateMetadata } = await import("../page");
+    const meta = await generateMetadata({ params: Promise.resolve({ slug: "interviste" }) });
+    expect(meta.robots).toEqual({ index: false, follow: true });
+  });
+
+  it("lets a category with articles be indexed", async () => {
+    getCategoryBySlug.mockReturnValueOnce({ detail: BASE_DETAIL, articles: [SAMPLE_ARTICLE] });
+    const { generateMetadata } = await import("../page");
+    const meta = await generateMetadata({ params: Promise.resolve({ slug: "interviste" }) });
+    expect(meta.robots).toBeUndefined();
+  });
+
   it("returns empty object when category not found", async () => {
     getCategoryBySlug.mockReturnValueOnce(null);
     const { generateMetadata } = await import("../page");

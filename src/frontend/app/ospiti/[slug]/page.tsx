@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getGuestBySlug, getAllGuestSlugs } from "../../../lib/content";
 import { formatPublishDate } from "../../../lib/dates";
@@ -87,7 +88,7 @@ export default async function GuestPage({ params }: Props) {
                 </div>
               )}
               <h2 className="card-title" style={{ marginTop: "0.75rem" }}>
-                <a href={`/articoli/${article.slug}`}>{article.title}</a>
+                <Link href={`/articoli/${article.slug}`}>{article.title}</Link>
               </h2>
               {article.excerpt && (
                 <p className="article-excerpt" style={{ marginTop: "0.5rem" }}>
