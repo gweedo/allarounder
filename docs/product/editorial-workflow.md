@@ -20,6 +20,17 @@ Scrivi l'articolo direttamente nel Doc, con la formattazione che preferisci
 (titoli, grassetto, corsivo, elenchi, immagini). Non serve sapere Markdown:
 la conversione avviene automaticamente in fase di pubblicazione.
 
+**Titoli di sezione:** per dividere l'articolo in sezioni basta scrivere il
+titolo della sezione su una riga a sé, **tutto in grassetto**, senza punto
+finale (es. **L'inganno moderno del benessere**). Sul sito diventa un vero
+sottotitolo. In alternativa puoi usare lo stile "Titolo 2" di Google Docs.
+Una frase in grassetto che finisce con un punto resta un normale paragrafo
+in grassetto.
+
+**Titolo e firma non vanno nel Doc:** il titolo dell'articolo e l'autore
+si inseriscono nel foglio (colonne `titolo` e `autore`) e il sito li mostra
+in automatico. Se li scrivi anche in cima al Doc, compaiono due volte.
+
 ## 2. Compilare la riga nel foglio
 
 Ogni riga del foglio corrisponde a un articolo. Ecco cosa significa ogni

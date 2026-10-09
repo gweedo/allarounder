@@ -40,9 +40,9 @@ class TestHtmlToMarkdown:
     def test_converts_google_docs_class_bold_italic(self) -> None:
         html = (
             "<html><head><style>.c3{font-weight:700;font-style:italic}</style></head>"
-            '<body><p><span class="c3">entrambi</span></p></body></html>'
+            '<body><p>sono <span class="c3">entrambi</span> qui</p></body></html>'
         )
-        assert html_to_markdown(html) == "***entrambi***"
+        assert html_to_markdown(html) == "sono ***entrambi*** qui"
 
     def test_does_not_bold_headings(self) -> None:
         # Docs styles heading text bold too; "## **Titolo**" would be noise.
@@ -85,6 +85,50 @@ class TestHtmlToMarkdown:
     def test_leaves_ordinary_links_untouched(self) -> None:
         html = '<p><a href="https://open.spotify.com/episode/abc?si=1">ep</a></p>'
         assert html_to_markdown(html) == "[ep](https://open.spotify.com/episode/abc?si=1)"
+
+    def test_bold_only_short_line_becomes_section_heading(self) -> None:
+        # Writers mark section titles by bolding a line, not with "Titolo 2"
+        # (real export shape: inline-styled span inside a <p>).
+        html = (
+            '<p><span style="font-weight:700">L’inganno moderno del benessere</span></p>'
+            "<p>Tra i tanti temi...</p>"
+        )
+        assert html_to_markdown(html) == "## L’inganno moderno del benessere\n\nTra i tanti temi..."
+
+    def test_section_heading_may_contain_a_colon(self) -> None:
+        html = '<p><span style="font-weight:700">Agonismo: sfidare sé stessi</span></p>'
+        assert html_to_markdown(html) == "## Agonismo: sfidare sé stessi"
+
+    def test_class_styled_bold_line_becomes_section_heading(self) -> None:
+        html = (
+            "<html><head><style>.c2{font-weight:700}</style></head><body>"
+            '<p class="c0"><span class="c2">La biologia della tenacia</span></p>'
+            "</body></html>"
+        )
+        assert html_to_markdown(html) == "## La biologia della tenacia"
+
+    def test_bold_sentence_ending_in_punctuation_stays_a_paragraph(self) -> None:
+        html = '<p><span style="font-weight:700">Questa frase è importante.</span></p>'
+        assert html_to_markdown(html) == "**Questa frase è importante.**"
+
+    def test_partly_bold_paragraph_stays_a_paragraph(self) -> None:
+        html = (
+            '<p><span style="font-weight:700">Nota</span>'
+            "<span> che il resto non è grassetto</span></p>"
+        )
+        assert html_to_markdown(html) == "**Nota** che il resto non è grassetto"
+
+    def test_long_bold_line_stays_a_paragraph(self) -> None:
+        text = "parola " * 30  # > 120 characters
+        html = f'<p><span style="font-weight:700">{text.strip()}</span></p>'
+        assert html_to_markdown(html) == f"**{text.strip()}**"
+
+    def test_existing_docs_headings_are_unchanged(self) -> None:
+        html = (
+            "<html><head><style>.c2{font-weight:700}</style></head><body>"
+            '<h2><span class="c2">Allenarsi alla vita</span></h2></body></html>'
+        )
+        assert html_to_markdown(html) == "## Allenarsi alla vita"
 
     def test_collapses_blank_line_runs(self) -> None:
         html = "<p>Uno</p><p></p><p></p><p>Due</p>"

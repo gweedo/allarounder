@@ -214,6 +214,20 @@ Export via `files.export` with `application/zip` (HTML + every embedded
 image in one request) — `text/markdown` is available for text-only Docs with
 no images. Convert the exported HTML to Markdown.
 
+Conversion rules (`ingest/convert.py`), beyond plain HTML → Markdown:
+
+- **Emphasis:** Docs never exports `<em>`/`<strong>`; italic and bold are
+  span styles (inline or `<style>` classes) and are converted to `*…*` /
+  `**…**`. Bold inside a Docs heading is dropped.
+- **Section headings:** a paragraph that is entirely bold, at most 120
+  characters, and does not end in `. ! ? … ; :` is a section title and
+  becomes `## …`. Writers bold a line rather than applying "Titolo 2";
+  Docs heading styles still convert as before.
+- **Links:** Docs wraps every link in a `google.com/url?q=<target>&sa=D…`
+  redirect; the target is published, not the redirect.
+- The Doc body must not repeat the article title or byline: both come from
+  the Sheet (`titolo`, `autore`) and are rendered by the site.
+
 **Images are static assets and must live under `src/frontend/public/`, not
 `src/frontend/content/`.** `content/` is read via `fs` at build time by
 `lib/content.ts`; it is not copied into the exported `out/` directory as a
