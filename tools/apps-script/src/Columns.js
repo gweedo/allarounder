@@ -28,7 +28,7 @@ var STATI = ["Bozza", "Pronto", "Pubblicato"];
 // whose autore doesn't match the registry — so this list should stay in
 // sync with authors.json by hand whenever an author is added there. There
 // is no automation linking the two files in v1.
-var AUTORI = ["Guido S.", "fabsonc00", "u.zurlini01", "chiara.simo2000"];
+var AUTORI = ["Guido S.", "Fabio Soncini", "Umberto Zurlini", "Chiara Simonelli"];
 
 // 1-indexed column number for a given column name, for use with
 // Sheet.getRange(row, col, ...).

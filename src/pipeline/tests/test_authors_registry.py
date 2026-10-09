@@ -40,7 +40,8 @@ def test_sheet_dropdown_matches_registry() -> None:
 
 def test_registry_lists_the_editorial_team() -> None:
     names = {author["name"] for author in _registry()}
-    assert names == {"Guido S.", "fabsonc00", "u.zurlini01", "chiara.simo2000"}
+    # Public bylines: the names the writers sign their articles with.
+    assert names == {"Guido S.", "Fabio Soncini", "Umberto Zurlini", "Chiara Simonelli"}
 
 
 def test_registry_slugs_are_derived_from_names() -> None:
