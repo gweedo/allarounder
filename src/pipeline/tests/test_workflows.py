@@ -53,6 +53,20 @@ def test_checkout_uses_publish_token_so_the_push_is_attributed() -> None:
     assert checkout["with"]["token"] == PUBLISH_TOKEN
 
 
+def test_checkout_builds_on_the_latest_main_not_the_trigger_commit() -> None:
+    # Without `ref`, checkout uses the commit current when the run was
+    # *triggered*. A run queued behind another (concurrency group) then
+    # regenerates content on a main that lacks the earlier run's merge --
+    # seen live 2026-10-09 (#137/#138): harmless when identical, a
+    # conflicting index.json and a stalled content PR otherwise.
+    [checkout] = [
+        s
+        for s in _steps(_load("publish.yml"))
+        if "actions/checkout" in s.get("uses", "")
+    ]
+    assert checkout["with"]["ref"] == "main"
+
+
 def test_content_pr_is_opened_and_merged_with_publish_token() -> None:
     step = _content_pr_step(_load("publish.yml"))
     assert step["env"]["GH_TOKEN"] == PUBLISH_TOKEN
