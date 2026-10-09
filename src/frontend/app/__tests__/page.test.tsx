@@ -70,6 +70,14 @@ describe("HomePage", () => {
     expect(screen.getByText(/nessun articolo pubblicato/i)).toBeInTheDocument();
   });
 
+  it("keeps a single h1 naming the site without repeating the header link", async () => {
+    await renderHomePage({ items: [BASE_ARTICLE], total: 1, page: 1, page_size: 13 });
+    const h1 = screen.getByRole("heading", { level: 1 });
+    expect(h1).toHaveTextContent("Allarounder");
+    expect(h1).toHaveClass("visually-hidden");
+    expect(h1.querySelector("a")).toBeNull();
+  });
+
   it("renders hero article title as h1 on page 1", async () => {
     await renderHomePage({
       items: [BASE_ARTICLE, GRID_ARTICLE],

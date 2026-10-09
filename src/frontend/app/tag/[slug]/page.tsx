@@ -42,7 +42,7 @@ export default async function TagPage({ params }: Props) {
   if (!data) notFound();
 
   return (
-    <main className="page-container page-container--wide">
+    <main id="contenuto" className="page-container page-container--wide">
       <header className="page-header">
         <h1>#{data.name}</h1>
         <p className="page-count">
