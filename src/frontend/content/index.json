@@ -45,6 +45,52 @@
         }
       ],
       "guests": []
+    },
+    {
+      "id": "article-appunti-di-agonismo",
+      "doc_id": "1V4ZIFCA1wXwrOkOAYwk8_CLyDZ8e-BBlvXdD0mnxH0s",
+      "row_hash": "9a3b74c76677a921f182304cbf85dc65b7f728e81f7805a64457ba38c0f8b871",
+      "title": "Appunti di Agonismo",
+      "slug": "appunti-di-agonismo",
+      "author_id": "author-chiara-simonelli",
+      "publish_at": "2026-10-05T22:00:00Z",
+      "updated_at": "2026-10-09T12:50:37.078Z",
+      "spotify_url": null,
+      "excerpt": "Agonismo non è aggressività ma lotta contro la propria pigrizia: dalla fatica nello sport alla corteccia aMCC, perché fare cose difficili ci fa bene.",
+      "cover_image_url": null,
+      "cover_image_alt": null,
+      "meta_title": "Appunti di Agonismo — Allarounder",
+      "meta_description": "Agonismo non è aggressività ma lotta contro la propria pigrizia: dalla fatica nello sport alla corteccia aMCC, perché fare cose difficili ci fa bene.",
+      "og_image_url": null,
+      "reading_time": 7,
+      "author_profile": {
+        "id": "author-chiara-simonelli",
+        "name": "Chiara Simonelli",
+        "slug": "chiara-simonelli"
+      },
+      "category": {
+        "id": "cat-out-of-the-box",
+        "name": "Out of the Box",
+        "slug": "out-of-the-box"
+      },
+      "tags": [
+        {
+          "id": "tag-agonismo",
+          "name": "agonismo",
+          "slug": "agonismo"
+        },
+        {
+          "id": "tag-fatica",
+          "name": "fatica",
+          "slug": "fatica"
+        },
+        {
+          "id": "tag-neuroscienze",
+          "name": "neuroscienze",
+          "slug": "neuroscienze"
+        }
+      ],
+      "guests": []
     }
   ],
   "categories": [
@@ -60,6 +106,14 @@
       "id": "author-umberto-zurlini",
       "name": "Umberto Zurlini",
       "slug": "umberto-zurlini",
+      "bio": null,
+      "photo_url": null,
+      "links": {}
+    },
+    {
+      "id": "author-chiara-simonelli",
+      "name": "Chiara Simonelli",
+      "slug": "chiara-simonelli",
       "bio": null,
       "photo_url": null,
       "links": {}
@@ -81,6 +135,21 @@
       "id": "tag-nba",
       "name": "NBA",
       "slug": "nba"
+    },
+    {
+      "id": "tag-agonismo",
+      "name": "agonismo",
+      "slug": "agonismo"
+    },
+    {
+      "id": "tag-fatica",
+      "name": "fatica",
+      "slug": "fatica"
+    },
+    {
+      "id": "tag-neuroscienze",
+      "name": "neuroscienze",
+      "slug": "neuroscienze"
     }
   ]
 }
