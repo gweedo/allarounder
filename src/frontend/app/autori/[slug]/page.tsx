@@ -42,7 +42,7 @@ export default async function AuthorPage({ params }: Props) {
   if (!data) notFound();
 
   return (
-    <main className="page-container page-container--wide">
+    <main id="contenuto" className="page-container page-container--wide">
       <header className="profile-header">
         {data.photo_url && (
           <Image

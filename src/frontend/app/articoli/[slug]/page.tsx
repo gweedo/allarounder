@@ -67,7 +67,7 @@ export default async function ArticlePage({ params }: Props) {
   };
 
   return (
-    <main className="page-container">
+    <main id="contenuto" className="page-container">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

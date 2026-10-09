@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import "./globals.css";
+import { SiteHeader } from "./_components/SiteHeader";
+import { SPOTIFY_SHOW_URL } from "../lib/site";
 
 export const metadata: Metadata = {
   title: {
@@ -18,6 +20,7 @@ export default function RootLayout({
   return (
     <html lang="it">
       <body>
+        <SiteHeader spotifyShowUrl={SPOTIFY_SHOW_URL} />
         {children}
         <footer className="site-footer">
           <nav aria-label="Footer">

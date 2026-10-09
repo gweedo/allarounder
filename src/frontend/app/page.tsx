@@ -26,10 +26,10 @@ export default async function HomePage() {
   const totalPages = Math.ceil(data.total / PAGE_SIZE);
 
   return (
-    <main className="page-container page-container--wide">
-      <h1 className="site-title">
-        <Link href="/">Allarounder</Link>
-      </h1>
+    <main id="contenuto" className="page-container page-container--wide">
+      {/* The site header shows the brand; this h1 only names the page for
+          screen readers and search engines. */}
+      <h1 className="visually-hidden">Allarounder</h1>
 
       {hero && (
         <section className="hero" aria-label="Articolo in evidenza">

@@ -41,7 +41,7 @@ export default async function StaticPageRoute({ params }: Props) {
   const bodyHtml = await renderMarkdown(page.body);
 
   return (
-    <main className="page-container">
+    <main id="contenuto" className="page-container">
       <article>
         <h1>{page.title}</h1>
         <div

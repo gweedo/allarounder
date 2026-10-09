@@ -42,7 +42,7 @@ export default async function CategoryPage({ params }: Props) {
   if (!data) notFound();
 
   return (
-    <main className="page-container page-container--wide">
+    <main id="contenuto" className="page-container page-container--wide">
       <header className="page-header">
         <h1>{data.name}</h1>
         {data.description && <p className="page-lede">{data.description}</p>}
