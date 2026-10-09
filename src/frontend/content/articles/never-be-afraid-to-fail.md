@@ -6,7 +6,7 @@ title: Never Be Afraid to Fail
 slug: never-be-afraid-to-fail
 author_id: author-umberto-zurlini
 publish_at: '2026-10-05T22:00:00Z'
-updated_at: '2026-10-09T12:01:40.145Z'
+updated_at: '2026-10-09T12:40:42.270Z'
 spotify_url: null
 excerpt: 'Jalen Brunson e i playoff NBA insegnano ad accettare l''errore: allenare
   la mente a sbagliare senza paura è ciò che distingue i veri agonisti.'
@@ -47,9 +47,9 @@ No, non si è messo a scrivere un romanzo sull’accettazione dell’errore: è 
 
 Ha fatto molto di più. E’ diventato il manifesto vivente di quello slogan, da lui stesso inserito in una semplice quanto efficace risposta alla domanda di Kon Knueppel - astro Nba nascente con la canotta degli Charlotte Hornets - che tradotta letteralmente suona così:
 
-“Qual è una delle chiavi per essere un giocatore di basket vincente?”
+“*Qual è una delle chiavi per essere un giocatore di basket vincente?*”
 
-“Non avere paura di fallire”.
+“*Non avere paura di fallire*”.
 
 Appunto.
 
