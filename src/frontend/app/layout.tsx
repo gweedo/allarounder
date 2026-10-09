@@ -25,7 +25,6 @@ export default function RootLayout({
         <footer className="site-footer">
           <nav aria-label="Footer">
             <Link href="/chi-siamo">Chi siamo</Link>
-            <Link href="/contatti">Contatti</Link>
             <Link href="/privacy-policy">Privacy Policy</Link>
             <Link href="/cookie-policy">Cookie Policy</Link>
           </nav>

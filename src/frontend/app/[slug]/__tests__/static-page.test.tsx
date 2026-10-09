@@ -56,14 +56,14 @@ describe("StaticPageRoute", { timeout: 20_000 }, () => {
     expect(result).toBe("notFound");
   });
 
-  it("renders contatti page", async () => {
-    await renderStaticPage("contatti", {
+  it("does not render the suspended contatti page", async () => {
+    const result = await renderStaticPage("contatti", {
       ...BASE_PAGE,
       id: "00000000-0000-0000-0000-000000000002",
       title: "Contatti",
       slug: "contatti",
     });
-    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Contatti");
+    expect(result).toBe("notFound");
   });
 
   it("renders privacy-policy page", async () => {
@@ -88,12 +88,11 @@ describe("StaticPageRoute", { timeout: 20_000 }, () => {
 });
 
 describe("generateStaticParams", () => {
-  it("returns the 4 known slugs", async () => {
+  it("returns the published slugs, without the suspended contatti page", async () => {
     const { generateStaticParams } = await import("../page");
     const params = await generateStaticParams();
     expect(params).toEqual([
       { slug: "chi-siamo" },
-      { slug: "contatti" },
       { slug: "privacy-policy" },
       { slug: "cookie-policy" },
     ]);
