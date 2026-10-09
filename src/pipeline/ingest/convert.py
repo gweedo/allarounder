@@ -1,9 +1,10 @@
 """HTML -> Markdown conversion for exported Docs (CONTENT-CONTRACT.md §6).
 
 Uses `markdownify` (BeautifulSoup-backed) rather than a hand-rolled parser.
-Two Docs export quirks need a pre-pass: italic and bold are never <em>/
-<strong> but styles on <span>s (inline, or CSS classes declared in <style>),
-so they are rewritten into real emphasis tags; and every link is wrapped in
+A pre-pass handles Docs export quirks and writer habits: italic and bold are
+never <em>/<strong> but styles on <span>s (inline, or CSS classes declared
+in <style>), so they are rewritten into real emphasis tags; a short, fully
+bold line is a section title and becomes <h2>; and every link is wrapped in
 a google.com/url tracking redirect, which is unwrapped to its target.
 """
 
@@ -19,6 +20,10 @@ _IMAGE_PATTERN = re.compile(r"!\[([^\]]*)\]\(([^)]+)\)")
 _CSS_CLASS_RULE = re.compile(r"\.([\w-]+)\s*\{([^}]*)\}")
 _BOLD_WEIGHT = re.compile(r"font-weight:(?:bold|[6-9]00)")
 _HEADINGS = ["h1", "h2", "h3", "h4", "h5", "h6"]
+# A fully bold paragraph is a section title only if it reads like one:
+# short, and not ending like a sentence (a colon *inside* is fine).
+_SECTION_HEADING_MAX_CHARS = 120
+_SENTENCE_END = ".!?…;:"
 
 
 def _emphasis(declarations: str) -> tuple[bool, bool]:
@@ -54,6 +59,32 @@ def _apply_docs_emphasis(soup: BeautifulSoup) -> None:
             _wrap_contents(soup, span, "strong")
 
 
+def _is_all_bold(paragraph: Tag) -> bool:
+    for text in paragraph.find_all(string=True):
+        if text.strip() and text.find_parent("strong") is None:
+            return False
+    return True
+
+
+def _promote_bold_lines_to_headings(soup: BeautifulSoup) -> None:
+    """Writers mark section titles by bolding a short line rather than
+    applying a Docs heading style; publish those as <h2>. Runs after
+    _apply_docs_emphasis, so Docs' styled bold is already <strong>."""
+    for paragraph in soup.find_all("p"):
+        text = paragraph.get_text().strip()
+        if (
+            not text
+            or len(text) > _SECTION_HEADING_MAX_CHARS
+            or text[-1] in _SENTENCE_END
+            or not _is_all_bold(paragraph)
+        ):
+            continue
+        for strong in paragraph.find_all("strong"):
+            strong.unwrap()
+        paragraph.name = "h2"
+        paragraph.attrs = {}
+
+
 def _unwrap_google_redirects(soup: BeautifulSoup) -> None:
     """Docs exports every link as google.com/url?q=<target>&sa=D&usg=...;
     publish the target itself, not Google's tracking redirect."""
@@ -68,6 +99,7 @@ def _unwrap_google_redirects(soup: BeautifulSoup) -> None:
 def html_to_markdown(html: str) -> str:
     soup = BeautifulSoup(html, "html.parser")
     _apply_docs_emphasis(soup)
+    _promote_bold_lines_to_headings(soup)
     _unwrap_google_redirects(soup)
     markdown = markdownify(str(soup), heading_style="ATX")
     lines = [line.rstrip() for line in markdown.splitlines()]
