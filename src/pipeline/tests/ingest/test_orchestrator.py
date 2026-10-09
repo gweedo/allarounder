@@ -424,3 +424,42 @@ class TestRun:
             _run(pipeline_dirs, sheets, drive)
 
         assert sheets.written == {}
+
+
+class TestFixedCategories:
+    def test_every_fixed_category_is_written_even_without_articles(
+        self, pipeline_dirs: tuple[Path, Path, Path]
+    ) -> None:
+        content_dir, _, _ = pipeline_dirs
+        _run(pipeline_dirs, FakeSheetsClient(rows=[]), FakeDriveClient(docs={}))
+
+        index = json.loads((content_dir / "index.json").read_text(encoding="utf-8"))
+        assert [(c["id"], c["name"], c["slug"]) for c in index["categories"]] == [
+            ("cat-interviste", "Interviste", "interviste"),
+            ("cat-analisi", "Analisi", "analisi"),
+            ("cat-roundtable", "Roundtable", "roundtable"),
+            ("cat-out-of-the-box", "Out of the Box", "out-of-the-box"),
+        ]
+
+    def test_seeding_keeps_an_existing_category_entry_untouched(
+        self, pipeline_dirs: tuple[Path, Path, Path]
+    ) -> None:
+        content_dir, _, _ = pipeline_dirs
+        content_dir.mkdir()
+        existing = {
+            "id": "cat-analisi",
+            "name": "Analisi",
+            "slug": "analisi",
+            "description": "Approfondimenti tecnici.",
+        }
+        (content_dir / "index.json").write_text(
+            json.dumps(
+                {"articles": [], "categories": [existing], "authors": [], "guests": [], "tags": []}
+            ),
+            encoding="utf-8",
+        )
+        _run(pipeline_dirs, FakeSheetsClient(rows=[]), FakeDriveClient(docs={}))
+
+        index = json.loads((content_dir / "index.json").read_text(encoding="utf-8"))
+        assert existing in index["categories"]
+        assert len(index["categories"]) == 4

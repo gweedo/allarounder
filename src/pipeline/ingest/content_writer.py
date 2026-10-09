@@ -113,6 +113,19 @@ def upsert_category(index: dict[str, Any], ref: SlugRef, description: str | None
     index["categories"].append(entry)
 
 
+def seed_categories(index: dict[str, Any], refs: list[SlugRef]) -> None:
+    """Make `index["categories"]` exactly `refs`, in that order.
+
+    The category list is fixed, so every category gets a page even before
+    its first article. An entry already in the index is kept as-is (it may
+    carry a description); a missing one is added with no description.
+    """
+    existing = {c["id"]: c for c in index["categories"]}
+    index["categories"] = [
+        existing.get(ref.id, {**_slug_ref_dict(ref), "description": None}) for ref in refs
+    ]
+
+
 def _upsert_profile(
     collection: list[dict[str, Any]],
     ref: SlugRef,

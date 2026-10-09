@@ -32,7 +32,7 @@ from ingest.models import (
 from ingest.publish_rule import Eligibility, evaluate, publish_at_utc
 from ingest.registries import Profile
 from ingest.sheets_client import SheetsClient
-from ingest.validate import RowValidationError, validate_row
+from ingest.validate import CATEGORIES, RowValidationError, validate_row
 
 
 @dataclass
@@ -110,6 +110,13 @@ def run(
     now: datetime,
 ) -> RunReport:
     index = content_writer.load_index(content_dir)
+    content_writer.seed_categories(
+        index,
+        [
+            SlugRef(id=category_id, name=name, slug=str(Slug.from_title(name)))
+            for name, category_id in CATEGORIES.items()
+        ],
+    )
     authors = registries.load_registry(authors_path)
     guests_registry = registries.load_registry(guests_path)
 
