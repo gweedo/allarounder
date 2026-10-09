@@ -18,7 +18,11 @@ describe("SiteHeader", () => {
   it("renders the main navigation", () => {
     render(<SiteHeader spotifyShowUrl={null} />);
     const nav = screen.getByRole("navigation", { name: "Principale" });
-    expect(within(nav).getByRole("link", { name: "Chi siamo" })).toHaveAttribute("href", "/chi-siamo");
+    expect(within(nav).getAllByRole("link").map((a) => [a.textContent, a.getAttribute("href")])).toEqual([
+      ["Articoli", "/articoli"],
+      ["Argomenti", "/argomenti"],
+      ["Chi siamo", "/chi-siamo"],
+    ]);
   });
 
   it("links to the podcast on Spotify in a new tab when the show URL is set", () => {

@@ -17,6 +17,8 @@ export function SiteHeader({ spotifyShowUrl }: Props) {
           Allarounder
         </Link>
         <nav aria-label="Principale" className="site-header-nav">
+          <Link href="/articoli">Articoli</Link>
+          <Link href="/argomenti">Argomenti</Link>
           <Link href="/chi-siamo">Chi siamo</Link>
           {spotifyShowUrl && (
             <a
