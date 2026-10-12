@@ -129,46 +129,55 @@ export default async function ArticlePage({ params }: Props) {
             />
           </div>
         )}
-        <h1>{article.title}</h1>
-        <div className="article-meta article-byline">
-          <time dateTime={article.publish_at}>
-            {formatPublishDate(article.publish_at)}
-          </time>
-          {minutes && <span>{minutes} min di lettura</span>}
-          {article.author_profile && (
-            <span>
-              di{" "}
-              <Link href={`/autori/${article.author_profile.slug}`}>
-                {article.author_profile.name}
-              </Link>
-            </span>
+        <header className="article-header">
+          {article.category && (
+            <Link href={`/argomenti/${article.category.slug}`} className="category-badge">
+              {article.category.name}
+            </Link>
           )}
-        </div>
-        {article.excerpt && (
-          <p className="article-excerpt article-standfirst">
-            {article.excerpt}
-          </p>
-        )}
-        {article.tags && article.tags.length > 0 && (
-          <div className="tag-list">
-            {article.tags.map((tag) => (
-              <Link key={tag.id} href={`/tag/${tag.slug}`} className="tag-pill">
-                #{tag.name}
-              </Link>
-            ))}
-          </div>
-        )}
-        {article.guests && article.guests.length > 0 && (
-          <div className="article-meta article-guests">
-            <span>Ospiti: </span>
-            {article.guests.map((guest, i) => (
-              <span key={guest.id}>
-                <Link href={`/ospiti/${guest.slug}`}>{guest.name}</Link>
-                {i < article.guests.length - 1 && ", "}
+          <h1 className="article-title">{article.title}</h1>
+          {article.excerpt && (
+            <p className="article-excerpt article-standfirst">
+              {article.excerpt}
+            </p>
+          )}
+          <div className="article-meta article-byline">
+            <time dateTime={article.publish_at}>
+              {formatPublishDate(article.publish_at)}
+            </time>
+            {minutes && <span>{minutes} min di lettura</span>}
+            {article.author_profile && (
+              <span>
+                di{" "}
+                <Link href={`/autori/${article.author_profile.slug}`}>
+                  {article.author_profile.name}
+                </Link>
               </span>
-            ))}
+            )}
           </div>
-        )}
+          {article.tags && article.tags.length > 0 && (
+            <div className="tag-list">
+              {article.tags.map((tag) => (
+                <Link key={tag.id} href={`/tag/${tag.slug}`} className="tag-pill">
+                  {/* Hidden so screen readers don't announce "cancelletto". */}
+                  <span aria-hidden="true">#</span>
+                  {tag.name}
+                </Link>
+              ))}
+            </div>
+          )}
+          {article.guests && article.guests.length > 0 && (
+            <div className="article-meta article-guests">
+              <span>Ospiti: </span>
+              {article.guests.map((guest, i) => (
+                <span key={guest.id}>
+                  <Link href={`/ospiti/${guest.slug}`}>{guest.name}</Link>
+                  {i < article.guests.length - 1 && ", "}
+                </span>
+              ))}
+            </div>
+          )}
+        </header>
         <div
           className="article-body"
           dangerouslySetInnerHTML={{ __html: bodyHtml }}
