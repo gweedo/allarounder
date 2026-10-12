@@ -44,16 +44,20 @@
   --radius: 6px;
 
   /* Fonts */
-  --font-sans:
-    system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  --font-serif:
-    Georgia, "Times New Roman", serif; /* article reading face, see .article-body */
   --font-mono:
     ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono",
     monospace;
-  /* Fallback stacks until the self-hosted brand fonts land */
-  --font-display: var(--font-sans); /* condensed uppercase headlines */
-  --font-mono-ui: var(--font-mono); /* meta lines, aligned numerals */
+  /*
+   * Brand faces (ADR-0019), self-hosted via next/font/local in
+   * app/layout.tsx, which sets the --font-barlow-condensed, --font-literata
+   * and --font-plex-mono variables on <html>. Each variable already carries
+   * its fallback (metric-adjusted for display and serif); the var()
+   * fallbacks only apply if the layout's class is missing. Weights shipped: display 600/700, serif
+   * 400/400 italic/700, mono 500; other weights use the nearest face.
+   */
+  --font-display: var(--font-barlow-condensed, "Arial Narrow", sans-serif);
+  --font-serif: var(--font-literata, Georgia, "Times New Roman", serif);
+  --font-mono-ui: var(--font-plex-mono, ui-monospace, monospace);
 
   /* Type scale */
   --text-sm: 0.875rem;
@@ -74,10 +78,36 @@
 body {
   margin: 0;
   line-height: 1.5;
-  font-family: var(--font-sans);
+  font-family: var(--font-serif);
   font-size: var(--text-base);
   color: var(--color-text);
   background: var(--color-bg);
+}
+
+/*
+ * Typography roles, design B · Tabellone: Literata for reading (body),
+ * Barlow Condensed for headings, IBM Plex Mono for meta lines and short
+ * labels. Sizes, case and spacing belong to the per-component slices.
+ */
+
+h1,
+h2,
+h3,
+.site-header-brand {
+  font-family: var(--font-display);
+  font-weight: 700;
+}
+
+.site-header-nav,
+.breadcrumb,
+.article-meta,
+.page-count,
+.category-badge,
+.tag-pill,
+.site-footer {
+  font-family: var(--font-mono-ui);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
 }
 
 /*
@@ -104,7 +134,7 @@ body {
 .article-body h4,
 .article-body h5,
 .article-body h6 {
-  font-family: var(--font-sans);
+  font-family: var(--font-display);
   font-weight: 700;
   line-height: 1.3;
   color: var(--color-text);
@@ -294,7 +324,6 @@ body {
 
 .site-header-nav .site-header-podcast {
   color: var(--color-accent);
-  font-weight: 600;
 }
 
 .page-header {
