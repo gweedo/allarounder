@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 
 vi.mock("next/navigation", () => ({
   notFound: () => {
@@ -25,9 +25,9 @@ const SAMPLE_ARTICLE = {
   title: "Intervista a Mario Rossi",
   slug: "intervista-mario-rossi",
   excerpt: "Un'intervista incredibile.",
-  cover_image_url: null,
-  cover_image_alt: null,
-  reading_time: 5,
+  cover_image_url: null as string | null,
+  cover_image_alt: null as string | null,
+  reading_time: 5 as number | null,
   publish_at: "2026-06-01T00:00:00Z",
 };
 
@@ -74,6 +74,55 @@ describe("CategoryPage", () => {
   it("renders article excerpt", async () => {
     await renderCategoryPage({ detail: BASE_DETAIL, articles: [SAMPLE_ARTICLE] });
     expect(screen.getByText("Un'intervista incredibile.")).toBeInTheDocument();
+  });
+
+  it("shows the reading time on a score tile, announced in words", async () => {
+    await renderCategoryPage({
+      detail: BASE_DETAIL,
+      articles: [{ ...SAMPLE_ARTICLE, reading_time: 7 }],
+    });
+    const spoken = screen.getByText("7 minuti di lettura");
+    const tile = spoken.parentElement!;
+    expect(within(tile).getByText("07")).toHaveAttribute("aria-hidden", "true");
+    expect(within(tile).getByText("min")).toHaveAttribute("aria-hidden", "true");
+    // The meta row repeats it in text, so nothing depends on the tile alone.
+    expect(screen.getByText("7 min di lettura")).toBeInTheDocument();
+  });
+
+  it.each([null, 0])("shows no tile and no stray digit when the reading time is %s", async (reading_time) => {
+    await renderCategoryPage({
+      detail: BASE_DETAIL,
+      articles: [{ ...SAMPLE_ARTICLE, reading_time }],
+    });
+    expect(screen.queryByText(/minut/)).toBeNull();
+    expect(screen.queryByText(/min di lettura/)).toBeNull();
+    expect(screen.queryByText(/^0+$/)).toBeNull();
+  });
+
+  it("renders no image block for an article without a cover image", async () => {
+    await renderCategoryPage({ detail: BASE_DETAIL, articles: [SAMPLE_ARTICLE] });
+    expect(document.querySelector("img")).toBeNull();
+    expect(document.querySelector("[aria-hidden='true']:empty")).toBeNull();
+  });
+
+  it("shows a cover image thumbnail in place of the tile", async () => {
+    await renderCategoryPage({
+      detail: BASE_DETAIL,
+      articles: [
+        {
+          ...SAMPLE_ARTICLE,
+          cover_image_url: "https://cdn.example.com/cover.jpg",
+          cover_image_alt: "Mario Rossi alla trave",
+        },
+      ],
+    });
+    expect(screen.getByRole("img", { name: "Mario Rossi alla trave" })).toBeInTheDocument();
+    expect(screen.queryByText(/minuti di lettura/)).toBeNull();
+  });
+
+  it("titles each article card with an h2", async () => {
+    await renderCategoryPage({ detail: BASE_DETAIL, articles: [SAMPLE_ARTICLE] });
+    expect(screen.getByRole("heading", { level: 2 })).toHaveTextContent("Intervista a Mario Rossi");
   });
 
   it("calls notFound when category not found", async () => {

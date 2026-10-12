@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
-import Image from "next/image";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getCategoryBySlug, getAllCategorySlugs } from "../../../lib/content";
-import { formatPublishDate } from "../../../lib/dates";
+import { ArticleList } from "../../_components/ArticleList";
 import { slugParams } from "../../../lib/static-params";
 import { emptyPageMetadata } from "../../../lib/seo";
 
@@ -56,38 +54,7 @@ export default async function CategoryPage({ params }: Props) {
       {data.articles.length === 0 ? (
         <p>Nessun articolo pubblicato in questa categoria.</p>
       ) : (
-        <ul className="article-list">
-          {data.articles.map((article) => (
-            <li key={article.id} className="article-list-item">
-              {article.cover_image_url && (
-                <div className="cover-image" style={{ height: 200 }}>
-                  <Image
-                    src={article.cover_image_url}
-                    alt={article.cover_image_alt ?? `Copertina: ${article.title}`}
-                    fill
-                    style={{ objectFit: "cover" }}
-                  />
-                </div>
-              )}
-              <h2 className="card-title" style={{ marginTop: "0.75rem" }}>
-                <Link href={`/articoli/${article.slug}`}>{article.title}</Link>
-              </h2>
-              {article.excerpt && (
-                <p className="article-excerpt" style={{ marginTop: "0.5rem" }}>
-                  {article.excerpt}
-                </p>
-              )}
-              <div className="article-meta" style={{ marginTop: "0.5rem" }}>
-                <time dateTime={article.publish_at}>
-                  {formatPublishDate(article.publish_at)}
-                </time>
-                {article.reading_time && (
-                  <span style={{ marginLeft: "1rem" }}>{article.reading_time} min di lettura</span>
-                )}
-              </div>
-            </li>
-          ))}
-        </ul>
+        <ArticleList articles={data.articles} />
       )}
     </main>
   );

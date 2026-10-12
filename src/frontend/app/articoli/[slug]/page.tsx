@@ -11,6 +11,7 @@ import {
 import { SPOTIFY_SHOW_URL } from "../../../lib/site";
 import { formatPublishDate } from "../../../lib/dates";
 import { slugParams } from "../../../lib/static-params";
+import { ArticleCard } from "../../_components/ArticleCard";
 
 const BASE = "https://allarounder.it";
 const RELATED_COUNT = 3;
@@ -116,7 +117,7 @@ export default async function ArticlePage({ params }: Props) {
       </nav>
       <article>
         {article.cover_image_url && (
-          <div className="cover-image" style={{ aspectRatio: "16/9", marginBottom: "1.5rem" }}>
+          <div className="cover-image article-cover">
             <Image
               src={article.cover_image_url}
               alt={article.cover_image_alt ?? `Copertina articolo: ${article.title}`}
@@ -127,17 +128,15 @@ export default async function ArticlePage({ params }: Props) {
           </div>
         )}
         <h1>{article.title}</h1>
-        <div className="article-meta" style={{ marginTop: "0.25rem" }}>
+        <div className="article-meta article-byline">
           <time dateTime={article.publish_at}>
             {formatPublishDate(article.publish_at)}
           </time>
-          {article.reading_time && (
-            <span style={{ marginLeft: "1rem" }}>
-              {article.reading_time} min di lettura
-            </span>
+          {(article.reading_time ?? 0) > 0 && (
+            <span>{article.reading_time} min di lettura</span>
           )}
           {article.author_profile && (
-            <span style={{ marginLeft: "1rem" }}>
+            <span>
               di{" "}
               <Link href={`/autori/${article.author_profile.slug}`}>
                 {article.author_profile.name}
@@ -146,7 +145,7 @@ export default async function ArticlePage({ params }: Props) {
           )}
         </div>
         {article.excerpt && (
-          <p className="article-excerpt" style={{ fontStyle: "italic", marginTop: "1rem" }}>
+          <p className="article-excerpt article-standfirst">
             {article.excerpt}
           </p>
         )}
@@ -160,7 +159,7 @@ export default async function ArticlePage({ params }: Props) {
           </div>
         )}
         {article.guests && article.guests.length > 0 && (
-          <div className="article-meta" style={{ marginTop: "1rem" }}>
+          <div className="article-meta article-guests">
             <span>Ospiti: </span>
             {article.guests.map((guest, i) => (
               <span key={guest.id}>
@@ -200,16 +199,10 @@ export default async function ArticlePage({ params }: Props) {
       {related.length > 0 && (
         <section aria-labelledby="leggi-anche" className="related-articles">
           <h2 id="leggi-anche">Leggi anche</h2>
-          <ul>
+          <ul className="article-grid">
             {related.map((r) => (
               <li key={r.id}>
-                {r.category && <span className="article-meta">{r.category.name}</span>}
-                <h3 className="card-title">
-                  <Link href={`/articoli/${r.slug}`}>{r.title}</Link>
-                </h3>
-                <time className="article-meta" dateTime={r.publish_at}>
-                  {formatPublishDate(r.publish_at)}
-                </time>
+                <ArticleCard article={r} headingLevel={3} variant="grid" />
               </li>
             ))}
           </ul>
