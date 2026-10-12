@@ -46,7 +46,8 @@
   /* Fonts */
   --font-sans:
     system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  --font-serif: Georgia, "Times New Roman", serif; /* article reading face, see .article-body */
+  --font-serif:
+    Georgia, "Times New Roman", serif; /* article reading face, see .article-body */
   --font-mono:
     ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono",
     monospace;

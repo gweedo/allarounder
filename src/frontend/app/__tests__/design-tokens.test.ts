@@ -45,9 +45,7 @@ function resolveHex(name: string, seen: string[] = []): string {
 function relativeLuminance(hex: string): number {
   const digits = hex.slice(1);
   const full =
-    digits.length === 3
-      ? [...digits].map((d) => d + d).join("")
-      : digits;
+    digits.length === 3 ? [...digits].map((d) => d + d).join("") : digits;
   const [r, g, b] = [0, 2, 4].map((i) => {
     const channel = parseInt(full.slice(i, i + 2), 16) / 255;
     return channel <= 0.03928
@@ -78,6 +76,16 @@ describe("design tokens", () => {
   ])("%s on %s meets WCAG AA (4.5:1)", (foreground, background) => {
     expect(contrastRatio(foreground, background)).toBeGreaterThanOrEqual(4.5);
   });
+
+  // A focus ring is a non-text UI component: WCAG 1.4.11 asks for 3:1.
+  it.each([["--color-surface"], ["--color-bg"]])(
+    "--color-focus on %s meets WCAG non-text contrast (3:1)",
+    (background) => {
+      expect(contrastRatio("--color-focus", background)).toBeGreaterThanOrEqual(
+        3,
+      );
+    },
+  );
 
   it("aliases the accent colour to the brand ink", () => {
     expect(tokens.get("--color-accent")).toBe("var(--color-brand-ink)");
