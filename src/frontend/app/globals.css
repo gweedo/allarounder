@@ -260,7 +260,8 @@ h3,
   max-width: 1100px;
 }
 
-.visually-hidden {
+.visually-hidden,
+.site-header-cta-long {
   position: absolute;
   width: 1px;
   height: 1px;
@@ -311,15 +312,19 @@ h3,
   color: var(--color-on-brand);
 }
 
-/* Phone: row 1 wordmark + "Ascolta" pill, row 2 the three nav links. */
+/*
+ * Phone: row 1 wordmark + "Ascolta" pill, row 2 the three nav links.
+ * The nav is display: contents so its links and the CTA (the last nav link)
+ * are placed straight on this grid, while the nav landmark stays in the
+ * accessibility tree. Links sit in the first free columns of their row.
+ */
 .site-header-inner {
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: repeat(3, 1fr);
   grid-template-areas:
-    "brand cta"
-    "nav nav";
+    "brand brand cta"
+    ". . .";
   align-items: center;
-  gap: 0 var(--space-4);
   max-width: 1100px;
   margin: 0 auto;
   padding: var(--space-2) var(--space-4);
@@ -341,15 +346,14 @@ h3,
 }
 
 .site-header-nav {
-  grid-area: nav;
-  display: flex;
-  font-size: 0.8rem;
+  display: contents;
+  font-size: var(--text-xs);
   text-transform: uppercase;
   letter-spacing: 0.08em;
 }
 
 .site-header-nav a {
-  flex: 1;
+  grid-row: 2;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -365,22 +369,14 @@ h3,
   text-underline-offset: 4px;
 }
 
-.site-header-cta {
+/* The CTA is a nav link too: it inherits the mono label type from the nav. */
+.site-header-nav .site-header-cta {
   grid-area: cta;
-  display: inline-flex;
-  align-items: center;
-  min-height: 44px;
+  justify-self: end;
   padding: 0 var(--space-4);
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: var(--color-on-brand);
   color: var(--color-brand);
-  font-family: var(--font-mono-ui);
-  font-weight: 500;
-  font-size: 0.8rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  text-decoration: none;
-  white-space: nowrap;
 }
 
 .site-header-cta:hover {
@@ -392,34 +388,16 @@ h3,
   outline-offset: 3px;
 }
 
-/* Phone shows a short "Ascolta"; the rest stays in the accessible name. */
-.site-header-cta-long {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0 0 0 0);
-  white-space: nowrap;
-}
-
 /* Desktop: one row, wordmark left, nav centred, CTA right. */
 @media (min-width: 800px) {
   .site-header-inner {
-    grid-template-columns: 1fr auto 1fr;
-    grid-template-areas: "brand nav cta";
-  }
-
-  .site-header-nav {
-    gap: var(--space-5);
+    grid-template-columns: 1fr repeat(3, auto) 1fr;
+    grid-template-areas: "brand . . . cta";
+    column-gap: var(--space-5);
   }
 
   .site-header-nav a {
-    flex: none;
-  }
-
-  .site-header-cta {
-    justify-self: end;
+    grid-row: 1;
   }
 
   .site-header-cta-long {

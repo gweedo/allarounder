@@ -54,6 +54,31 @@ test.describe("Header bar on desktop", () => {
   }
 });
 
+test.describe("Header bar on a narrow desktop", () => {
+  test.use({ viewport: { width: 1024, height: 768 } });
+
+  test("keeps every link on one row with no page overflow at 1024px", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    const links = page.getByRole("banner").getByRole("link");
+    const tops: number[] = [];
+    for (const link of await links.all()) {
+      await expect(link).toBeInViewport({ ratio: 1 });
+      tops.push(Math.round((await link.boundingBox())!.y));
+    }
+    // The pill is vertically centred on the row, so allow a few px of drift.
+    expect(Math.max(...tops) - Math.min(...tops)).toBeLessThanOrEqual(4);
+
+    const overflow = await page.evaluate(
+      () =>
+        document.documentElement.scrollWidth -
+        document.documentElement.clientWidth,
+    );
+    expect(overflow).toBeLessThanOrEqual(0);
+  });
+});
+
 test.describe("Header keyboard focus", () => {
   test("every header link shows a focus ring when reached with the keyboard", async ({
     page,

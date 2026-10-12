@@ -19,8 +19,8 @@ describe("SiteHeader", () => {
     expect(within(banner).getByRole("link", { name: "Allarounder" })).toHaveAttribute("href", "/");
   });
 
-  it("renders the three main navigation links, with the podcast link outside the nav", () => {
-    render(<SiteHeader spotifyShowUrl={SHOW_URL} />);
+  it("renders the three main navigation links in the nav when there is no show URL", () => {
+    render(<SiteHeader spotifyShowUrl={null} />);
     const nav = screen.getByRole("navigation", { name: "Principale" });
     expect(within(nav).getAllByRole("link").map((a) => [a.textContent, a.getAttribute("href")])).toEqual([
       ["Articoli", "/articoli"],
@@ -29,10 +29,13 @@ describe("SiteHeader", () => {
     ]);
   });
 
-  it("links to the podcast on Spotify in a new tab from the banner when the show URL is set", () => {
+  it("links to the podcast on Spotify in a new tab as the last nav link when the show URL is set", () => {
     render(<SiteHeader spotifyShowUrl={SHOW_URL} />);
-    const banner = screen.getByRole("banner");
-    const link = within(banner).getByRole("link", { name: "Ascolta il podcast" });
+    const nav = screen.getByRole("navigation", { name: "Principale" });
+    const links = within(nav).getAllByRole("link");
+    expect(links).toHaveLength(4);
+    const link = links[3];
+    expect(link).toHaveAccessibleName("Ascolta il podcast");
     expect(link).toHaveAttribute("href", SHOW_URL);
     expect(link).toHaveAttribute("target", "_blank");
     expect(link).toHaveAttribute("rel", "noopener noreferrer");

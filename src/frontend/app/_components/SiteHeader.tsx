@@ -5,9 +5,9 @@ interface Props {
 }
 
 // Site-wide header bar (design B · Tabellone): skip link, wordmark home,
-// main navigation and the podcast CTA. The full-width <header> carries the
-// brand background; the inner wrapper holds the max-width and the grid that
-// lays it out as one row on desktop and two rows on phones (globals.css).
+// main navigation ending in the podcast CTA. The full-width <header> carries
+// the brand background; the inner wrapper holds the max-width and the grid
+// that lays it out as one row on desktop and two rows on phones (globals.css).
 // Every page's <main> carries id="contenuto" for the skip link.
 export function SiteHeader({ spotifyShowUrl }: Props) {
   return (
@@ -26,17 +26,17 @@ export function SiteHeader({ spotifyShowUrl }: Props) {
             <Link href="/articoli">Articoli</Link>
             <Link href="/argomenti">Argomenti</Link>
             <Link href="/chi-siamo">Chi siamo</Link>
+            {spotifyShowUrl && (
+              <a
+                href={spotifyShowUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="site-header-cta"
+              >
+                Ascolta<span className="site-header-cta-long"> il podcast</span>
+              </a>
+            )}
           </nav>
-          {spotifyShowUrl && (
-            <a
-              href={spotifyShowUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="site-header-cta"
-            >
-              Ascolta<span className="site-header-cta-long"> il podcast</span>
-            </a>
-          )}
         </div>
       </header>
     </>
