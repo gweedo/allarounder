@@ -260,7 +260,8 @@ h3,
   max-width: 1100px;
 }
 
-.visually-hidden {
+.visually-hidden,
+.site-header-cta-long {
   position: absolute;
   width: 1px;
   height: 1px;
@@ -272,63 +273,146 @@ h3,
   border: 0;
 }
 
-/* Site header. Structure only; the look belongs to the design review. */
+/*
+ * Focus ring, site-wide. Inside the brand header bar (and on the skip link,
+ * which sits over it) the ring switches to the on-brand colour, since
+ * --color-focus would vanish against --color-brand.
+ */
+
+:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+/* Site header bar — design B · Tabellone */
 
 .skip-link {
   position: absolute;
   left: var(--space-4);
   top: -100%;
   padding: var(--space-2) var(--space-4);
-  background: var(--color-surface);
-  color: var(--color-text);
-  border: 1px solid var(--color-border);
+  background: var(--color-brand);
+  color: var(--color-on-brand);
+  border: 1px solid var(--color-on-brand);
   border-radius: var(--radius);
-  z-index: 10;
+  z-index: 100;
 }
 
 .skip-link:focus {
   top: var(--space-2);
 }
 
+.skip-link:focus-visible,
+.site-header :focus-visible {
+  outline-color: var(--color-on-brand);
+}
+
 .site-header {
-  display: flex;
-  flex-wrap: wrap;
+  background: var(--color-brand);
+  color: var(--color-on-brand);
+}
+
+/*
+ * Phone: row 1 wordmark + "Ascolta" pill, row 2 the three nav links.
+ * The nav is display: contents so its links and the CTA (the last nav link)
+ * are placed straight on this grid, while the nav landmark stays in the
+ * accessibility tree. The three section links sit in the first free columns
+ * of their row; both grids assume exactly three, so a fourth section link
+ * needs a new column template here and in the desktop query below.
+ */
+.site-header-inner {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-areas:
+    "brand brand cta"
+    ". . .";
   align-items: center;
-  justify-content: space-between;
-  gap: var(--space-3) var(--space-5);
   max-width: 1100px;
   margin: 0 auto;
-  padding: var(--space-4);
-  border-bottom: 1px solid var(--color-border);
+  padding: var(--space-2) var(--space-4);
 }
 
 .site-header-brand {
+  grid-area: brand;
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3); /* logo slot (#157) to wordmark */
+  min-height: 44px;
   font-size: var(--text-xl);
-  font-weight: 700;
-  color: var(--color-text);
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: inherit;
   text-decoration: none;
 }
 
 .site-header-nav {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--space-2) var(--space-5);
-  font-size: var(--text-sm);
+  display: contents;
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
 }
 
 .site-header-nav a {
-  color: var(--color-text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 var(--space-2);
+  color: inherit;
   text-decoration: none;
+  white-space: nowrap;
 }
 
-.site-header-nav a:hover,
-.site-header-nav a:focus-visible {
+.site-header-nav a:hover {
   text-decoration: underline;
+  text-underline-offset: 4px;
 }
 
-.site-header-nav .site-header-podcast {
-  color: var(--color-accent);
+/* Section links go on row 2; the CTA is placed by its own rule below. */
+.site-header-nav a:not(.site-header-cta) {
+  grid-row: 2;
+}
+
+/* The CTA is a nav link too: it inherits the mono label type from
+   .site-header-nav and the link box and hover from .site-header-nav a;
+   here it takes the cta area and becomes the pill. */
+.site-header-nav .site-header-cta {
+  grid-area: cta;
+  justify-self: end;
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-pill);
+  background: var(--color-on-brand);
+  color: var(--color-brand);
+}
+
+/* The ring would sit flush against the light pill; offset it onto the bar. */
+.site-header-cta:focus-visible {
+  outline-offset: 3px;
+}
+
+/* Desktop: one row, wordmark left, nav centred, CTA right. */
+@media (min-width: 800px) {
+  .site-header-inner {
+    grid-template-columns: 1fr repeat(3, auto) 1fr;
+    grid-template-areas: "brand . . . cta";
+    column-gap: var(--space-5);
+  }
+
+  .site-header-nav a:not(.site-header-cta) {
+    grid-row: 1;
+  }
+
+  .site-header-cta-long {
+    position: static;
+    width: auto;
+    height: auto;
+    margin: 0;
+    overflow: visible;
+    clip: auto;
+    white-space: pre;
+  }
 }
 
 .page-header {
