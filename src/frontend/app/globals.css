@@ -316,7 +316,9 @@ h3,
  * Phone: row 1 wordmark + "Ascolta" pill, row 2 the three nav links.
  * The nav is display: contents so its links and the CTA (the last nav link)
  * are placed straight on this grid, while the nav landmark stays in the
- * accessibility tree. Links sit in the first free columns of their row.
+ * accessibility tree. The three section links sit in the first free columns
+ * of their row; both grids assume exactly three, so a fourth section link
+ * needs a new column template here and in the desktop query below.
  */
 .site-header-inner {
   display: grid;
@@ -353,7 +355,6 @@ h3,
 }
 
 .site-header-nav a {
-  grid-row: 2;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -369,7 +370,13 @@ h3,
   text-underline-offset: 4px;
 }
 
-/* The CTA is a nav link too: it inherits the mono label type from the nav. */
+/* Placement only: the CTA takes the cta area, the section links row 2. */
+.site-header-nav a:not(.site-header-cta) {
+  grid-row: 2;
+}
+
+/* The CTA is a nav link too: it inherits the mono label type and the link
+   box and hover from .site-header-nav a; here it becomes the pill. */
 .site-header-nav .site-header-cta {
   grid-area: cta;
   justify-self: end;
@@ -377,10 +384,6 @@ h3,
   border-radius: var(--radius-pill);
   background: var(--color-on-brand);
   color: var(--color-brand);
-}
-
-.site-header-cta:hover {
-  text-decoration: underline;
 }
 
 /* The ring would sit flush against the light pill; offset it onto the bar. */
@@ -396,7 +399,7 @@ h3,
     column-gap: var(--space-5);
   }
 
-  .site-header-nav a {
+  .site-header-nav a:not(.site-header-cta) {
     grid-row: 1;
   }
 

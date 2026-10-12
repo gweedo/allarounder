@@ -1,8 +1,9 @@
 import { test, expect } from "@playwright/test";
 
 // Header bar, design B · Tabellone (#155): two rows on a phone with no
-// horizontal scroll, a full-width brand bar on desktop, and a visible focus
-// ring on every header link.
+// horizontal scroll, one row in order from the 800px breakpoint up, a
+// full-width brand bar on desktop, and a visible focus ring on every header
+// link.
 
 test.describe("Header bar on a 390px phone", () => {
   test.use({ viewport: { width: 390, height: 844 } });
@@ -54,21 +55,27 @@ test.describe("Header bar on desktop", () => {
   }
 });
 
-test.describe("Header bar on a narrow desktop", () => {
-  test.use({ viewport: { width: 1024, height: 768 } });
+test.describe("Header bar at the 800px desktop breakpoint", () => {
+  test.use({ viewport: { width: 800, height: 768 } });
 
-  test("keeps every link on one row with no page overflow at 1024px", async ({
+  test("lays out wordmark, nav and CTA on one row, in order, with no page overflow", async ({
     page,
   }) => {
     await page.goto("/");
-    const links = page.getByRole("banner").getByRole("link");
-    const tops: number[] = [];
-    for (const link of await links.all()) {
+    const links = await page.getByRole("banner").getByRole("link").all();
+    const boxes = [];
+    for (const link of links) {
       await expect(link).toBeInViewport({ ratio: 1 });
-      tops.push(Math.round((await link.boundingBox())!.y));
+      boxes.push((await link.boundingBox())!);
     }
     // The pill is vertically centred on the row, so allow a few px of drift.
+    const tops = boxes.map((b) => Math.round(b.y));
     expect(Math.max(...tops) - Math.min(...tops)).toBeLessThanOrEqual(4);
+    // Wordmark, Articoli, Argomenti, Chi siamo, CTA: left to right, no overlap.
+    for (let i = 1; i < boxes.length; i++) {
+      expect(boxes[i].x).toBeGreaterThanOrEqual(boxes[i - 1].x + boxes[i - 1].width);
+    }
+    await expect(links.at(-1)!).toHaveText("Ascolta il podcast");
 
     const overflow = await page.evaluate(
       () =>

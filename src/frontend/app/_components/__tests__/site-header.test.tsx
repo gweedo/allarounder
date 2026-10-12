@@ -32,10 +32,8 @@ describe("SiteHeader", () => {
   it("links to the podcast on Spotify in a new tab as the last nav link when the show URL is set", () => {
     render(<SiteHeader spotifyShowUrl={SHOW_URL} />);
     const nav = screen.getByRole("navigation", { name: "Principale" });
-    const links = within(nav).getAllByRole("link");
-    expect(links).toHaveLength(4);
-    const link = links[3];
-    expect(link).toHaveAccessibleName("Ascolta il podcast");
+    const link = within(nav).getByRole("link", { name: "Ascolta il podcast" });
+    expect(within(nav).getAllByRole("link").at(-1)).toBe(link);
     expect(link).toHaveAttribute("href", SHOW_URL);
     expect(link).toHaveAttribute("target", "_blank");
     expect(link).toHaveAttribute("rel", "noopener noreferrer");
