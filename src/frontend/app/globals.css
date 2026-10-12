@@ -39,9 +39,13 @@
   --space-4: 1rem;
   --space-5: 1.5rem;
   --space-6: 2rem;
+  --space-7: 2.5rem;
+  --space-8: 4rem;
 
   /* Radius */
   --radius: 6px;
+  --radius-sm: 4px; /* small media: card covers, score tiles */
+  --radius-pill: 999px;
 
   /* Fonts */
   --font-mono:
@@ -60,6 +64,7 @@
   --font-mono-ui: var(--font-plex-mono, ui-monospace, monospace);
 
   /* Type scale */
+  --text-xs: 0.75rem; /* mono uppercase labels: meta lines, card categories */
   --text-sm: 0.875rem;
   --text-base: 1rem;
   --text-lg: 1.125rem;
@@ -487,6 +492,14 @@ h3,
   object-fit: cover;
 }
 
+.profile-name {
+  margin-bottom: var(--space-2);
+}
+
+.profile-count {
+  margin-bottom: var(--space-5);
+}
+
 .profile-bio {
   color: var(--color-text-muted);
 }
@@ -508,58 +521,273 @@ h3,
   text-decoration: underline;
 }
 
-/* Article hero + cards (home page) */
+/* Home page: featured Article (hero) beside the latest Articles. */
+
+.home-layout {
+  display: grid;
+  gap: var(--space-6);
+  align-items: start;
+}
+
+@media (min-width: 60rem) {
+  .home-layout {
+    grid-template-columns: 1.4fr 1fr;
+    gap: var(--space-7);
+  }
+
+  .home-layout .article-grid {
+    grid-template-columns: 1fr;
+  }
+}
 
 .hero {
-  margin-bottom: var(--space-6);
-  padding-bottom: var(--space-5);
-  border-bottom: 2px solid var(--color-text);
+  display: grid;
+  gap: var(--space-3);
+  align-content: start;
+  min-width: 0;
+}
+
+/* No Cover image: a brand rule stands in, never an empty box. */
+.hero--ruled {
+  padding-left: var(--space-4);
+  border-left: 6px solid var(--color-brand);
+}
+
+.hero__cover {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.hero .category-badge {
+  justify-self: start;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
 .hero-title {
-  margin: 0 0 var(--space-2);
-  font-size: var(--text-2xl);
+  margin: 0;
+  font-size: clamp(2.4rem, 9vw, 4.6rem);
+  line-height: 0.95;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  text-wrap: balance;
+  overflow-wrap: break-word;
+}
+
+.hero-title a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.hero-title a:hover {
+  text-decoration: underline;
+  text-decoration-thickness: 3px;
+  text-underline-offset: 5px;
 }
 
 .hero-excerpt {
-  margin: var(--space-2) 0 var(--space-4);
+  margin: 0;
+  max-width: 60ch;
   font-size: var(--text-lg);
   color: var(--color-text-muted);
 }
 
 .hero-cta {
-  display: inline-block;
+  justify-self: start;
   padding: var(--space-2) var(--space-5);
-  border-radius: var(--radius);
-  background: var(--color-text);
-  color: #fff;
-  font-weight: 700;
+  border-radius: var(--radius-pill);
+  background: var(--color-brand);
+  color: var(--color-on-brand);
+  font-family: var(--font-mono-ui);
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
   text-decoration: none;
 }
 
-.card-grid {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: var(--space-6);
+.page-empty {
+  margin-top: var(--space-8);
+  text-align: center;
 }
 
-/* Article list (category/author/guest/tag listing pages) */
+/* Article cards: app/_components/ArticleCard.tsx. */
+
+.article-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 20rem), 1fr));
+  gap: var(--space-5) var(--space-6);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
 
 .article-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
   display: grid;
   gap: var(--space-5);
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
-.article-list-item {
-  border-bottom: 1px solid var(--color-border);
-  padding-bottom: var(--space-5);
+.article-card {
+  --article-card-media: 4.625rem;
+  display: flex;
+  gap: var(--space-4);
+  align-items: flex-start;
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-border);
 }
+
+.article-card--list {
+  --article-card-media: 5.5rem;
+}
+
+.article-card__tile {
+  display: grid;
+  flex: none;
+  justify-items: center;
+  width: var(--article-card-media);
+  padding: var(--space-2) var(--space-1);
+  border-radius: var(--radius-sm);
+  background: var(--color-tile);
+  color: var(--color-tile-text);
+  font-family: var(--font-mono-ui);
+  font-size: 0.6rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.article-card__tile-value {
+  font-family: var(--font-display);
+  font-size: 2.1rem;
+  font-weight: 700;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0;
+}
+
+.article-card__cover {
+  position: relative;
+  flex: none;
+  width: var(--article-card-media);
+  aspect-ratio: 1;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.article-card__body {
+  display: grid;
+  gap: var(--space-2);
+  flex: 1;
+  min-width: 0;
+}
+
+.article-card__category {
+  justify-self: start;
+  color: var(--color-brand-ink);
+  font-family: var(--font-mono-ui);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+
+.article-card__category:hover {
+  text-decoration: underline;
+}
+
+/* Card titles stay in sentence case: long Italian titles in condensed
+   capitals are hard to scan. */
+.article-card__title {
+  margin: 0;
+  font-size: var(--text-xl);
+  line-height: 1.1;
+  text-wrap: balance;
+  overflow-wrap: break-word;
+}
+
+.article-card--list .article-card__title {
+  font-size: 1.75rem;
+}
+
+.article-card__title a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.article-card__title a:hover {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.article-card__excerpt {
+  margin: 0;
+  color: var(--color-text-muted);
+}
+
+.article-card--grid .article-card__excerpt {
+  display: -webkit-box;
+  overflow: hidden;
+  font-size: 0.95rem;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+/* Meta lines: date, author, reading time, as mono uppercase labels. */
+
+.article-meta {
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+.article-card__meta,
+.hero__meta,
+.article-byline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-4);
+  margin: 0;
+  font-size: var(--text-xs);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.article-meta a {
+  color: var(--color-text-muted);
+  text-decoration: underline;
+}
+
+.category-badge {
+  display: inline-block;
+  margin-bottom: var(--space-2);
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius);
+  background: var(--color-brand);
+  color: var(--color-on-brand);
+  font-size: var(--text-sm);
+  text-decoration: none;
+}
+
+/* Kept for the section-root cards in TaxonomyIndex. */
+.card-title {
+  margin: 0 0 var(--space-2);
+}
+
+.card-title a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.article-excerpt {
+  color: var(--color-text-muted);
+}
+
+/* Article page: classes that replaced its inline styles; the look belongs
+   to the Article page slice. */
 
 .cover-image {
   position: relative;
@@ -570,52 +798,22 @@ h3,
   background: var(--color-border);
 }
 
-.cover-image img {
-  object-fit: cover;
+.article-cover {
+  aspect-ratio: 16 / 9;
+  margin-bottom: var(--space-5);
 }
 
-.category-badge {
-  display: inline-block;
-  margin-bottom: var(--space-2);
-  padding: 0.2rem 0.6rem;
-  border-radius: var(--radius);
-  background: var(--color-text);
-  color: #fff;
-  font-size: var(--text-sm);
-  text-decoration: none;
+.article-byline {
+  margin-top: var(--space-1);
 }
 
-.category-badge--muted {
-  background: var(--color-border);
-  color: var(--color-text);
+.article-standfirst {
+  margin-top: var(--space-4);
+  font-style: italic;
 }
 
-.card-title {
-  margin: 0 0 var(--space-2);
-}
-
-.card-title a,
-.article-title a {
-  text-decoration: none;
-  color: inherit;
-}
-
-.article-title {
-  margin: 0 0 var(--space-1);
-}
-
-.article-excerpt {
-  color: var(--color-text-muted);
-}
-
-.article-meta {
-  color: var(--color-text-muted);
-  font-size: var(--text-sm);
-}
-
-.article-meta a {
-  color: var(--color-text-muted);
-  text-decoration: underline;
+.article-guests {
+  margin-top: var(--space-4);
 }
 
 .tag-list {
@@ -684,23 +882,6 @@ h3,
   margin-top: var(--space-6);
   padding-top: var(--space-5);
   border-top: 1px solid var(--color-border);
-}
-
-.related-articles ul {
-  display: grid;
-  gap: var(--space-5);
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.related-articles .card-title {
-  margin: var(--space-1) 0;
-  font-size: var(--text-lg);
-}
-
-.related-articles span.article-meta {
-  display: block;
 }
 
 /* Site footer */

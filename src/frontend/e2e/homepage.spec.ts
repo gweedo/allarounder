@@ -25,4 +25,13 @@ test.describe("Homepage", () => {
     // longer than the default 5s expect timeout on a cold server.
     await expect(page).toHaveURL(/\/articoli\//, { timeout: 30_000 });
   });
+
+  test("the home page does not scroll sideways on a phone", async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/");
+    const overflow = await page.evaluate(
+      () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+    );
+    expect(overflow).toBeLessThanOrEqual(0);
+  });
 });

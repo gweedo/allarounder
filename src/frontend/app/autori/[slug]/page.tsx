@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getAuthorBySlug, getAllAuthorSlugs } from "../../../lib/content";
-import { formatPublishDate } from "../../../lib/dates";
+import { ArticleList } from "../../_components/ArticleList";
 import { slugParams } from "../../../lib/static-params";
 
 export async function generateStaticParams() {
@@ -55,7 +54,7 @@ export default async function AuthorPage({ params }: Props) {
           />
         )}
         <div>
-          <h1 style={{ marginBottom: "0.5rem" }}>{data.name}</h1>
+          <h1 className="profile-name">{data.name}</h1>
           {data.bio && <p className="profile-bio">{data.bio}</p>}
           {Object.entries(data.links).length > 0 && (
             <div className="profile-links">
@@ -68,44 +67,13 @@ export default async function AuthorPage({ params }: Props) {
           )}
         </div>
       </header>
-      <p className="page-count" style={{ marginBottom: "1.5rem" }}>
+      <p className="page-count profile-count">
         {data.total} {data.total === 1 ? "articolo pubblicato" : "articoli pubblicati"}
       </p>
       {data.articles.length === 0 ? (
         <p>Nessun articolo pubblicato da questo autore.</p>
       ) : (
-        <ul className="article-list">
-          {data.articles.map((article) => (
-            <li key={article.id} className="article-list-item">
-              {article.cover_image_url && (
-                <div className="cover-image" style={{ height: 200 }}>
-                  <Image
-                    src={article.cover_image_url}
-                    alt={article.cover_image_alt ?? `Copertina: ${article.title}`}
-                    fill
-                    style={{ objectFit: "cover" }}
-                  />
-                </div>
-              )}
-              <h2 className="card-title" style={{ marginTop: "0.75rem" }}>
-                <Link href={`/articoli/${article.slug}`}>{article.title}</Link>
-              </h2>
-              {article.excerpt && (
-                <p className="article-excerpt" style={{ marginTop: "0.5rem" }}>
-                  {article.excerpt}
-                </p>
-              )}
-              <div className="article-meta" style={{ marginTop: "0.5rem" }}>
-                <time dateTime={article.publish_at}>
-                  {formatPublishDate(article.publish_at)}
-                </time>
-                {article.reading_time && (
-                  <span style={{ marginLeft: "1rem" }}>{article.reading_time} min di lettura</span>
-                )}
-              </div>
-            </li>
-          ))}
-        </ul>
+        <ArticleList articles={data.articles} />
       )}
     </main>
   );

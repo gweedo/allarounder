@@ -11,7 +11,11 @@ test.describe("Article page", () => {
     test.skip(publishedArticles.length < 2, "needs two published articles");
     await page.goto(`/articoli/${publishedArticles[0].slug}`);
 
-    const next = page.getByRole("region", { name: "Leggi anche" }).getByRole("link").first();
+    const next = page
+      .getByRole("region", { name: "Leggi anche" })
+      .getByRole("heading", { level: 3 })
+      .first()
+      .getByRole("link");
     const href = await next.getAttribute("href");
     expect(href).toMatch(/^\/articoli\//);
     expect(href).not.toBe(`/articoli/${publishedArticles[0].slug}`);

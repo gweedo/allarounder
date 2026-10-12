@@ -72,7 +72,7 @@ describe("TagPage", () => {
     const link = screen.getByRole("link", { name: "Articolo di test" });
     expect(link).toHaveAttribute("href", "/articoli/articolo-di-test");
     expect(screen.getByText("Un estratto")).toBeInTheDocument();
-    expect(screen.getByText(/5 min/i)).toBeInTheDocument();
+    expect(screen.getByText("5 min di lettura")).toBeInTheDocument();
   });
 
   it("calls notFound when tag is not found", async () => {

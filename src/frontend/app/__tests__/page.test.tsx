@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import type { ArticleMeta, ArticleListResult } from "../../lib/content";
 
 vi.mock("next/navigation", () => ({
@@ -166,6 +166,81 @@ describe("HomePage", () => {
       "href",
       "/autori/marco-rossi",
     );
+  });
+
+  it("shows each grid article's reading time on a score tile", async () => {
+    await renderHomePage({
+      items: [BASE_ARTICLE, { ...GRID_ARTICLE, reading_time: 7 }],
+      total: 2,
+      page: 1,
+      page_size: 13,
+    });
+    const grid = screen.getByRole("region", { name: /articoli recenti/i });
+    const tile = within(grid).getByRole("img", { name: "7 minuti di lettura" });
+    expect(within(tile).getByText("07")).toHaveAttribute("aria-hidden", "true");
+    expect(within(grid).getByText("7 min di lettura")).toBeInTheDocument();
+  });
+
+  it("shows no tile for a grid article without a reading time", async () => {
+    await renderHomePage({
+      items: [BASE_ARTICLE, { ...GRID_ARTICLE, reading_time: null }],
+      total: 2,
+      page: 1,
+      page_size: 13,
+    });
+    const grid = screen.getByRole("region", { name: /articoli recenti/i });
+    expect(within(grid).queryByRole("img")).toBeNull();
+    expect(within(grid).queryByText(/^0+$/)).toBeNull();
+  });
+
+  it("titles grid cards with h2", async () => {
+    await renderHomePage({
+      items: [BASE_ARTICLE, GRID_ARTICLE],
+      total: 2,
+      page: 1,
+      page_size: 13,
+    });
+    const grid = screen.getByRole("region", { name: /articoli recenti/i });
+    expect(within(grid).getByRole("heading", { level: 2 })).toHaveTextContent("Secondo articolo");
+  });
+
+  it("renders no image block anywhere when no article has a cover image", async () => {
+    await renderHomePage({
+      items: [BASE_ARTICLE, GRID_ARTICLE],
+      total: 2,
+      page: 1,
+      page_size: 13,
+    });
+    expect(document.querySelector("img")).toBeNull();
+    expect(document.querySelector("[aria-hidden='true']:empty")).toBeNull();
+  });
+
+  it("shows a grid article's cover image in place of the tile, not marked priority", async () => {
+    await renderHomePage({
+      items: [
+        BASE_ARTICLE,
+        { ...GRID_ARTICLE, cover_image_url: "https://cdn.example.com/b.jpg", cover_image_alt: "Anelli" },
+      ],
+      total: 2,
+      page: 1,
+      page_size: 13,
+    });
+    const grid = screen.getByRole("region", { name: /articoli recenti/i });
+    const cover = within(grid).getByRole("img", { name: "Anelli" });
+    // Only the hero's cover image is `priority`; next/image lazy-loads the rest.
+    expect(cover).toHaveAttribute("loading", "lazy");
+    expect(within(grid).queryByRole("img", { name: /minut/ })).toBeNull();
+  });
+
+  it("shows the hero cover image large and loads it first", async () => {
+    await renderHomePage({
+      items: [{ ...BASE_ARTICLE, cover_image_url: "https://cdn.example.com/a.jpg", cover_image_alt: "Trave" }],
+      total: 1,
+      page: 1,
+      page_size: 13,
+    });
+    const hero = screen.getByRole("region", { name: /articolo in evidenza/i });
+    expect(within(hero).getByRole("img", { name: "Trave" })).not.toHaveAttribute("loading", "lazy");
   });
 
   it("links to the full article list instead of paginating", async () => {
