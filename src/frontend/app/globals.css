@@ -680,28 +680,6 @@ body {
   display: block;
 }
 
-.pagination-nav {
-  display: flex;
-  justify-content: center;
-  gap: var(--space-4);
-  margin-top: var(--space-6);
-  padding-top: var(--space-5);
-  border-top: 1px solid var(--color-border);
-}
-
-.pagination-nav a {
-  padding: var(--space-2) var(--space-4);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-  color: var(--color-text);
-  text-decoration: none;
-}
-
-.pagination-status {
-  padding: var(--space-2) 0;
-  color: var(--color-text-muted);
-}
-
 /* Site footer */
 
 .site-footer {
