@@ -27,3 +27,16 @@ test.describe("Site header", () => {
     await expect(page.locator("main#contenuto")).toBeVisible();
   });
 });
+
+test.describe("Main navigation", () => {
+  test("reaches the article list and the topics from any page", async ({ page }) => {
+    await page.goto("/chi-siamo");
+    const nav = page.getByRole("navigation", { name: "Principale" });
+
+    await nav.getByRole("link", { name: "Articoli" }).click();
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Articoli", { timeout: 30_000 });
+
+    await nav.getByRole("link", { name: "Argomenti" }).click();
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Argomenti", { timeout: 30_000 });
+  });
+});
