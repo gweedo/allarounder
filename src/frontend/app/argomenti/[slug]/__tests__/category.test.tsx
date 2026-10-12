@@ -81,8 +81,7 @@ describe("CategoryPage", () => {
       detail: BASE_DETAIL,
       articles: [{ ...SAMPLE_ARTICLE, reading_time: 7 }],
     });
-    const spoken = screen.getByText("7 minuti di lettura");
-    const tile = spoken.parentElement!;
+    const tile = screen.getByRole("img", { name: "7 minuti di lettura" });
     expect(within(tile).getByText("07")).toHaveAttribute("aria-hidden", "true");
     expect(within(tile).getByText("min")).toHaveAttribute("aria-hidden", "true");
     // The meta row repeats it in text, so nothing depends on the tile alone.
@@ -94,7 +93,7 @@ describe("CategoryPage", () => {
       detail: BASE_DETAIL,
       articles: [{ ...SAMPLE_ARTICLE, reading_time }],
     });
-    expect(screen.queryByText(/minut/)).toBeNull();
+    expect(screen.queryByRole("img")).toBeNull();
     expect(screen.queryByText(/min di lettura/)).toBeNull();
     expect(screen.queryByText(/^0+$/)).toBeNull();
   });
@@ -105,7 +104,7 @@ describe("CategoryPage", () => {
     expect(document.querySelector("[aria-hidden='true']:empty")).toBeNull();
   });
 
-  it("shows a cover image thumbnail in place of the tile", async () => {
+  it("shows the cover image in place of the tile", async () => {
     await renderCategoryPage({
       detail: BASE_DETAIL,
       articles: [
@@ -117,7 +116,7 @@ describe("CategoryPage", () => {
       ],
     });
     expect(screen.getByRole("img", { name: "Mario Rossi alla trave" })).toBeInTheDocument();
-    expect(screen.queryByText(/minuti di lettura/)).toBeNull();
+    expect(screen.queryByRole("img", { name: /minut/ })).toBeNull();
   });
 
   it("titles each article card with an h2", async () => {

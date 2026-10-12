@@ -144,7 +144,7 @@ describe("ArticlePage", () => {
     await renderArticlePage(BASE_ARTICLE);
     const section = screen.getByRole("region", { name: "Leggi anche" });
     expect(within(section).getByRole("heading", { level: 3 })).toHaveTextContent("Altro articolo");
-    expect(within(section).getByText("7 minuti di lettura")).toBeInTheDocument();
+    expect(within(section).getByRole("img", { name: "7 minuti di lettura" })).toBeInTheDocument();
   });
 
   it("omits 'Leggi anche' when there is nothing else to read", async () => {

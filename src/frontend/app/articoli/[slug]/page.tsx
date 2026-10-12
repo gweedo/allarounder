@@ -10,6 +10,7 @@ import {
 } from "../../../lib/content";
 import { SPOTIFY_SHOW_URL } from "../../../lib/site";
 import { formatPublishDate } from "../../../lib/dates";
+import { readingMinutes } from "../../../lib/reading-time";
 import { slugParams } from "../../../lib/static-params";
 import { ArticleCard } from "../../_components/ArticleCard";
 
@@ -56,6 +57,7 @@ export default async function ArticlePage({ params }: Props) {
   if (!article) notFound();
 
   const bodyHtml = await renderMarkdown(article.body);
+  const minutes = readingMinutes(article);
   const url = `${BASE}/articoli/${article.slug}`;
   const related = getRelatedArticles(article, RELATED_COUNT);
 
@@ -132,9 +134,7 @@ export default async function ArticlePage({ params }: Props) {
           <time dateTime={article.publish_at}>
             {formatPublishDate(article.publish_at)}
           </time>
-          {(article.reading_time ?? 0) > 0 && (
-            <span>{article.reading_time} min di lettura</span>
-          )}
+          {minutes && <span>{minutes} min di lettura</span>}
           {article.author_profile && (
             <span>
               di{" "}

@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { getArticleCards } from "../lib/content";
 import { formatPublishDate } from "../lib/dates";
+import { readingMinutes } from "../lib/reading-time";
 import { ArticleCard } from "./_components/ArticleCard";
 
 export const metadata: Metadata = {
@@ -18,6 +19,7 @@ export default async function HomePage() {
   const data = getArticleCards(1, LATEST_COUNT);
   const hero = data.items[0] ?? null;
   const grid = data.items.slice(1);
+  const heroMinutes = hero && readingMinutes(hero);
 
   return (
     <main id="contenuto" className="page-container page-container--wide">
@@ -32,7 +34,7 @@ export default async function HomePage() {
             aria-label="Articolo in evidenza"
           >
             {hero.cover_image_url && (
-              <div className="hero__image">
+              <div className="hero__cover">
                 <Image
                   src={hero.cover_image_url}
                   alt={hero.cover_image_alt ?? `Copertina: ${hero.title}`}
@@ -62,7 +64,7 @@ export default async function HomePage() {
                   </Link>
                 </span>
               )}
-              {(hero.reading_time ?? 0) > 0 && <span>{hero.reading_time} min di lettura</span>}
+              {heroMinutes && <span>{heroMinutes} min di lettura</span>}
             </p>
             <Link href={`/articoli/${hero.slug}`} className="hero-cta">
               Leggi

@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import type { ArticleMeta } from "../../lib/content";
 import { formatPublishDate } from "../../lib/dates";
+import { readingMinutes } from "../../lib/reading-time";
 
 // "grid" is the compact home/related card with a clamped excerpt; "list" is
 // the full-width row used by /articoli and the taxonomy pages, which also
@@ -18,13 +19,12 @@ interface Props {
 // caller owns the surrounding <ul>/<li>.
 export function ArticleCard({ article, headingLevel, variant }: Props) {
   const Heading = headingLevel === 2 ? "h2" : "h3";
-  // Nullable in the content contract; 0 would be a meaningless "00 min".
-  const minutes = (article.reading_time ?? 0) > 0 ? article.reading_time : null;
+  const minutes = readingMinutes(article);
 
   return (
     <div className={`article-card article-card--${variant}`}>
       {article.cover_image_url ? (
-        <div className="article-card__thumb">
+        <div className="article-card__cover">
           <Image
             src={article.cover_image_url}
             alt={article.cover_image_alt ?? `Copertina: ${article.title}`}
@@ -58,19 +58,17 @@ export function ArticleCard({ article, headingLevel, variant }: Props) {
   );
 }
 
-// The scoreboard tile stands in for a missing Cover image. Its zero-padded
-// digits are decoration; assistive technology hears the sentence instead.
+// The scoreboard tile stands in for a missing Cover image, so it is an
+// image named in words; its zero-padded digits are decoration.
 function ReadingTimeTile({ minutes }: { minutes: number }) {
+  const label = `${minutes} ${minutes === 1 ? "minuto" : "minuti"} di lettura`;
   return (
-    <div className="article-card__tile">
+    <div className="article-card__tile" role="img" aria-label={label}>
       <span aria-hidden="true" className="article-card__tile-value">
         {String(minutes).padStart(2, "0")}
       </span>
       <span aria-hidden="true" className="article-card__tile-unit">
         min
-      </span>
-      <span className="visually-hidden">
-        {minutes} {minutes === 1 ? "minuto" : "minuti"} di lettura
       </span>
     </div>
   );

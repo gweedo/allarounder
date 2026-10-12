@@ -176,7 +176,7 @@ describe("HomePage", () => {
       page_size: 13,
     });
     const grid = screen.getByRole("region", { name: /articoli recenti/i });
-    const tile = within(grid).getByText("7 minuti di lettura").parentElement!;
+    const tile = within(grid).getByRole("img", { name: "7 minuti di lettura" });
     expect(within(tile).getByText("07")).toHaveAttribute("aria-hidden", "true");
     expect(within(grid).getByText("7 min di lettura")).toBeInTheDocument();
   });
@@ -189,7 +189,7 @@ describe("HomePage", () => {
       page_size: 13,
     });
     const grid = screen.getByRole("region", { name: /articoli recenti/i });
-    expect(within(grid).queryByText(/minut/)).toBeNull();
+    expect(within(grid).queryByRole("img")).toBeNull();
     expect(within(grid).queryByText(/^0+$/)).toBeNull();
   });
 
@@ -215,7 +215,7 @@ describe("HomePage", () => {
     expect(document.querySelector("[aria-hidden='true']:empty")).toBeNull();
   });
 
-  it("shows a grid article's cover image as a thumbnail, not marked priority", async () => {
+  it("shows a grid article's cover image in place of the tile, not marked priority", async () => {
     await renderHomePage({
       items: [
         BASE_ARTICLE,
@@ -226,10 +226,10 @@ describe("HomePage", () => {
       page_size: 13,
     });
     const grid = screen.getByRole("region", { name: /articoli recenti/i });
-    const thumb = within(grid).getByRole("img", { name: "Anelli" });
-    // Only the hero image is `priority`; next/image lazy-loads the rest.
-    expect(thumb).toHaveAttribute("loading", "lazy");
-    expect(within(grid).queryByText(/minuti di lettura/)).toBeNull();
+    const cover = within(grid).getByRole("img", { name: "Anelli" });
+    // Only the hero's cover image is `priority`; next/image lazy-loads the rest.
+    expect(cover).toHaveAttribute("loading", "lazy");
+    expect(within(grid).queryByRole("img", { name: /minut/ })).toBeNull();
   });
 
   it("shows the hero cover image large and loads it first", async () => {
