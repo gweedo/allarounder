@@ -51,8 +51,8 @@
    * Brand faces (ADR-0019), self-hosted via next/font/local in
    * app/layout.tsx, which sets the --font-barlow-condensed, --font-literata
    * and --font-plex-mono variables on <html>. Each variable already carries
-   * its metric-adjusted fallback; the var() fallbacks only apply if the
-   * layout's class is missing. Weights shipped: display 600/700, serif
+   * its fallback (metric-adjusted for display and serif); the var()
+   * fallbacks only apply if the layout's class is missing. Weights shipped: display 600/700, serif
    * 400/400 italic/700, mono 500; other weights use the nearest face.
    */
   --font-display: var(--font-barlow-condensed, "Arial Narrow", sans-serif);
