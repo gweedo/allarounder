@@ -48,6 +48,37 @@ Seen in screenshots of the live site (desktop 1280px and mobile 390px):
    home page; no menu, no link to the podcast. The root layout
    (`app/layout.tsx`) has only a footer.
 
+## Flags from the UX follow-up (2026-10-12)
+
+Bug 4 is partly addressed: #141/#146 added a structural `SiteHeader`
+(skip link, brand link, `nav[aria-label=Principale]` with Articoli, Argomenti,
+Chi siamo and "Ascolta il podcast"), deliberately unstyled beyond
+layout. Its look is yours. The UX session also found these. They are colour
+or visual decisions, so they're yours too:
+
+5. **Spotify CTA fails WCAG AA contrast.** `.spotify-callout a` uses Spotify
+   green `#1db954` as text on `#fdfbf9`, which axe measures at **2.5:1**
+   (AA needs 4.5:1 for body text). It shows on every article page. The CI axe
+   spec (`src/frontend/e2e/accessibility.spec.ts`) tolerates exactly those
+   nodes via `isKnownFailure()`. When you pick the colour, delete that
+   exception so the rule guards the fix.
+6. **Header bottom border stops at 1100px.** `.site-header` puts
+   `border-bottom` on the same box as `max-width: 1100px`, so on wide screens
+   the rule doesn't span the viewport. A full-width outer band with an inner
+   1100px container is the usual fix.
+7. **Header nav wraps on phones.** At 390px the nav drops under the brand and
+   then wraps again ("Ascolta il podcast" on a third line), making the header
+   131px tall. `.site-header` and `.site-header-nav` both `flex-wrap`.
+   Decide the mobile pattern (compact row, smaller type, or a menu), keeping
+   the skip link first in tab order.
+
+Bugs 1 and 2 above (hero title in default blue, grey `.cover-image`
+placeholders filling most of the first screen on home) still stand. Neither
+live article has a cover.
+
+Keep the axe spec green: CI's `Test (E2E)` job runs it on home, `/argomenti`,
+an article, a category and the 404 page at 1280px and 390px.
+
 ## Brand assets (Google Drive)
 
 Shared Drive folder `All Arounder/Loghi e assets grafici/Double Double/`
