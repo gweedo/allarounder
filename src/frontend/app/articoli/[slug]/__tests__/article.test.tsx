@@ -25,8 +25,18 @@ vi.mock("rehype-sanitize", () => ({ default: vi.fn() }));
 vi.mock("rehype-stringify", () => ({ default: vi.fn() }));
 
 vi.mock("next/link", () => ({
-  default: ({ children, href }: { children: React.ReactNode; href: string }) => (
-    <a href={href}>{children}</a>
+  default: ({
+    children,
+    href,
+    className,
+  }: {
+    children: React.ReactNode;
+    href: string;
+    className?: string;
+  }) => (
+    <a href={href} className={className}>
+      {children}
+    </a>
   ),
 }));
 
@@ -213,16 +223,37 @@ describe("ArticlePage", () => {
     expect(link).toHaveAttribute("href", "/autori/marco-rossi");
   });
 
-  it("renders category link when category is present", async () => {
+  it("shows the category as a badge linking to its category page", async () => {
     await renderArticlePage({
       ...BASE_ARTICLE,
       category: { id: "cat-1", name: "Interviste", slug: "interviste" },
     });
-    const link = screen.getByRole("link", { name: "Interviste" });
-    expect(link).toHaveAttribute("href", "/argomenti/interviste");
+    const badge = within(screen.getByRole("article")).getByRole("link", { name: "Interviste" });
+    expect(badge).toHaveAttribute("href", "/argomenti/interviste");
+    expect(badge).toHaveClass("category-badge");
   });
 
-  it("renders tag chips linking to /tag/{slug}", async () => {
+  it("orders the page header badge, title, excerpt, then the meta line", async () => {
+    await renderArticlePage({
+      ...BASE_ARTICLE,
+      excerpt: "Un estratto.",
+      category: { id: "cat-1", name: "Interviste", slug: "interviste" },
+    });
+    const article = within(screen.getByRole("article"));
+    const order = [
+      article.getByRole("link", { name: "Interviste" }),
+      article.getByRole("heading", { level: 1 }),
+      article.getByText("Un estratto."),
+      document.querySelector(".article-byline")!,
+    ];
+    for (let i = 1; i < order.length; i++) {
+      expect(
+        order[i - 1].compareDocumentPosition(order[i]) & Node.DOCUMENT_POSITION_FOLLOWING,
+      ).toBeTruthy();
+    }
+  });
+
+  it("renders tag chips linking to /tag/{slug}, with the '#' hidden from assistive technology", async () => {
     await renderArticlePage({
       ...BASE_ARTICLE,
       tags: [
@@ -230,15 +261,29 @@ describe("ArticlePage", () => {
         { id: "t2", name: "serie-a", slug: "serie-a" },
       ],
     });
-    const calcioLink = screen.getByRole("link", { name: /#calcio/i });
+    const calcioLink = screen.getByRole("link", { name: "calcio" });
     expect(calcioLink).toHaveAttribute("href", "/tag/calcio");
-    const serieaLink = screen.getByRole("link", { name: /#serie-a/i });
+    expect(within(calcioLink).getByText("#")).toHaveAttribute("aria-hidden", "true");
+    const serieaLink = screen.getByRole("link", { name: "serie-a" });
     expect(serieaLink).toHaveAttribute("href", "/tag/serie-a");
+    expect(within(serieaLink).getByText("#")).toHaveAttribute("aria-hidden", "true");
   });
 
   it("does not render tags section when tags list is empty", async () => {
     await renderArticlePage({ ...BASE_ARTICLE, tags: [] });
     expect(screen.queryByText(/#/i)).toBeNull();
+  });
+
+  it("keeps no inline styles except objectFit on the cover image", async () => {
+    await renderArticlePage({
+      ...BASE_ARTICLE,
+      cover_image_url: "https://cdn.allarounder.it/images/copertina.jpg",
+      category: { id: "cat-1", name: "Interviste", slug: "interviste" },
+      tags: [{ id: "t1", name: "calcio", slug: "calcio" }],
+    });
+    const styled = [...document.querySelectorAll("[style]")];
+    expect(styled.map((el) => el.tagName)).toEqual(["IMG"]);
+    expect((styled[0] as HTMLElement).style.objectFit).toBe("cover");
   });
 
   it("calls notFound when article lookup fails", async () => {

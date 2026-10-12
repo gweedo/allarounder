@@ -87,6 +87,11 @@ describe("design tokens", () => {
     },
   );
 
+  // Spotify green (#1db954) is about 2:1 on white; brand tokens replace it.
+  it("uses no Spotify-green text", () => {
+    expect(css).not.toMatch(/#1db954/i);
+  });
+
   it("aliases the accent colour to the brand ink", () => {
     expect(tokens.get("--color-accent")).toBe("var(--color-brand-ink)");
   });
