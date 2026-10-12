@@ -19,7 +19,7 @@ interface Props {
 export function ArticleCard({ article, headingLevel, variant }: Props) {
   const Heading = headingLevel === 2 ? "h2" : "h3";
   // Nullable in the content contract; 0 would be a meaningless "00 min".
-  const minutes = article.reading_time && article.reading_time > 0 ? article.reading_time : null;
+  const minutes = (article.reading_time ?? 0) > 0 ? article.reading_time : null;
 
   return (
     <div className={`article-card article-card--${variant}`}>

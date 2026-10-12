@@ -455,6 +455,8 @@ h3,
 
 .hero .category-badge {
   justify-self: start;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
 .hero-title {
@@ -595,7 +597,7 @@ h3,
    capitals are hard to scan. */
 .article-card__title {
   margin: 0;
-  font-size: 1.5rem;
+  font-size: var(--text-xl);
   line-height: 1.1;
   text-wrap: balance;
   overflow-wrap: break-word;
