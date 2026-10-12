@@ -1,8 +1,7 @@
 /*
- * Global stylesheet: design tokens + a small set of semantic component
- * classes shared by the admin UI and the public site. See
- * docs/DECISIONS.md — "Styling: single global stylesheet with design
- * tokens" — for the rationale (no Tailwind/CSS-modules/CSS-in-JS).
+ * Global stylesheet: design tokens + the semantic classes the public site
+ * uses. See docs/DECISIONS.md — "Styling: single global stylesheet with
+ * design tokens" — for the rationale (no Tailwind/CSS-modules/CSS-in-JS).
  */
 
 :root {
@@ -12,11 +11,26 @@
   --color-bg: #fdfbf9;
   --color-surface: #ffffff;
   --color-border: #e4dfda;
-  --color-accent: #a8462f;
-  --color-accent-hover: #8a3a27;
-  --color-danger: #b3261e;
-  --color-danger-hover: #922019;
-  --color-danger-bg: #fdecea;
+  --color-accent: var(--color-brand-ink);
+  --color-focus: #0f1114;
+
+  /*
+   * Brand swap — design B · Tabellone (docs/DECISIONS.md). Interim values
+   * until the Double Double brand colour arrives; replace these three hex
+   * values to rebrand. Keep them precomputed hex (no color-mix()): the
+   * contrast test (app/__tests__/design-tokens.test.ts) checks every
+   * text/background pair against WCAG AA.
+   *   --color-brand      header bar and other brand surfaces
+   *   --color-on-brand   text on --color-brand
+   *   --color-brand-ink  brand-coloured text on light backgrounds (links)
+   */
+  --color-brand: #0f1114;
+  --color-on-brand: #ffffff;
+  --color-brand-ink: #a8462f;
+
+  /* Score tile on article cards (reading time) */
+  --color-tile: #0f1114;
+  --color-tile-text: #ffffff;
 
   /* Spacing scale */
   --space-1: 0.25rem;
@@ -32,10 +46,14 @@
   /* Fonts */
   --font-sans:
     system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  --font-serif: Georgia, "Times New Roman", serif; /* article reading face, see .article-body */
+  --font-serif:
+    Georgia, "Times New Roman", serif; /* article reading face, see .article-body */
   --font-mono:
     ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono",
     monospace;
+  /* Fallback stacks until the self-hosted brand fonts land */
+  --font-display: var(--font-sans); /* condensed uppercase headlines */
+  --font-mono-ui: var(--font-mono); /* meta lines, aligned numerals */
 
   /* Type scale */
   --text-sm: 0.875rem;
@@ -63,136 +81,10 @@ body {
 }
 
 /*
- * `.admin-shell`/`.admin-bare` (see AdminShell.tsx) now only need the
- * min-height for their layout — font/color/background come from `body`,
- * which public pages share as of M5.
- */
-.admin-shell,
-.admin-bare {
-  min-height: 100vh;
-}
-
-/* Semantic component classes */
-
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-2);
-  padding: var(--space-2) var(--space-4);
-  font-size: var(--text-sm);
-  font-family: inherit;
-  border-radius: var(--radius);
-  border: 1px solid var(--color-border);
-  background: var(--color-surface);
-  color: var(--color-text);
-  cursor: pointer;
-}
-
-.btn:disabled {
-  cursor: not-allowed;
-  opacity: 0.6;
-}
-
-.btn-primary {
-  background: var(--color-accent);
-  border-color: var(--color-accent);
-  color: #fff;
-}
-
-.btn-primary:not(:disabled):hover {
-  background: var(--color-accent-hover);
-  border-color: var(--color-accent-hover);
-}
-
-.btn-danger {
-  background: var(--color-danger);
-  border-color: var(--color-danger);
-  color: #fff;
-}
-
-.btn-danger:not(:disabled):hover {
-  background: var(--color-danger-hover);
-  border-color: var(--color-danger-hover);
-}
-
-.label {
-  display: block;
-  font-size: var(--text-sm);
-  font-weight: 600;
-  margin-bottom: var(--space-1);
-}
-
-.input {
-  display: block;
-  width: 100%;
-  padding: var(--space-2) var(--space-3);
-  font-size: var(--text-base);
-  font-family: inherit;
-  color: var(--color-text);
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-}
-
-.input:focus {
-  outline: 2px solid var(--color-accent);
-  outline-offset: 1px;
-}
-
-.card {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-  padding: var(--space-4);
-}
-
-.table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: var(--text-sm);
-}
-
-.table th,
-.table td {
-  text-align: left;
-  padding: var(--space-3) var(--space-4);
-  border-bottom: 1px solid var(--color-border);
-}
-
-.table th {
-  font-weight: 600;
-  color: var(--color-text-muted);
-}
-
-.table tbody tr:hover {
-  background: var(--color-bg);
-}
-
-.badge {
-  display: inline-block;
-  padding: var(--space-1) var(--space-2);
-  font-size: var(--text-sm);
-  border-radius: var(--radius);
-  background: var(--color-border);
-  color: var(--color-text);
-}
-
-.alert-error {
-  padding: var(--space-3) var(--space-4);
-  border-radius: var(--radius);
-  background: var(--color-danger-bg);
-  color: var(--color-danger);
-  font-size: var(--text-sm);
-}
-
-/*
  * Article-body typography — the SEO-critical reading experience for
  * published articles and static pages. Applied to the sanitized HTML
  * rendered from Markdown (see lib/markdown.ts) wherever it lands:
- * app/articoli/[slug], app/preview/articles/[token], app/[slug], and the
- * editor's live preview pane (`.article-body.markdown-preview` in
- * MarkdownEditor.tsx) — writers preview what readers see.
+ * app/articoli/[slug] and app/[slug].
  */
 
 .article-body {
@@ -280,7 +172,7 @@ body {
 
 .article-body a:hover,
 .article-body a:focus-visible {
-  color: var(--color-accent-hover);
+  text-decoration-thickness: 2px;
 }
 
 .article-body img {
@@ -710,96 +602,14 @@ body {
   margin-top: var(--space-4);
 }
 
-/* Admin shell layout */
+/* Respect the reader's reduced-motion setting everywhere. */
 
-.admin-shell {
-  display: grid;
-  grid-template-columns: 220px 1fr;
-}
-
-.admin-shell-sidebar {
-  display: flex;
-  flex-direction: column;
-  padding: var(--space-4);
-  background: var(--color-surface);
-  border-right: 1px solid var(--color-border);
-}
-
-.admin-shell-brand {
-  font-size: var(--text-lg);
-  font-weight: 700;
-  margin-bottom: var(--space-5);
-}
-
-.admin-shell-nav {
-  flex: 1;
-}
-
-.admin-shell-nav ul {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-}
-
-.admin-shell-nav a {
-  display: block;
-  padding: var(--space-2) var(--space-3);
-  border-radius: var(--radius);
-  color: var(--color-text);
-  text-decoration: none;
-  font-size: var(--text-sm);
-}
-
-.admin-shell-nav a:hover {
-  background: var(--color-bg);
-}
-
-.admin-shell-nav a[aria-current="page"] {
-  background: var(--color-accent);
-  color: #fff;
-  font-weight: 600;
-}
-
-.admin-shell-logout {
-  margin-top: var(--space-4);
-  width: 100%;
-}
-
-.admin-shell-content {
-  overflow-y: auto;
-  padding: var(--space-4);
-}
-
-@media (max-width: 768px) {
-  .admin-shell {
-    grid-template-columns: 1fr;
-  }
-
-  .admin-shell-sidebar {
-    flex-direction: row;
-    align-items: center;
-    border-right: none;
-    border-bottom: 1px solid var(--color-border);
-    overflow-x: auto;
-  }
-
-  .admin-shell-brand {
-    margin-bottom: 0;
-    margin-right: var(--space-4);
-    white-space: nowrap;
-  }
-
-  .admin-shell-nav ul {
-    flex-direction: row;
-  }
-
-  .admin-shell-logout {
-    width: auto;
-    margin-top: 0;
-    margin-left: var(--space-2);
-    white-space: nowrap;
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+    animation: none !important;
+    scroll-behavior: auto !important;
   }
 }
