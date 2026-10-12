@@ -75,7 +75,12 @@ test.describe("Header bar at the 800px desktop breakpoint", () => {
     for (let i = 1; i < boxes.length; i++) {
       expect(boxes[i].x).toBeGreaterThanOrEqual(boxes[i - 1].x + boxes[i - 1].width);
     }
-    await expect(links.at(-1)!).toHaveText("Ascolta il podcast");
+    // The CTA ends the row and shows its long label: on phones " il podcast"
+    // is still in the text, but visually hidden in a 1px box.
+    const cta = links.at(-1)!;
+    await expect(cta).toHaveAccessibleName("Ascolta il podcast");
+    const longLabel = await cta.getByText("il podcast").boundingBox();
+    expect(longLabel!.width).toBeGreaterThan(1);
 
     const overflow = await page.evaluate(
       () =>
