@@ -74,6 +74,7 @@ TDD (red → green → refactor) still applies, scoped to what's left:
 - Lint: `cd src/frontend && npm run lint`
 - Dev server: `cd src/frontend && npm run dev`
 - E2E: `cd src/frontend && npm run test:e2e` (starts its own dev server; no Docker, no backend needed)
+- E2E against the static export, as CI runs it: `cd src/frontend && npm run build && E2E_STATIC=1 npm run test:e2e` (includes the axe accessibility spec)
 
 **Pipeline domain** (`src/pipeline/`, Python venv at `src/pipeline/.venv`):
 - Tests: `cd src/pipeline && .venv/bin/python -m pytest -q`
