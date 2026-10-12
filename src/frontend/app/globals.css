@@ -836,8 +836,8 @@ h3,
   text-decoration: underline;
 }
 
-/* Text stays brand ink on the page background: the pair the contrast test
-   checks. No Spotify green (about 2:1 on white). */
+/* Brand ink on --color-surface: a pair the contrast test checks. No Spotify
+   green (about 2:1 on white). */
 .spotify-callout {
   margin-top: var(--space-6);
   padding: var(--space-4);
