@@ -1,9 +1,9 @@
 import { test, expect } from "@playwright/test";
 
 // Header bar, design B · Tabellone (#155): two rows on a phone with no
-// horizontal scroll, one row in order from the 800px breakpoint up, a
-// full-width brand bar on desktop, and a visible focus ring on every header
-// link.
+// horizontal scroll, one row in order at the 800px desktop breakpoint, a
+// full-width brand bar at 1280px and wider, and a visible focus ring on every
+// header link.
 
 test.describe("Header bar on a 390px phone", () => {
   test.use({ viewport: { width: 390, height: 844 } });

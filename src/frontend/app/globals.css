@@ -370,13 +370,14 @@ h3,
   text-underline-offset: 4px;
 }
 
-/* Placement only: the CTA takes the cta area, the section links row 2. */
+/* Section links go on row 2; the CTA is placed by its own rule below. */
 .site-header-nav a:not(.site-header-cta) {
   grid-row: 2;
 }
 
-/* The CTA is a nav link too: it inherits the mono label type and the link
-   box and hover from .site-header-nav a; here it becomes the pill. */
+/* The CTA is a nav link too: it inherits the mono label type from
+   .site-header-nav and the link box and hover from .site-header-nav a;
+   here it takes the cta area and becomes the pill. */
 .site-header-nav .site-header-cta {
   grid-area: cta;
   justify-self: end;
