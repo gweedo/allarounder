@@ -67,7 +67,7 @@ describe("GuestPage", () => {
     expect(screen.getByText(/nessun articolo/i)).toBeInTheDocument();
   });
 
-  it("renders article list with links", async () => {
+  it("renders each article as a card with links and a score tile", async () => {
     await renderGuestPage({
       detail: BASE_DETAIL,
       articles: [
@@ -86,6 +86,8 @@ describe("GuestPage", () => {
     const link = screen.getByRole("link", { name: "Articolo con ospite" });
     expect(link).toHaveAttribute("href", "/articoli/articolo-con-ospite");
     expect(screen.getByText("Un estratto")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 2, name: "Articolo con ospite" })).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: "5 minuti di lettura" })).toBeInTheDocument();
   });
 
   it("renders social links", async () => {

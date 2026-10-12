@@ -67,7 +67,7 @@ describe("AuthorPage", () => {
     expect(screen.getByText(/nessun articolo/i)).toBeInTheDocument();
   });
 
-  it("renders article list with links", async () => {
+  it("renders each article as a card with links and a score tile", async () => {
     await renderAuthorPage({
       detail: BASE_DETAIL,
       articles: [
@@ -86,6 +86,8 @@ describe("AuthorPage", () => {
     const link = screen.getByRole("link", { name: "Articolo di test" });
     expect(link).toHaveAttribute("href", "/articoli/articolo-di-test");
     expect(screen.getByText("Un estratto")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 2, name: "Articolo di test" })).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: "3 minuti di lettura" })).toBeInTheDocument();
   });
 
   it("renders social links", async () => {

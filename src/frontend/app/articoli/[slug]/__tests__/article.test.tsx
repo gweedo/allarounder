@@ -137,6 +137,16 @@ describe("ArticlePage", () => {
     );
   });
 
+  it("shows related articles as h3 cards with their reading time", async () => {
+    getRelatedArticles.mockReturnValue([
+      { ...BASE_ARTICLE, id: "r1", slug: "altro-articolo", title: "Altro articolo", reading_time: 7 },
+    ]);
+    await renderArticlePage(BASE_ARTICLE);
+    const section = screen.getByRole("region", { name: "Leggi anche" });
+    expect(within(section).getByRole("heading", { level: 3 })).toHaveTextContent("Altro articolo");
+    expect(within(section).getByRole("img", { name: "7 minuti di lettura" })).toBeInTheDocument();
+  });
+
   it("omits 'Leggi anche' when there is nothing else to read", async () => {
     await renderArticlePage(BASE_ARTICLE);
     expect(screen.queryByRole("region", { name: "Leggi anche" })).toBeNull();
