@@ -22,6 +22,7 @@ This directory records the significant architectural decisions for the Allaround
 | [0016](0016-front-door-optional-per-environment.md) | Front Door optional per-environment; disabled on staging — amends 0015 item 4 | 📦 Superseded by 0018 | 2026-07-01 |
 | [0017](0017-google-sso-and-session-persistence.md) | Google SSO and session persistence for admin login — amends 0013 §1 | 📦 Superseded by 0018 | 2026-07-07 |
 | [0018](0018-drive-cms-static-site.md) | Google Drive as CMS, static site on Cloudflare Pages — supersedes 0001, 0002, 0003, 0004, 0005, 0010, 0013, 0015, 0016, 0017 | Accepted | 2026-08-26 |
+| [0019](0019-self-hosted-web-fonts.md) | Self-hosted web fonts via `next/font/local` | Accepted | 2026-10-12 |
 
 ## Conventions
 

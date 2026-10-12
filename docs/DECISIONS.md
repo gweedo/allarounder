@@ -78,7 +78,7 @@ Last updated: 2026-06-14
 ### Podcast / brand name: Allarounder
 - **Date**: 2026-06-14
 - **Decision**: The podcast and site brand name is **Allarounder**.
-- **Pending**: Logo and full visual identity (colors, typography) not yet designed. Exact domains assumed to be `allarounder.it` (canonical) and `allarounder.eu` (redirect) — to confirm.
+- **Pending**: Logo and brand colour not yet supplied; typography decided 2026-10-12 (see "Visual design: direction B · Tabellone" and ADR-0019). Exact domains assumed to be `allarounder.it` (canonical) and `allarounder.eu` (redirect) — to confirm.
 - **Status**: ✅ Final (name); 🔄 visual identity pending
 - **Decided by**: Team
 
@@ -356,7 +356,7 @@ Last updated: 2026-06-14
 - **Date**: 2026-10-12
 - **Decision**: Restyle the public site to design direction **B · Tabellone** (scoreboard-inspired), chosen from three mockups: a full-width brand-colour header bar, condensed uppercase display headlines (Barlow Condensed), a book serif for reading (Literata), monospace meta lines (IBM Plex Mono), and Article cards that show a dark reading-time "score tile" instead of an empty image block when there is no Cover image. It is a polish pass delivered in six PRs (PRD #151, slices #152–#157); routes, content and header links stay the same. The header ships with an **interim near-black brand colour** (`#0f1114`, white text) until the Double Double brand colour and logo are supplied; the swap is a three-token change guarded by the contrast test.
 - **Rationale**: The site looked unfinished (default-blue hero link, empty grey cover boxes, a Spotify callout failing AA contrast) and carried no brand identity. Tabellone fixes those bugs while reading as part of the podcast's brand, and shipping with an interim colour lets the fixes go live without waiting for brand assets.
-- **Trade-off noted**: Until the brand colour arrives, the header is neutral near-black rather than on-brand; three web fonts add page weight (self-hosted, Latin subset only — see the fonts ADR to come with #153).
+- **Trade-off noted**: Until the brand colour arrives, the header is neutral near-black rather than on-brand; three web fonts add page weight (self-hosted, Latin subset only — see ADR-0019).
 - **Status**: ✅ Final
 - **Decided by**: Guido
 
@@ -383,7 +383,7 @@ Last updated: 2026-06-14
 
 ### ❓ Brand visual identity (in progress — other team)
 - **Context**: Name is set (**Allarounder**). Logo, colors, and typography are being produced by the rest of the team and will be handed over.
-- **Status**: Partly resolved 2026-10-12 — design direction and typography decided (see "Visual design: direction B · Tabellone"); brand colour and logo still pending from the team.
+- **Status**: Partly resolved 2026-10-12 — design direction and typography decided (see "Visual design: direction B · Tabellone"; the fonts are self-hosted per ADR-0019); brand colour and logo still pending from the team.
 - **Owner**: Rest of the team (writers)
 - **Target date**: Before frontend design work starts
 
