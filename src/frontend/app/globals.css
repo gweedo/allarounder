@@ -20,12 +20,12 @@
    * Keep them precomputed hex or aliases (no color-mix()): the contrast
    * test (app/__tests__/design-tokens.test.ts) checks every
    * text/background pair against WCAG AA.
-   *   --color-brand       header bar and other brand surfaces (azzurro)
+   *   --color-brand       header bar and other brand surfaces (light blue)
    *   --color-brand-deep  the logo's navy: score tile, focus ring
-   *   --color-on-brand    text on --color-brand; the azzurro is light, so
-   *                       white fails AA (3:1) and the navy is used
+   *   --color-on-brand    text on --color-brand; the light blue fails AA
+   *                       with white (3:1), so it takes the navy
    *   --color-brand-ink   brand-coloured text on light backgrounds (links):
-   *                       the azzurro darkened to pass AA, not an artwork colour
+   *                       the light blue darkened to pass AA, not an artwork colour
    */
   --color-brand: #479dd3;
   --color-brand-deep: #152144;

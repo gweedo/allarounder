@@ -20,8 +20,9 @@ describe("SiteHeader", () => {
   });
 
   it("shows the Double Double logo in the wordmark link as a decorative image with fixed dimensions", () => {
-    const { container } = render(<SiteHeader spotifyShowUrl={null} />);
-    const logo = container.querySelector(".site-header-brand img");
+    render(<SiteHeader spotifyShowUrl={null} />);
+    const home = within(screen.getByRole("banner")).getByRole("link", { name: "Allarounder" });
+    const logo = home.querySelector("img");
     expect(logo).not.toBeNull();
     expect(logo).toHaveAttribute("alt", "");
     expect(logo?.getAttribute("src")).toContain("dd-logo-header.png");

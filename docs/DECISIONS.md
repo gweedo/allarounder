@@ -1,6 +1,6 @@
 # Decision Log — Podcast Blog Website
 
-Last updated: 2026-06-14
+Last updated: 2026-10-13
 
 ---
 
@@ -78,9 +78,9 @@ Last updated: 2026-06-14
 ### Podcast / brand name: Allarounder
 - **Date**: 2026-06-14
 - **Decision**: The podcast and site brand name is **Allarounder**.
-- **Visual identity**: Typography decided 2026-10-12 (see "Visual design: direction B · Tabellone" and ADR-0019); the site adopts the Double Double logo and colours on 2026-10-13 (same entry, amendment).
-- **Pending**: Exact domains assumed to be `allarounder.it` (canonical) and `allarounder.eu` (redirect) — to confirm.
-- **Status**: ✅ Final (name and visual identity)
+- **Pending**: Logo and brand colour not yet supplied; typography decided 2026-10-12 (see "Visual design: direction B · Tabellone" and ADR-0019). Exact domains assumed to be `allarounder.it` (canonical) and `allarounder.eu` (redirect) — to confirm.
+- **Amendment (2026-10-13, #157)**: Logo and brand colour are now applied: the site uses the Double Double logo and colours (see the 2026-10-13 amendment to "Visual design: direction B · Tabellone"). Only the domain confirmation is still pending.
+- **Status**: ✅ Final (name); 🔄 Amended 2026-10-13 — visual identity resolved
 - **Decided by**: Team
 
 ### Product definition (PRD) — topic, audience, goals
@@ -292,7 +292,8 @@ Last updated: 2026-06-14
 - **Rationale**: Solo-dev pragmatism — zero build config or extra dependencies beyond what Next.js already ships with. A plain stylesheet with tokens is enough for a small admin UI and public site; the SEO-critical `.article-body` typography (arriving in M5) needs a real stylesheet regardless, so introducing one now rather than layering a utility framework or CSS-in-JS on top avoids churn later. Public pages keep their pre-existing inline styles for now (inline styles win over class styles) and will be migrated to the same token system in M5.
 - **Amendment (2026-10-12)**: The admin UI is gone (ADR-0018), so its classes are deleted from `globals.css`: `.btn*`, `.input`, `.label`, `.table`, the bare `.card` and `.badge`, `.alert-error`, `.admin-shell*`/`.admin-bare`, plus the unused `.pagination-*` classes and the danger and `--color-accent-hover` tokens. The stylesheet now holds only what the public site uses. Brand tokens are added for design B · Tabellone (see below): `--color-brand`, `--color-on-brand` and `--color-brand-ink` as precomputed hex values in one "brand swap" block, plus `--color-focus`, `--color-tile`, `--color-tile-text`, `--font-display` and `--font-mono-ui`; `--color-accent` is now an alias of `--color-brand-ink`. `app/__tests__/design-tokens.test.ts` asserts WCAG AA (4.5:1) for each listed text/background token pair (on-brand on brand, text, muted text and brand ink on both light backgrounds, tile text on tile) and 3:1 for the focus colour; add a pair there when a new text token is introduced. A global `prefers-reduced-motion: reduce` rule disables transitions and animations. `.article-body` link hover now thickens the underline instead of darkening the colour, since its hover token was removed. Public pages no longer keep inline styles by policy: each restyle PR moves the inline styles of the pages it touches into stylesheet classes (`objectFit` on fill images excepted).
 - **Amendment (2026-10-12, #153)**: The font tokens now point at the self-hosted brand faces (ADR-0019): `--font-display` (Barlow Condensed), `--font-serif` (Literata, now the `body` face, not only `.article-body`) and `--font-mono-ui` (IBM Plex Mono). The unused `--font-sans` token is removed.
-- **Status**: 🔄 Amended 2026-10-12 — see "Visual design: direction B · Tabellone"
+- **Amendment (2026-10-13, #157)**: The "brand swap" block is now the "Brand" block. It holds `--color-brand`, `--color-on-brand` and `--color-brand-ink` plus a new `--color-brand-deep` (the logo navy). `--color-on-brand`, `--color-tile` and `--color-focus` are `var()` aliases of it, which the contrast test resolves; hex or alias, still no `color-mix()`. A `--tap-target` token (44px) replaces the header's two literal minimum heights, the header's desktop breakpoint is `50rem` like the other layout breakpoint, and the site-wide `:focus-visible` rule sits with the base rules.
+- **Status**: 🔄 Amended 2026-10-13 — see "Visual design: direction B · Tabellone"
 - **Decided by**: Guido + Claude (Milestone 2 of the admin-UX plan)
 
 ### Google Docs import: paste-first (Phase A)
@@ -360,7 +361,7 @@ Last updated: 2026-06-14
 - **Rationale**: The site looked unfinished (default-blue hero link, empty grey cover boxes, a Spotify callout failing AA contrast) and carried no brand identity. Tabellone fixes those bugs while reading as part of the podcast's brand, and shipping with an interim colour lets the fixes go live without waiting for brand assets.
 - **Trade-off noted**: Until the brand colour arrives, the header is neutral near-black rather than on-brand; three web fonts add page weight (self-hosted, Latin subset only — see ADR-0019).
 - **Amendment (2026-10-13, #157)**: The interim near-black is replaced by the **Double Double** identity. The colours are read from the logo artwork in the shared Drive folder `All Arounder/Loghi e assets grafici/Double Double/`: azzurro `#479dd3`, navy `#152144` and the rings' tan `#b2a086`. The azzurro is light (white text on it is 3:1, failing AA), so the header bar is azzurro with **navy** text (5.3:1), as on the artwork. `--color-brand` is `#479dd3`, a new `--color-brand-deep` is the navy, `--color-on-brand` aliases it, and so do the score tile and the focus ring (previously hardcoded near-black). `--color-brand-ink` (links on light backgrounds) is `#256f9c`, the azzurro darkened in HSL to pass AA (about 5.3:1 on `--color-bg`); it is derived, not an artwork colour. The tan is not used yet. The header shows the stacked DD logo (navy letters and tan rings on a transparent background, trimmed to 125×80 at `public/brand/dd-logo-header.png`) before the wordmark, as a decorative `alt=""` image inside the home link, so the link's accessible name stays "Allarounder". The source PNGs (horizontal, full white, full transparent) are committed under `public/brand/`.
-- **Status**: ✅ Final (amended 2026-10-13)
+- **Status**: 🔄 Amended 2026-10-13 — Double Double brand applied
 - **Decided by**: Guido
 
 ---
