@@ -19,6 +19,17 @@ describe("SiteHeader", () => {
     expect(within(banner).getByRole("link", { name: "Allarounder" })).toHaveAttribute("href", "/");
   });
 
+  it("shows the Double Double logo in the wordmark link as a decorative image with fixed dimensions", () => {
+    render(<SiteHeader spotifyShowUrl={null} />);
+    const home = within(screen.getByRole("banner")).getByRole("link", { name: "Allarounder" });
+    const logo = home.querySelector("img");
+    expect(logo).not.toBeNull();
+    expect(logo).toHaveAttribute("alt", "");
+    expect(logo?.getAttribute("src")).toContain("dd-logo-header.png");
+    expect(logo).toHaveAttribute("width");
+    expect(logo).toHaveAttribute("height");
+  });
+
   it("renders the three main navigation links in the nav when there is no show URL", () => {
     render(<SiteHeader spotifyShowUrl={null} />);
     const nav = screen.getByRole("navigation", { name: "Principale" });

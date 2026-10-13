@@ -3,10 +3,10 @@ import { describe, it, expect } from "vitest";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
-// Guards the brand-colour swap: every text/background token pair in
-// globals.css must meet WCAG AA for normal text (4.5:1). Swapping in the real
-// Double Double colour is a three-line change to the "brand swap" block, and
-// this test is what refuses a colour that would make text unreadable.
+// Guards the brand colours: every text/background token pair in globals.css
+// must meet WCAG AA for normal text (4.5:1). Changing the brand is an edit
+// to the "Brand" token block, and this test is what refuses a colour that
+// would make text unreadable.
 
 const css = readFileSync(
   fileURLToPath(new URL("../globals.css", import.meta.url)),
