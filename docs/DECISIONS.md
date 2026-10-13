@@ -78,8 +78,9 @@ Last updated: 2026-06-14
 ### Podcast / brand name: Allarounder
 - **Date**: 2026-06-14
 - **Decision**: The podcast and site brand name is **Allarounder**.
-- **Pending**: Logo and brand colour not yet supplied; typography decided 2026-10-12 (see "Visual design: direction B · Tabellone" and ADR-0019). Exact domains assumed to be `allarounder.it` (canonical) and `allarounder.eu` (redirect) — to confirm.
-- **Status**: ✅ Final (name); 🔄 visual identity pending
+- **Visual identity**: Typography decided 2026-10-12 (see "Visual design: direction B · Tabellone" and ADR-0019); the site adopts the Double Double logo and colours on 2026-10-13 (same entry, amendment).
+- **Pending**: Exact domains assumed to be `allarounder.it` (canonical) and `allarounder.eu` (redirect) — to confirm.
+- **Status**: ✅ Final (name and visual identity)
 - **Decided by**: Team
 
 ### Product definition (PRD) — topic, audience, goals
@@ -358,7 +359,8 @@ Last updated: 2026-06-14
 - **Decision**: Restyle the public site to design direction **B · Tabellone** (scoreboard-inspired), chosen from three mockups: a full-width brand-colour header bar, condensed uppercase display headlines (Barlow Condensed), a book serif for reading (Literata), monospace meta lines (IBM Plex Mono), and Article cards that show a dark reading-time "score tile" instead of an empty image block when there is no Cover image. It is a polish pass delivered in six PRs (PRD #151, slices #152–#157); routes, content and header links stay the same. The header ships with an **interim near-black brand colour** (`#0f1114`, white text) until the Double Double brand colour and logo are supplied; the swap is a three-token change guarded by the contrast test.
 - **Rationale**: The site looked unfinished (default-blue hero link, empty grey cover boxes, a Spotify callout failing AA contrast) and carried no brand identity. Tabellone fixes those bugs while reading as part of the podcast's brand, and shipping with an interim colour lets the fixes go live without waiting for brand assets.
 - **Trade-off noted**: Until the brand colour arrives, the header is neutral near-black rather than on-brand; three web fonts add page weight (self-hosted, Latin subset only — see ADR-0019).
-- **Status**: ✅ Final
+- **Amendment (2026-10-13, #157)**: The interim near-black is replaced by the **Double Double** identity. The colours are read from the logo artwork in the shared Drive folder `All Arounder/Loghi e assets grafici/Double Double/`: azzurro `#479dd3`, navy `#152144` and the rings' tan `#b2a086`. The azzurro is light (white text on it is 3:1, failing AA), so the header bar is azzurro with **navy** text (5.3:1), as on the artwork. `--color-brand` is `#479dd3`, a new `--color-brand-deep` is the navy, `--color-on-brand` aliases it, and so do the score tile and the focus ring (previously hardcoded near-black). `--color-brand-ink` (links on light backgrounds) is `#256f9c`, the azzurro darkened in HSL to pass AA (about 5.3:1 on `--color-bg`); it is derived, not an artwork colour. The tan is not used yet. The header shows the stacked DD logo (navy letters and tan rings on a transparent background, trimmed to 125×80 at `public/brand/dd-logo-header.png`) before the wordmark, as a decorative `alt=""` image inside the home link, so the link's accessible name stays "Allarounder". The source PNGs (horizontal, full white, full transparent) are committed under `public/brand/`.
+- **Status**: ✅ Final (amended 2026-10-13)
 - **Decided by**: Guido
 
 ---
@@ -382,9 +384,9 @@ Last updated: 2026-06-14
 
 ## ❓ Open Questions
 
-### ❓ Brand visual identity (in progress — other team)
+### ✅ Brand visual identity (resolved 2026-10-13)
 - **Context**: Name is set (**Allarounder**). Logo, colors, and typography are being produced by the rest of the team and will be handed over.
-- **Status**: Partly resolved 2026-10-12 — design direction and typography decided (see "Visual design: direction B · Tabellone"; the fonts are self-hosted per ADR-0019); brand colour and logo still pending from the team.
+- **Status**: Resolved 2026-10-13 — design direction and typography decided 2026-10-12 (see "Visual design: direction B · Tabellone"; the fonts are self-hosted per ADR-0019); the Double Double logo and colours are applied by #157 (see that entry's 2026-10-13 amendment).
 - **Owner**: Rest of the team (writers)
 - **Target date**: Before frontend design work starts
 

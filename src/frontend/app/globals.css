@@ -12,24 +12,28 @@
   --color-surface: #ffffff;
   --color-border: #e4dfda;
   --color-accent: var(--color-brand-ink);
-  --color-focus: #0f1114;
+  --color-focus: var(--color-brand-deep);
 
   /*
-   * Brand swap — design B · Tabellone (docs/DECISIONS.md). Interim values
-   * until the Double Double brand colour arrives; replace these three hex
-   * values to rebrand. Keep them precomputed hex (no color-mix()): the
-   * contrast test (app/__tests__/design-tokens.test.ts) checks every
+   * Brand — design B · Tabellone in the Double Double colours
+   * (docs/DECISIONS.md), read from the logo artwork in public/brand/.
+   * Keep them precomputed hex or aliases (no color-mix()): the contrast
+   * test (app/__tests__/design-tokens.test.ts) checks every
    * text/background pair against WCAG AA.
-   *   --color-brand      header bar and other brand surfaces
-   *   --color-on-brand   text on --color-brand
-   *   --color-brand-ink  brand-coloured text on light backgrounds (links)
+   *   --color-brand       header bar and other brand surfaces (azzurro)
+   *   --color-brand-deep  the logo's navy: score tile, focus ring
+   *   --color-on-brand    text on --color-brand; the azzurro is light, so
+   *                       white fails AA (3:1) and the navy is used
+   *   --color-brand-ink   brand-coloured text on light backgrounds (links):
+   *                       the azzurro darkened to pass AA, not an artwork colour
    */
-  --color-brand: #0f1114;
-  --color-on-brand: #ffffff;
-  --color-brand-ink: #a8462f;
+  --color-brand: #479dd3;
+  --color-brand-deep: #152144;
+  --color-on-brand: var(--color-brand-deep);
+  --color-brand-ink: #256f9c;
 
   /* Score tile on article cards (reading time) */
-  --color-tile: #0f1114;
+  --color-tile: var(--color-brand-deep);
   --color-tile-text: #ffffff;
 
   /* Spacing scale */
@@ -46,6 +50,9 @@
   --radius: 6px;
   --radius-sm: 4px; /* small media: card covers, score tiles */
   --radius-pill: 999px;
+
+  /* Minimum touch target for header links (WCAG 2.5.5 / Apple HIG 44px) */
+  --tap-target: 44px;
 
   /* Fonts */
   --font-mono:
@@ -87,6 +94,16 @@ body {
   font-size: var(--text-base);
   color: var(--color-text);
   background: var(--color-bg);
+}
+
+/*
+ * Focus ring, site-wide. Inside the brand header bar (and on the skip link,
+ * which sits over it) the ring takes the on-brand colour instead, so it
+ * contrasts with --color-brand whatever --color-focus is.
+ */
+:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
 }
 
 /*
@@ -274,17 +291,6 @@ h3,
   border: 0;
 }
 
-/*
- * Focus ring, site-wide. Inside the brand header bar (and on the skip link,
- * which sits over it) the ring switches to the on-brand colour, since
- * --color-focus would vanish against --color-brand.
- */
-
-:focus-visible {
-  outline: 2px solid var(--color-focus);
-  outline-offset: 2px;
-}
-
 /* Site header bar — design B · Tabellone */
 
 .skip-link {
@@ -338,14 +344,20 @@ h3,
   justify-self: start;
   display: inline-flex;
   align-items: center;
-  gap: var(--space-3); /* logo slot (#157) to wordmark */
-  min-height: 44px;
+  gap: var(--space-3); /* logo to wordmark */
+  min-height: var(--tap-target);
   font-size: var(--text-xl);
   line-height: 1;
   text-transform: uppercase;
   letter-spacing: 0.02em;
   color: inherit;
   text-decoration: none;
+}
+
+/* Sized by its width/height attributes, so the bar does not shift on load. */
+.site-header-logo {
+  display: block;
+  flex: none;
 }
 
 .site-header-nav {
@@ -359,7 +371,7 @@ h3,
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 44px;
+  min-height: var(--tap-target);
   padding: 0 var(--space-2);
   color: inherit;
   text-decoration: none;
@@ -394,7 +406,7 @@ h3,
 }
 
 /* Desktop: one row, wordmark left, nav centred, CTA right. */
-@media (min-width: 800px) {
+@media (min-width: 50rem) {
   .site-header-inner {
     grid-template-columns: 1fr repeat(3, auto) 1fr;
     grid-template-areas: "brand . . . cta";
