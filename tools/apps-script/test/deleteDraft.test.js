@@ -1,4 +1,4 @@
-const { draftDeletionBlocker, extractDocId } = require("../src/DeleteDraft");
+const { draftDeletionBlocker, extractDocId, linkFromCellData } = require("../src/DeleteDraft");
 
 describe("draftDeletionBlocker", () => {
   it("allows a Bozza row that never ran through the pipeline", () => {
@@ -46,5 +46,37 @@ describe("extractDocId", () => {
   it("returns null for an empty cell or a URL without an ID", () => {
     expect(extractDocId("")).toBeNull();
     expect(extractDocId("https://docs.google.com/document/u/0/")).toBeNull();
+  });
+});
+
+describe("linkFromCellData", () => {
+  it("returns a file chip's URL, not the title the cell displays", () => {
+    const cell = {
+      formattedValue: "Articolo Test",
+      chipRuns: [{ chip: { richLinkProperties: { uri: "https://docs.google.com/document/d/abc123/edit" } } }],
+    };
+    expect(linkFromCellData(cell)).toBe("https://docs.google.com/document/d/abc123/edit");
+  });
+
+  it("finds a chip that follows a plain-text run", () => {
+    const cell = {
+      formattedValue: "vedi Articolo Test",
+      chipRuns: [{}, { startIndex: 5, chip: { richLinkProperties: { uri: "https://docs.google.com/document/d/x/edit" } } }],
+    };
+    expect(linkFromCellData(cell)).toBe("https://docs.google.com/document/d/x/edit");
+  });
+
+  it("falls back to the hyperlink, then to the displayed value", () => {
+    expect(linkFromCellData({ formattedValue: "Doc", hyperlink: "https://docs.google.com/document/d/h/edit" })).toBe(
+      "https://docs.google.com/document/d/h/edit"
+    );
+    expect(linkFromCellData({ formattedValue: "https://docs.google.com/document/d/p/edit" })).toBe(
+      "https://docs.google.com/document/d/p/edit"
+    );
+  });
+
+  it("returns an empty string for an empty cell", () => {
+    expect(linkFromCellData({})).toBe("");
+    expect(linkFromCellData(undefined)).toBe("");
   });
 });
