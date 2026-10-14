@@ -80,3 +80,12 @@ describe("linkFromCellData", () => {
     expect(linkFromCellData(undefined)).toBe("");
   });
 });
+
+it("resolves the live Sheet's titled doc cell to its Doc ID", () => {
+  // Verbatim from the live Sheet (2026-10-14): no chipRuns, URL only in `hyperlink`.
+  const cell = {
+    formattedValue: "Articolo Test",
+    hyperlink: "https://docs.google.com/open?id=1Q1dCB5KEWEUzla1c5T440sdi06LI-99cUjbFojwYqec",
+  };
+  expect(extractDocId(linkFromCellData(cell))).toBe("1Q1dCB5KEWEUzla1c5T440sdi06LI-99cUjbFojwYqec");
+});

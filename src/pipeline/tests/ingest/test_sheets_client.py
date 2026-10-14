@@ -1,5 +1,6 @@
 from unittest.mock import MagicMock
 
+from ingest.drive_client import extract_doc_id
 from ingest.sheets_client import (
     COLUMNS,
     GoogleSheetsClient,
@@ -160,3 +161,16 @@ class TestGoogleSheetsClientReadRows:
         service = MagicMock()
         service.spreadsheets().get().execute.return_value = {"sheets": [{"data": [{}]}]}
         assert GoogleSheetsClient(service, "sheet-id").read_rows() == []
+
+
+def test_live_doc_cell_shape_resolves_to_a_doc_id() -> None:
+    # Verbatim from the live Sheet (2026-10-14): the cell Sheets displays as
+    # a chip came back with no chipRuns, its URL only in `hyperlink`.
+    cell = {
+        "formattedValue": "Articolo Test",
+        "hyperlink": "https://docs.google.com/open?id=1Q1dCB5KEWEUzla1c5T440sdi06LI-99cUjbFojwYqec",
+    }
+    assert (
+        extract_doc_id(cell_text("doc", cell))
+        == "1Q1dCB5KEWEUzla1c5T440sdi06LI-99cUjbFojwYqec"
+    )
