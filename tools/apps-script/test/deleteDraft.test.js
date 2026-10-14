@@ -1,4 +1,4 @@
-const { draftDeletionBlocker, extractDocId } = require("../src/DeleteDraft");
+const { draftDeletionBlocker, extractDocId, linkFromCellData } = require("../src/DeleteDraft");
 
 describe("draftDeletionBlocker", () => {
   it("allows a Bozza row that never ran through the pipeline", () => {
@@ -47,4 +47,45 @@ describe("extractDocId", () => {
     expect(extractDocId("")).toBeNull();
     expect(extractDocId("https://docs.google.com/document/u/0/")).toBeNull();
   });
+});
+
+describe("linkFromCellData", () => {
+  it("returns a file chip's URL, not the title the cell displays", () => {
+    const cell = {
+      formattedValue: "Articolo Test",
+      chipRuns: [{ chip: { richLinkProperties: { uri: "https://docs.google.com/document/d/abc123/edit" } } }],
+    };
+    expect(linkFromCellData(cell)).toBe("https://docs.google.com/document/d/abc123/edit");
+  });
+
+  it("finds a chip that follows a plain-text run", () => {
+    const cell = {
+      formattedValue: "vedi Articolo Test",
+      chipRuns: [{}, { startIndex: 5, chip: { richLinkProperties: { uri: "https://docs.google.com/document/d/x/edit" } } }],
+    };
+    expect(linkFromCellData(cell)).toBe("https://docs.google.com/document/d/x/edit");
+  });
+
+  it("falls back to the hyperlink, then to the displayed value", () => {
+    expect(linkFromCellData({ formattedValue: "Doc", hyperlink: "https://docs.google.com/document/d/h/edit" })).toBe(
+      "https://docs.google.com/document/d/h/edit"
+    );
+    expect(linkFromCellData({ formattedValue: "https://docs.google.com/document/d/p/edit" })).toBe(
+      "https://docs.google.com/document/d/p/edit"
+    );
+  });
+
+  it("returns an empty string for an empty cell", () => {
+    expect(linkFromCellData({})).toBe("");
+    expect(linkFromCellData(undefined)).toBe("");
+  });
+});
+
+it("resolves the live Sheet's titled doc cell to its Doc ID", () => {
+  // Verbatim from the live Sheet (2026-10-14): no chipRuns, URL only in `hyperlink`.
+  const cell = {
+    formattedValue: "Articolo Test",
+    hyperlink: "https://docs.google.com/open?id=1Q1dCB5KEWEUzla1c5T440sdi06LI-99cUjbFojwYqec",
+  };
+  expect(extractDocId(linkFromCellData(cell))).toBe("1Q1dCB5KEWEUzla1c5T440sdi06LI-99cUjbFojwYqec");
 });

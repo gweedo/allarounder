@@ -29,13 +29,13 @@ One row per article.
 | Column | Meaning | Format | Required |
 |---|---|---|---|
 | `titolo` | Article title | Free text | Yes |
-| `doc` | Link to the Google Doc | Full Docs share URL or bare Doc ID | Yes |
+| `doc` | Link to the Google Doc | Full Docs share URL or bare Doc ID, as plain text, a hyperlink, or a Drive smart chip | Yes |
 | `categoria` | Category | One of: `Interviste`, `Analisi`, `Roundtable`, `Out of the Box` | Yes |
 | `tag` | Tags | Comma-separated tag names (Italian) | No |
 | `autore` | Author | Name matching an entry in `src/pipeline/data/authors.json` (§4) | Yes |
 | `ospite` | Guest(s) | Comma-separated names (§4) | No |
 | `spotify` | Spotify episode/show link | `https://open.spotify.com/(episode\|show\|track)/<id>` | No |
-| `copertina` | Cover image | Google Drive share link or file ID | No |
+| `copertina` | Cover image | Google Drive share link or file ID, as plain text, a hyperlink, or a Drive smart chip | No |
 | `meta_description` | SEO description | 140–155 characters (§5) | Yes |
 | `data` | Publish date | `YYYY-MM-DD`, interpreted as Europe/Rome midnight (§3) | Yes |
 | `stato` | Editorial status | `Bozza` / `Pronto` / `Pubblicato` | Yes |

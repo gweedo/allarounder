@@ -74,6 +74,12 @@ Sheet is created. Someone with access to Google Workspace and the
    without it, `DocumentApp.create()` leaves the Doc in the writer's own My
    Drive, where the pipeline cannot read it. "Nuovo articolo" refuses to run
    until this property is set.
+   `src/appsscript.json` enables the **Sheets advanced service** (`Sheets`,
+   v4): "Elimina bozza" uses it to read the link inside a `doc` cell that
+   Sheets has turned into a smart chip (the cell's plain value is then only
+   the Doc's title). `clasp push` applies it from the manifest; without
+   clasp, add it in the editor under Services → Google Sheets API. The first
+   run after this asks each user to re-authorize the script.
 5. **Reload the Sheet.** The "Allarounder" menu should appear (`onOpen`).
    Run "Configura validazione colonne" once to install the `categoria`,
    `stato`, and `autore` dropdowns.

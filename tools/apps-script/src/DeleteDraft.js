@@ -6,9 +6,10 @@
 // retract the committed content, so deleting such a row would only orphan
 // a live page. Removing a live article stays a `git revert`.
 //
-// draftDeletionBlocker() and extractDocId() are pure and tested;
-// handleEliminaBozza() calls SpreadsheetApp/DriveApp and is not unit-testable
-// outside the Apps Script runtime.
+// draftDeletionBlocker(), extractDocId() and linkFromCellData() are pure and
+// tested; handleEliminaBozza() and readDocRef() call SpreadsheetApp/DriveApp/
+// the Sheets advanced service and are not unit-testable outside the Apps
+// Script runtime.
 
 function handleEliminaBozza() {
   var ui = SpreadsheetApp.getUi();
@@ -24,7 +25,7 @@ function handleEliminaBozza() {
   var titolo = String(values[getColumnIndex("titolo") - 1]);
   var stato = String(values[getColumnIndex("stato") - 1]);
   var esito = String(values[getColumnIndex("esito") - 1]);
-  var docRef = String(values[getColumnIndex("doc") - 1]);
+  var docRef = readDocRef(sheet, row);
 
   var blocker = draftDeletionBlocker(stato, esito);
   if (blocker) {
@@ -50,15 +51,51 @@ function handleEliminaBozza() {
       DriveApp.getFileById(docId).setTrashed(true);
     } catch (err) {
       ui.alert(
-        "Bozza non eliminata: non è stato possibile spostare il documento nel cestino " +
-          "(solo il proprietario del documento può farlo).\n" +
-          err.message
+        "Bozza non eliminata: non è stato possibile spostare il documento nel cestino.\n" +
+          err.message +
+          "\n(Se il documento è di un altro autore, solo il proprietario può eliminarlo.)"
       );
       return;
     }
   }
 
   sheet.deleteRow(row);
+}
+
+// The `doc` cell's link. Sheets turns a pasted Drive URL into a smart chip
+// on request, after which getValues() returns only the Doc's title; the URL
+// is reachable only through the Sheets API's chipRuns (the advanced Sheets
+// service, enabled in appsscript.json).
+function readDocRef(sheet, row) {
+  var a1 = "'" + sheet.getName().replace(/'/g, "''") + "'!" +
+    sheet.getRange(row, getColumnIndex("doc")).getA1Notation();
+  var result = Sheets.Spreadsheets.get(sheet.getParent().getId(), {
+    ranges: [a1],
+    fields: "sheets.data.rowData.values(formattedValue,hyperlink,chipRuns)",
+  });
+  var rowData = result.sheets[0].data[0].rowData || [];
+  var cell = rowData.length && rowData[0].values ? rowData[0].values[0] : undefined;
+  return linkFromCellData(cell);
+}
+
+// A Sheets API CellData -> the link it holds: a smart chip's URL, else the
+// cell's hyperlink, else its displayed value (a pasted URL or bare ID).
+// Mirrors the pipeline's cell_text() for link columns.
+function linkFromCellData(cell) {
+  if (!cell) {
+    return "";
+  }
+  var runs = cell.chipRuns || [];
+  for (var i = 0; i < runs.length; i++) {
+    var link = runs[i].chip && runs[i].chip.richLinkProperties;
+    if (link && link.uri) {
+      return String(link.uri);
+    }
+  }
+  if (cell.hyperlink) {
+    return String(cell.hyperlink);
+  }
+  return String(cell.formattedValue || "");
 }
 
 // Returns an Italian message explaining why this row must not be deleted,
@@ -89,5 +126,5 @@ function extractDocId(docRef) {
 }
 
 if (typeof module !== "undefined") {
-  module.exports = { draftDeletionBlocker, extractDocId };
+  module.exports = { draftDeletionBlocker, extractDocId, linkFromCellData };
 }
