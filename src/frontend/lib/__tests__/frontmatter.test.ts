@@ -3,10 +3,11 @@ import path from "path";
 import { describe, it, expect } from "vitest";
 import { parseFrontmatter } from "../frontmatter";
 
-// Snapshots of the committed content files, plus the { data, content } that
-// gray-matter 4.0.3 produced for each one before it was replaced.
+// Frozen snapshots of the content files committed when gray-matter was
+// replaced, with what gray-matter 4.0.3 returned for each: its `data`, and
+// the offset in the file where its `content` began (content ran to the end).
 const FIXTURES = path.join(__dirname, "fixtures", "frontmatter");
-const GOLDEN: Record<string, unknown> = JSON.parse(
+const GOLDEN: Record<string, { data: unknown; contentStart: number }> = JSON.parse(
   fs.readFileSync(path.join(FIXTURES, "gray-matter-golden.json"), "utf-8"),
 );
 
@@ -18,19 +19,23 @@ describe("parseFrontmatter parity with gray-matter", () => {
 
   it.each(Object.keys(GOLDEN))("parses %s like gray-matter did", (name) => {
     const raw = fs.readFileSync(path.join(FIXTURES, name), "utf-8");
-    expect(parseFrontmatter(raw)).toEqual(GOLDEN[name]);
+    const { data, contentStart } = GOLDEN[name];
+
+    expect(parseFrontmatter(raw)).toEqual({ data, content: raw.slice(contentStart) });
   });
 });
 
 // The fixtures above are frozen; this keeps content the pipeline publishes
-// later covered by a basic check.
+// later covered by a basic check. A directory git dropped when empty is skipped.
 const CONTENT = path.join(__dirname, "..", "..", "content");
-const LIVE = ["articles", "pages"].flatMap((dir) =>
-  fs
-    .readdirSync(path.join(CONTENT, dir))
-    .filter((f) => f.endsWith(".md"))
-    .map((f) => path.join(dir, f)),
-);
+const LIVE = ["articles", "pages"]
+  .filter((dir) => fs.existsSync(path.join(CONTENT, dir)))
+  .flatMap((dir) =>
+    fs
+      .readdirSync(path.join(CONTENT, dir))
+      .filter((f) => f.endsWith(".md"))
+      .map((f) => path.join(dir, f)),
+  );
 
 describe("parseFrontmatter on the committed content", () => {
   it.each(LIVE)("reads %s into a slug matching its file name and a body", (file) => {
@@ -104,8 +109,11 @@ describe("parseFrontmatter", () => {
     });
   });
 
-  it("treats an unclosed block as all frontmatter and no body, as gray-matter did", () => {
-    expect(parseFrontmatter("---\ntitle: x\n")).toEqual({ data: { title: "x" }, content: "" });
+  it.each([
+    ["no closing line", "---\ntitle: x\n"],
+    ["a closing line longer than ---", "---\ntitle: x\n----\nCorpo\n"],
+  ])("rejects a block with %s", (_label, raw) => {
+    expect(() => parseFrontmatter(raw)).toThrow(/closing/);
   });
 
   it.each([
@@ -122,10 +130,19 @@ describe("parseFrontmatter", () => {
     });
   });
 
-  it.each(["---js", "---yaml"])(
-    "rejects a %s language opener instead of evaluating or ignoring it",
-    (opener) => {
-      expect(() => parseFrontmatter(`${opener}\ntitle: x\n---\nCorpo\n`)).toThrow(/language/);
-    },
-  );
+  it.each([
+    ["a ---js language tag", "---js\nmodule.exports = {};\n---\nCorpo\n"],
+    ["a ---yaml language tag", "---yaml\ntitle: x\n---\nCorpo\n"],
+    ["other text after ---", "--- -x\ntitle: x\n---\nCorpo\n"],
+    ["a non-breaking space after ---", "---\u00a0\ntitle: x\n---\nCorpo\n"],
+    ["--- alone", "---"],
+  ])("rejects an opening line with %s instead of evaluating or ignoring it", (_label, raw) => {
+    expect(() => parseFrontmatter(raw)).toThrow(/opening line/);
+  });
+
+  it("treats a first line of four or more dashes as body, not frontmatter", () => {
+    const raw = "----\nCorpo\n";
+
+    expect(parseFrontmatter(raw)).toEqual({ data: {}, content: raw });
+  });
 });
