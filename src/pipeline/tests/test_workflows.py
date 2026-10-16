@@ -15,17 +15,24 @@ So publish.yml checks out (and therefore pushes) with PUBLISH_TOKEN, opens
 and merges the PR with it, and authors the commit as the token's owner.
 Found on the first live run (2026-10-06); see docs/DECISIONS.md. These tests
 pin that wiring; nothing else exercises it short of a live run.
+
+They also pin ci.yml's content-only classifier (.github/scripts/content-only.sh),
+which lets those content PRs skip the dependency audit (#168).
 """
 
 from __future__ import annotations
 
+import shutil
+import subprocess
 from pathlib import Path
 from typing import Any
 
+import pytest
 import yaml
 
 WORKFLOWS = Path(__file__).resolve().parents[3] / ".github" / "workflows"
 PUBLISH_TOKEN = "${{ secrets.PUBLISH_TOKEN }}"
+CONTENT_ONLY = WORKFLOWS.parent / "scripts" / "content-only.sh"
 
 
 def _load(name: str) -> dict[Any, Any]:
@@ -110,3 +117,60 @@ def test_repo_settings_check_uses_publish_token() -> None:
 def test_github_token_keeps_read_only_permissions() -> None:
     permissions = _load("publish.yml")["permissions"]
     assert permissions == {"contents": "read", "pull-requests": "read"}
+
+
+def test_security_scan_skips_only_on_an_explicit_content_only_verdict() -> None:
+    # audit-scope is skipped on push/workflow_dispatch; without `!cancelled()`
+    # that skip would cascade and silently drop the audit on main.
+    jobs = _load("ci.yml")["jobs"]
+    scope = jobs["audit-scope"]
+    assert scope["outputs"]["skip"] == "${{ steps.classify.outputs.skip }}"
+    [checkout] = [s for s in scope["steps"] if "actions/checkout" in s.get("uses", "")]
+    assert checkout["with"]["fetch-depth"] == 2
+    [classify] = [s for s in scope["steps"] if s.get("id") == "classify"]
+    assert "content-only.sh" in classify["run"]
+    assert jobs["security-scan"]["needs"] == "audit-scope"
+    condition = jobs["security-scan"]["if"]
+    assert "!cancelled()" in condition
+    assert "needs.audit-scope.outputs.skip != 'true'" in condition
+
+
+@pytest.mark.skipif(shutil.which("sh") is None, reason="needs a POSIX sh")
+def test_every_path_publish_yml_stages_counts_as_content() -> None:
+    # If publish.yml starts staging a new path, its PRs would audit again.
+    [diff] = [s for s in _steps(_load("publish.yml")) if s.get("id") == "diff"]
+    staged = [
+        path
+        for line in diff["run"].splitlines()
+        if line.strip().startswith("git add ")
+        for path in line.split()[2:]
+    ]
+    assert staged
+    for path in staged:
+        result = subprocess.run(
+            ["sh", str(CONTENT_ONLY)], input=f"{path}/x\n", text=True, check=False
+        )
+        assert result.returncode == 0, path
+
+
+@pytest.mark.skipif(shutil.which("sh") is None, reason="needs a POSIX sh")
+@pytest.mark.parametrize(
+    ("changed", "skips_audit"),
+    [
+        ("src/frontend/content/articles/a.md\n", True),
+        ("src/frontend/public/images/a.jpg\n", True),
+        ("src/frontend/content/index.json\nsrc/frontend/public/images/a.jpg", True),
+        ("src/frontend/content/index.json\nsrc/frontend/lib/content.ts\n", False),
+        ("src/frontend/package.json\n", False),
+        (".github/workflows/ci.yml\n", False),
+        ("", False),
+        ("\n", False),
+        ("src/frontend/contentx/a\n", False),
+    ],
+)
+def test_content_only_classifies_changed_paths(changed: str, skips_audit: bool) -> None:
+    # ci.yml skips npm audit only when this exits 0; anything else audits.
+    result = subprocess.run(
+        ["sh", str(CONTENT_ONLY)], input=changed, text=True, check=False
+    )
+    assert (result.returncode == 0) is skips_audit
