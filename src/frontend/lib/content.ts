@@ -6,7 +6,7 @@
 // editorial Google Sheet/Docs — this loader defines the contract it must emit.
 import fs from "fs";
 import path from "path";
-import matter from "gray-matter";
+import { parseFrontmatter } from "./frontmatter";
 import { rankRelated } from "./related";
 
 const CONTENT_DIR = path.join(process.cwd(), "content");
@@ -108,8 +108,8 @@ export function getArticleBySlug(slug: string): Article | null {
   const filePath = path.join(CONTENT_DIR, "articles", `${slug}.md`);
   if (!fs.existsSync(filePath)) return null;
   const raw = fs.readFileSync(filePath, "utf-8");
-  const { data, content } = matter(raw);
-  return { ...(data as ArticleMeta), body: content.trim() };
+  const { data, content } = parseFrontmatter(raw);
+  return { ...(data as unknown as ArticleMeta), body: content.trim() };
 }
 
 export function getRelatedArticles(article: ArticleMeta, limit: number): ArticleMeta[] {
@@ -215,6 +215,6 @@ export function getStaticPageBySlug(slug: string): StaticPage | null {
   const filePath = path.join(CONTENT_DIR, "pages", `${slug}.md`);
   if (!fs.existsSync(filePath)) return null;
   const raw = fs.readFileSync(filePath, "utf-8");
-  const { data, content } = matter(raw);
-  return { ...(data as Omit<StaticPage, "body">), body: content.trim() };
+  const { data, content } = parseFrontmatter(raw);
+  return { ...(data as unknown as Omit<StaticPage, "body">), body: content.trim() };
 }
