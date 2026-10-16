@@ -15,6 +15,9 @@ So publish.yml checks out (and therefore pushes) with PUBLISH_TOKEN, opens
 and merges the PR with it, and authors the commit as the token's owner.
 Found on the first live run (2026-10-06); see docs/DECISIONS.md. These tests
 pin that wiring; nothing else exercises it short of a live run.
+
+They also pin ci.yml's content-only classifier (.github/scripts/content-only.sh),
+which lets those content PRs skip the dependency audit (#168).
 """
 
 from __future__ import annotations
@@ -28,6 +31,7 @@ import yaml
 
 WORKFLOWS = Path(__file__).resolve().parents[3] / ".github" / "workflows"
 PUBLISH_TOKEN = "${{ secrets.PUBLISH_TOKEN }}"
+CONTENT_ONLY = WORKFLOWS.parent / "scripts" / "content-only.sh"
 
 
 def _load(name: str) -> dict[Any, Any]:
@@ -112,9 +116,6 @@ def test_repo_settings_check_uses_publish_token() -> None:
 def test_github_token_keeps_read_only_permissions() -> None:
     permissions = _load("publish.yml")["permissions"]
     assert permissions == {"contents": "read", "pull-requests": "read"}
-
-
-CONTENT_ONLY = WORKFLOWS.parent / "scripts" / "content-only.sh"
 
 
 @pytest.mark.parametrize(
