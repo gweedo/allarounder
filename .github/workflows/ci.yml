@@ -166,7 +166,7 @@ jobs:
             echo "::notice::Content-only PR: Security scan skipped."
             echo "skip=true" >> "$GITHUB_OUTPUT"
           else
-            echo "::notice::Not content-only: Security scan runs."
+            echo "::notice::Not content-only (or undetermined): Security scan runs."
           fi
 
   # A job skipped by `if:` reports success to required status checks.

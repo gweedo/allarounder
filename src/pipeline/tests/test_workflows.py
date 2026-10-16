@@ -123,12 +123,27 @@ def test_security_scan_skips_only_on_an_explicit_content_only_verdict() -> None:
     # audit-scope is skipped on push/workflow_dispatch; without `!cancelled()`
     # that skip would cascade and silently drop the audit on main.
     jobs = _load("ci.yml")["jobs"]
-    assert (
-        jobs["audit-scope"]["outputs"]["skip"] == "${{ steps.classify.outputs.skip }}"
-    )
+    scope = jobs["audit-scope"]
+    assert scope["outputs"]["skip"] == "${{ steps.classify.outputs.skip }}"
+    assert scope["steps"][0]["with"]["fetch-depth"] == 2
+    assert "content-only.sh" in scope["steps"][1]["run"]
+    assert jobs["security-scan"]["needs"] == "audit-scope"
     condition = jobs["security-scan"]["if"]
     assert "!cancelled()" in condition
     assert "needs.audit-scope.outputs.skip != 'true'" in condition
+
+
+@pytest.mark.skipif(shutil.which("sh") is None, reason="needs a POSIX sh")
+def test_every_path_publish_yml_stages_counts_as_content() -> None:
+    # If publish.yml starts staging a new path, its PRs would audit again.
+    run = next(s["run"] for s in _steps(_load("publish.yml")) if s.get("id") == "diff")
+    staged = [line.split()[-1] for line in run.splitlines() if "git add" in line]
+    assert staged
+    for path in staged:
+        result = subprocess.run(
+            ["sh", str(CONTENT_ONLY)], input=f"{path}/x\n", text=True, check=False
+        )
+        assert result.returncode == 0, path
 
 
 @pytest.mark.skipif(shutil.which("sh") is None, reason="needs a POSIX sh")
