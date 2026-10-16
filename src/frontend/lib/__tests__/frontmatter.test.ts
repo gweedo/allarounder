@@ -118,6 +118,12 @@ describe("parseFrontmatter", () => {
     expect(data).toEqual({ reading_time: 5, zero: 0, half: 0.5 });
   });
 
+  it("resolves explicitly tagged leading-zero numbers", () => {
+    const { data } = parseFrontmatter("---\nint: !!int 010\nfloat: !!float 00.5\n---\n");
+
+    expect(data).toEqual({ int: 10, float: 0.5 });
+  });
+
   it("closes the block at the first delimiter, keeping later --- rules in the body", () => {
     expect(parseFrontmatter("---\ntitle: x\n---\nA\n\n---\n\nB\n")).toEqual({
       data: { title: "x" },
@@ -138,6 +144,8 @@ describe("parseFrontmatter", () => {
   it.each([
     ["a scalar", "---\nsolo testo\n---\nCorpo\n"],
     ["a list", "---\n- a\n- b\n---\nCorpo\n"],
+    ["null", "---\nnull\n---\nCorpo\n"],
+    ["~", "---\n~\n---\nCorpo\n"],
   ])("rejects frontmatter that is %s rather than a mapping", (_label, raw) => {
     expect(() => parseFrontmatter(raw)).toThrow(/mapping/);
   });
