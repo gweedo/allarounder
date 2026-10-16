@@ -22,6 +22,7 @@ which lets those content PRs skip the dependency audit (#168).
 
 from __future__ import annotations
 
+import shutil
 import subprocess
 from pathlib import Path
 from typing import Any
@@ -118,6 +119,19 @@ def test_github_token_keeps_read_only_permissions() -> None:
     assert permissions == {"contents": "read", "pull-requests": "read"}
 
 
+def test_security_scan_skips_only_on_an_explicit_content_only_verdict() -> None:
+    # audit-scope is skipped on push/workflow_dispatch; without `!cancelled()`
+    # that skip would cascade and silently drop the audit on main.
+    jobs = _load("ci.yml")["jobs"]
+    assert (
+        jobs["audit-scope"]["outputs"]["skip"] == "${{ steps.classify.outputs.skip }}"
+    )
+    condition = jobs["security-scan"]["if"]
+    assert "!cancelled()" in condition
+    assert "needs.audit-scope.outputs.skip != 'true'" in condition
+
+
+@pytest.mark.skipif(shutil.which("sh") is None, reason="needs a POSIX sh")
 @pytest.mark.parametrize(
     ("changed", "skips_audit"),
     [
