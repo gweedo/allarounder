@@ -11,6 +11,7 @@ a type assertion, not runtime validation.
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 from typing import Any
 
@@ -19,6 +20,35 @@ import yaml
 from ingest.models import ArticleMeta, GeneratedArticle, SlugRef
 
 _INDEX_KEYS = ("articles", "categories", "authors", "guests", "tags")
+
+
+class _FrontmatterDumper(yaml.SafeDumper):
+    """Quotes every string, keys included: double quotes, or single quotes
+    for strings with non-BMP characters (see `_represent_str`). PyYAML
+    resolves scalars by YAML 1.1 rules, so it leaves e.g. `1e3` plain, which
+    a YAML 1.2 reader (the frontend's js-yaml) reads as a number."""
+
+
+_NON_BMP = re.compile("[\U00010000-\U0010ffff]")
+
+
+def _represent_str(dumper: yaml.SafeDumper, data: str) -> yaml.ScalarNode:
+    # Double quotes escape non-BMP characters (emoji), single quotes keep
+    # them literal but double every apostrophe, which Italian has plenty of.
+    style = "'" if _NON_BMP.search(data) else '"'
+    return dumper.represent_scalar("tag:yaml.org,2002:str", data, style=style)
+
+
+_FrontmatterDumper.add_representer(str, _represent_str)
+
+# Wide enough that no quoted value is folded with `\` line continuations.
+_NO_WRAP_WIDTH = 2**31 - 1
+
+
+def dump_frontmatter(data: dict[str, Any]) -> str:
+    return yaml.dump(
+        data, Dumper=_FrontmatterDumper, allow_unicode=True, sort_keys=False, width=_NO_WRAP_WIDTH
+    )
 
 
 def load_index(content_dir: Path) -> dict[str, Any]:
@@ -78,9 +108,7 @@ def article_meta_dict(meta: ArticleMeta) -> dict[str, Any]:
 def write_article_file(content_dir: Path, article: GeneratedArticle) -> None:
     articles_dir = content_dir / "articles"
     articles_dir.mkdir(parents=True, exist_ok=True)
-    frontmatter = yaml.safe_dump(
-        article_meta_dict(article.meta), allow_unicode=True, sort_keys=False
-    )
+    frontmatter = dump_frontmatter(article_meta_dict(article.meta))
     text = f"---\n{frontmatter}---\n{article.body.strip()}\n"
     (articles_dir / f"{article.meta.slug}.md").write_text(text, encoding="utf-8")
 

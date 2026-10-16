@@ -1,8 +1,15 @@
 import json
 from pathlib import Path
 
+import pytest
+import yaml
+
 from ingest import content_writer
 from ingest.models import ArticleMeta, GeneratedArticle, SlugRef
+
+_COMMITTED_CONTENT = sorted(
+    (Path(__file__).resolve().parents[3] / "frontend" / "content").glob("*/*.md")
+)
 
 
 def _meta(**overrides: object) -> ArticleMeta:
@@ -57,8 +64,72 @@ class TestWriteArticleFile:
         content_writer.write_article_file(tmp_path, article)
         text = (tmp_path / "articles" / "intervista-a-marco.md").read_text(encoding="utf-8")
         assert text.startswith("---\n")
-        assert "doc_id: doc-1" in text
+        assert '"doc_id": "doc-1"' in text
         assert text.rstrip().endswith("Corpo dell'articolo.")
+
+    @pytest.mark.parametrize(
+        "value",
+        ["1e3", "1E+3", "08", "0o17", "1:30", "1_000", "yes", "no", "null", "~", "true",
+         "Perché è già così", "Titolo: parte #1", "riga uno\nriga due"],
+    )
+    def test_string_values_are_quoted_and_round_trip(self, tmp_path: Path, value: str) -> None:
+        tag = SlugRef(id=value, name=value, slug=value)
+        article = GeneratedArticle(meta=_meta(title=value, tags=[tag]), body="Corpo.")
+        content_writer.write_article_file(tmp_path, article)
+        frontmatter = _frontmatter(tmp_path / "articles" / "intervista-a-marco.md")
+        data = yaml.safe_load(frontmatter)
+        assert data["title"] == value
+        assert data["tags"] == [{"id": value, "name": value, "slug": value}]
+        # A quoted scalar is a string under YAML 1.1 and 1.2 alike.
+        assert _plain_strings(yaml.compose(frontmatter)) == []
+
+    def test_long_values_stay_on_one_line(self, tmp_path: Path) -> None:
+        excerpt = "parola " * 30
+        article = GeneratedArticle(meta=_meta(excerpt=excerpt), body="Corpo.")
+        content_writer.write_article_file(tmp_path, article)
+        text = (tmp_path / "articles" / "intervista-a-marco.md").read_text(encoding="utf-8")
+        assert f'"excerpt": "{excerpt}"\n' in text
+
+    @pytest.mark.parametrize("title", ["Finale 🥇 dell'anno", "🥇 riga\n---\naltro", "🥇\tx"])
+    def test_emoji_are_written_literally(self, tmp_path: Path, title: str) -> None:
+        article = GeneratedArticle(meta=_meta(title=title), body="Corpo.")
+        content_writer.write_article_file(tmp_path, article)
+        frontmatter = _frontmatter(tmp_path / "articles" / "intervista-a-marco.md")
+        assert yaml.safe_load(frontmatter)["title"] == title
+        assert _plain_strings(yaml.compose(frontmatter)) == []
+        if "\t" not in title:  # a tab forces double quotes, which escape emoji
+            assert "🥇" in frontmatter
+
+    def test_committed_content_is_found(self) -> None:
+        assert _COMMITTED_CONTENT, "no committed content under src/frontend/content"
+
+    @pytest.mark.parametrize(
+        "path", _COMMITTED_CONTENT, ids=lambda p: f"{p.parent.name}/{p.name}"
+    )
+    def test_requoting_committed_content_keeps_its_data(self, path: Path) -> None:
+        frontmatter = yaml.safe_load(_frontmatter(path))
+        redumped = content_writer.dump_frontmatter(frontmatter)
+        assert yaml.safe_load(redumped) == frontmatter
+        assert _plain_strings(yaml.compose(redumped)) == []
+
+
+def _frontmatter(path: Path) -> str:
+    """The text between the opening `---` line and the next `---` line."""
+    text = path.read_text(encoding="utf-8")
+    return text.removeprefix("---\n").split("\n---\n")[0] + "\n"
+
+
+def _plain_strings(node: yaml.Node) -> list[str]:
+    """Unquoted scalars, keys included, other than the null and int values
+    the writer emits plain. Checking style rather than the resolved tag also
+    catches strings like `yes` that YAML 1.1 would resolve to a bool."""
+    if isinstance(node, yaml.MappingNode):
+        return [s for kv in node.value for n in kv for s in _plain_strings(n)]
+    if isinstance(node, yaml.SequenceNode):
+        return [s for v in node.value for s in _plain_strings(v)]
+    assert isinstance(node, yaml.ScalarNode)
+    plain_ok = node.tag in ("tag:yaml.org,2002:null", "tag:yaml.org,2002:int")
+    return [] if plain_ok or node.style in ('"', "'") else [node.value]
 
 
 class TestUpsertArticle:
