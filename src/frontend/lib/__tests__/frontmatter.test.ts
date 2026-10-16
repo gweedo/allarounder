@@ -71,6 +71,13 @@ describe("parseFrontmatter", () => {
     });
   });
 
+  it("recognises a closing ---\\r at the end of the file", () => {
+    expect(parseFrontmatter("---\r\ntitle: Ciao\r\n---\r")).toEqual({
+      data: { title: "Ciao" },
+      content: "",
+    });
+  });
+
   it("returns empty data and the whole text when there is no frontmatter", () => {
     const raw = "Solo testo, nessun frontmatter.\n\n---\n\nAltro testo.\n";
 
@@ -99,6 +106,18 @@ describe("parseFrontmatter", () => {
     expect(data.day).toEqual(new Date("2026-10-09T00:00:00.000Z"));
   });
 
+  it("keeps leading-zero values as strings, as gray-matter's js-yaml 3 did", () => {
+    const { data } = parseFrontmatter("---\ntitle: 08\nslug: 09\nid: 0o17\n---\n");
+
+    expect(data).toEqual({ title: "08", slug: "09", id: "0o17" });
+  });
+
+  it("still reads plain numbers as numbers", () => {
+    const { data } = parseFrontmatter("---\nreading_time: 5\nzero: 0\nhalf: 0.5\n---\n");
+
+    expect(data).toEqual({ reading_time: 5, zero: 0, half: 0.5 });
+  });
+
   it("closes the block at the first delimiter, keeping later --- rules in the body", () => {
     expect(parseFrontmatter("---\ntitle: x\n---\nA\n\n---\n\nB\n")).toEqual({
       data: { title: "x" },
@@ -111,6 +130,7 @@ describe("parseFrontmatter", () => {
     ["no closing line (a body that opens with a --- rule)", "---\n\nIntroduzione.\n"],
     ["a closing line longer than ---", "---\ntitle: x\n----\nCorpo\n"],
     ["text after the closing ---", "---\ntitle: x\n--- # fine\n---\nCorpo\n"],
+    ["a non-breaking space after the closing ---", "---\ntitle: x\n---\u00a0\nCorpo\n"],
   ])("rejects a block with %s", (_label, raw) => {
     expect(() => parseFrontmatter(raw)).toThrow(/closing/);
   });
