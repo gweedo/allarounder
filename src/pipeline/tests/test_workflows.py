@@ -19,9 +19,11 @@ pin that wiring; nothing else exercises it short of a live run.
 
 from __future__ import annotations
 
+import subprocess
 from pathlib import Path
 from typing import Any
 
+import pytest
 import yaml
 
 WORKFLOWS = Path(__file__).resolve().parents[3] / ".github" / "workflows"
@@ -110,3 +112,28 @@ def test_repo_settings_check_uses_publish_token() -> None:
 def test_github_token_keeps_read_only_permissions() -> None:
     permissions = _load("publish.yml")["permissions"]
     assert permissions == {"contents": "read", "pull-requests": "read"}
+
+
+CONTENT_ONLY = WORKFLOWS.parent / "scripts" / "content-only.sh"
+
+
+@pytest.mark.parametrize(
+    ("changed", "skips_audit"),
+    [
+        ("src/frontend/content/articles/a.md\n", True),
+        ("src/frontend/public/images/a.jpg\n", True),
+        ("src/frontend/content/index.json\nsrc/frontend/public/images/a.jpg", True),
+        ("src/frontend/content/index.json\nsrc/frontend/lib/content.ts\n", False),
+        ("src/frontend/package.json\n", False),
+        (".github/workflows/ci.yml\n", False),
+        ("", False),
+        ("\n", False),
+        ("src/frontend/contentx/a\n", False),
+    ],
+)
+def test_content_only_classifies_changed_paths(changed: str, skips_audit: bool) -> None:
+    # ci.yml skips npm audit only when this exits 0; anything else audits.
+    result = subprocess.run(
+        ["sh", str(CONTENT_ONLY)], input=changed, text=True, check=False
+    )
+    assert (result.returncode == 0) is skips_audit
