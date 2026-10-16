@@ -7,7 +7,9 @@ import yaml
 from ingest import content_writer
 from ingest.models import ArticleMeta, GeneratedArticle, SlugRef
 
-_COMMITTED_CONTENT = Path(__file__).resolve().parents[3] / "frontend" / "content"
+_COMMITTED_CONTENT = sorted(
+    (Path(__file__).resolve().parents[3] / "frontend" / "content").glob("*/*.md")
+)
 
 
 def _meta(**overrides: object) -> ArticleMeta:
@@ -82,9 +84,10 @@ class TestWriteArticleFile:
         # A quoted scalar is a string under YAML 1.1 and 1.2 alike.
         assert _plain_string_values(yaml.compose(frontmatter)) == []
 
-    @pytest.mark.parametrize(
-        "path", sorted(_COMMITTED_CONTENT.glob("*/*.md")), ids=lambda p: p.name
-    )
+    def test_committed_content_is_found(self) -> None:
+        assert _COMMITTED_CONTENT, "no committed content under src/frontend/content"
+
+    @pytest.mark.parametrize("path", _COMMITTED_CONTENT, ids=lambda p: p.name)
     def test_requoting_committed_content_keeps_its_data(self, path: Path) -> None:
         frontmatter = yaml.safe_load(path.read_text(encoding="utf-8").split("---\n")[1])
         redumped = content_writer.dump_frontmatter(frontmatter)
