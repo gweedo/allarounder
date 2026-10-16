@@ -1,8 +1,13 @@
 import json
 from pathlib import Path
 
+import pytest
+import yaml
+
 from ingest import content_writer
 from ingest.models import ArticleMeta, GeneratedArticle, SlugRef
+
+_COMMITTED_CONTENT = Path(__file__).resolve().parents[3] / "frontend" / "content"
 
 
 def _meta(**overrides: object) -> ArticleMeta:
@@ -57,8 +62,43 @@ class TestWriteArticleFile:
         content_writer.write_article_file(tmp_path, article)
         text = (tmp_path / "articles" / "intervista-a-marco.md").read_text(encoding="utf-8")
         assert text.startswith("---\n")
-        assert "doc_id: doc-1" in text
+        assert 'doc_id: "doc-1"' in text
         assert text.rstrip().endswith("Corpo dell'articolo.")
+
+    @pytest.mark.parametrize(
+        "value",
+        ["1e3", "1E+3", "08", "0o17", "1:30", "1_000", "yes", "no", "null", "~", "true",
+         "Perché è già così", "Titolo: parte #1", "riga uno\nriga due"],
+    )
+    def test_string_values_are_quoted_and_round_trip(self, tmp_path: Path, value: str) -> None:
+        tag = SlugRef(id=value, name=value, slug=value)
+        article = GeneratedArticle(meta=_meta(title=value, tags=[tag]), body="Corpo.")
+        content_writer.write_article_file(tmp_path, article)
+        text = (tmp_path / "articles" / "intervista-a-marco.md").read_text(encoding="utf-8")
+        frontmatter = text.split("---\n")[1]
+        data = yaml.safe_load(frontmatter)
+        assert data["title"] == value
+        assert data["tags"] == [{"id": value, "name": value, "slug": value}]
+        # A quoted scalar is a string under YAML 1.1 and 1.2 alike.
+        assert _plain_string_values(yaml.compose(frontmatter)) == []
+
+    @pytest.mark.parametrize(
+        "path", sorted(_COMMITTED_CONTENT.glob("*/*.md")), ids=lambda p: p.name
+    )
+    def test_requoting_committed_content_keeps_its_data(self, path: Path) -> None:
+        frontmatter = yaml.safe_load(path.read_text(encoding="utf-8").split("---\n")[1])
+        redumped = content_writer.dump_frontmatter(frontmatter)
+        assert yaml.safe_load(redumped) == frontmatter
+
+
+def _plain_string_values(node: yaml.Node) -> list[str]:
+    """String-typed value scalars left unquoted (keys are not checked)."""
+    if isinstance(node, yaml.MappingNode):
+        return [s for _, v in node.value for s in _plain_string_values(v)]
+    if isinstance(node, yaml.SequenceNode):
+        return [s for v in node.value for s in _plain_string_values(v)]
+    is_str = node.tag == "tag:yaml.org,2002:str"
+    return [node.value] if is_str and node.style not in ('"', "'") else []
 
 
 class TestUpsertArticle:

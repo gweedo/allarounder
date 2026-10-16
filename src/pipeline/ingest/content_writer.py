@@ -21,6 +21,31 @@ from ingest.models import ArticleMeta, GeneratedArticle, SlugRef
 _INDEX_KEYS = ("articles", "categories", "authors", "guests", "tags")
 
 
+class _FrontmatterDumper(yaml.SafeDumper):
+    """Double-quotes every string value. PyYAML resolves scalars by YAML 1.1
+    rules, so it leaves e.g. `1e3` plain, which a YAML 1.2 reader (the
+    frontend's js-yaml) reads as a number. Mapping keys stay plain."""
+
+
+def _represent_str(dumper: yaml.SafeDumper, data: str) -> yaml.ScalarNode:
+    return dumper.represent_scalar("tag:yaml.org,2002:str", data, style='"')
+
+
+def _represent_dict(dumper: yaml.SafeDumper, data: dict[Any, Any]) -> yaml.MappingNode:
+    node = dumper.represent_dict(data)
+    for key_node, _ in node.value:
+        key_node.style = None
+    return node
+
+
+_FrontmatterDumper.add_representer(str, _represent_str)
+_FrontmatterDumper.add_representer(dict, _represent_dict)
+
+
+def dump_frontmatter(data: dict[str, Any]) -> str:
+    return yaml.dump(data, Dumper=_FrontmatterDumper, allow_unicode=True, sort_keys=False)
+
+
 def load_index(content_dir: Path) -> dict[str, Any]:
     index_path = content_dir / "index.json"
     if not index_path.exists():
@@ -78,9 +103,7 @@ def article_meta_dict(meta: ArticleMeta) -> dict[str, Any]:
 def write_article_file(content_dir: Path, article: GeneratedArticle) -> None:
     articles_dir = content_dir / "articles"
     articles_dir.mkdir(parents=True, exist_ok=True)
-    frontmatter = yaml.safe_dump(
-        article_meta_dict(article.meta), allow_unicode=True, sort_keys=False
-    )
+    frontmatter = dump_frontmatter(article_meta_dict(article.meta))
     text = f"---\n{frontmatter}---\n{article.body.strip()}\n"
     (articles_dir / f"{article.meta.slug}.md").write_text(text, encoding="utf-8")
 
