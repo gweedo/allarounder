@@ -4,9 +4,9 @@ on:
   push:
     branches: [main]
   pull_request:
-  # publish.yml dispatches this explicitly on its content PR branch: a PR
-  # opened with GITHUB_TOKEN never triggers `pull_request` runs, so the
-  # required checks would otherwise never report and auto-merge never fire.
+  # Manual re-run only. publish.yml opens its content PRs with PUBLISH_TOKEN,
+  # so they get the normal `pull_request` run; a dispatched run's checks
+  # would not attach to the PR anyway.
   workflow_dispatch:
 
 concurrency:
@@ -144,8 +144,36 @@ jobs:
         working-directory: src/pipeline
         run: python -m pytest -q --cov --cov-fail-under=80
 
+  # Not a security control (a PR can edit this file): it only stops a new,
+  # unfixable advisory from freezing unattended publish.yml content PRs,
+  # whose audit result is identical to main's. Any doubt => audit runs.
+  audit-scope:
+    name: Audit scope
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    outputs:
+      skip: ${{ steps.classify.outputs.skip }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 2 # HEAD^1 of the PR merge commit is the base tip
+
+      - name: Classify changed paths
+        id: classify
+        run: |
+          if files=$(git -c core.quotePath=false diff --name-only --no-renames HEAD^1 HEAD) &&
+            printf '%s\n' "$files" | sh .github/scripts/content-only.sh; then
+            echo "::notice::Content-only PR: Security scan skipped."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::notice::Not content-only (or undetermined): Security scan runs."
+          fi
+
+  # A job skipped by `if:` reports success to required status checks.
   security-scan:
     name: Security scan
+    needs: audit-scope
+    if: ${{ !cancelled() && needs.audit-scope.outputs.skip != 'true' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7

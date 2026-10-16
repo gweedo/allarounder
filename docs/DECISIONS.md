@@ -1,6 +1,6 @@
 # Decision Log — Podcast Blog Website
 
-Last updated: 2026-10-13
+Last updated: 2026-10-16
 
 ---
 
@@ -352,7 +352,8 @@ Last updated: 2026-10-13
 - **Decision**: The required `Security scan` check runs `npm audit --omit=dev --audit-level=high` — it blocks only on advisories in what ships in the static export. The full audit (dev dependencies included) still runs in the same job as a report-only step (`continue-on-error`). Narrows ADR-0012's "block on high/critical" for npm; `pip-audit` is unchanged.
 - **Rationale**: `braces` (GHSA-vfj7-8cjw-p6xm, high) has no patched release and reaches the repo only through lint tooling (`eslint-config-next` → `@next/eslint-plugin-next` → `fast-glob` → `micromatch`), even on the latest `eslint-config-next` 16.x; npm's suggested fix is a downgrade to 14.x. Dev tooling never reaches the site (`output: "export"`, no server). And because `publish.yml`'s content PRs must pass the same required checks, an unfixable dev-only advisory would silently freeze all unattended publishing, not just code PRs. The other advisories found at the same time (`js-yaml` via `gray-matter` — a runtime dependency — `brace-expansion`, `vitest`) were fixed by version bumps and `overrides` in `src/frontend/package.json`.
 - **Trade-off noted**: A high-severity advisory in a dev dependency (which runs in CI against this repo's own code) no longer blocks a merge; it only shows in the log. Acceptable at this scale — the dev tools process trusted input only — but the report-only step's output should be skimmed when touching `package.json`.
-- **Status**: ✅ Final
+- **Amendment (2026-10-16, #168)**: On a PR whose every changed path is under `src/frontend/content/` or `src/frontend/public/images/` (what `publish.yml` commits), `Security scan` (npm audit and pip-audit) is skipped; GitHub reports a job skipped by `if:` as successful for required checks. Such a PR cannot change the audit result, but a new unfixable runtime advisory would otherwise freeze unattended publishing. An `Audit scope` job classifies the PR diff (`.github/scripts/content-only.sh`); any doubt (empty diff, other path, git failure, non-PR event) runs the audit. Decided on paths, not branch names. Not a security control: a PR can edit `ci.yml` itself.
+- **Status**: 🔄 Amended 2026-10-16 — content-only PRs skip the audit
 - **Decided by**: Guido + Claude
 
 ### Visual design: direction B · Tabellone, interim near-black header
