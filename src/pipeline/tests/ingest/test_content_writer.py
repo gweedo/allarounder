@@ -76,8 +76,7 @@ class TestWriteArticleFile:
         tag = SlugRef(id=value, name=value, slug=value)
         article = GeneratedArticle(meta=_meta(title=value, tags=[tag]), body="Corpo.")
         content_writer.write_article_file(tmp_path, article)
-        text = (tmp_path / "articles" / "intervista-a-marco.md").read_text(encoding="utf-8")
-        frontmatter = text.split("---\n")[1]
+        frontmatter = _frontmatter(tmp_path / "articles" / "intervista-a-marco.md")
         data = yaml.safe_load(frontmatter)
         assert data["title"] == value
         assert data["tags"] == [{"id": value, "name": value, "slug": value}]
@@ -91,14 +90,26 @@ class TestWriteArticleFile:
         text = (tmp_path / "articles" / "intervista-a-marco.md").read_text(encoding="utf-8")
         assert f'"excerpt": "{excerpt}"\n' in text
 
+    def test_emoji_are_written_literally(self, tmp_path: Path) -> None:
+        article = GeneratedArticle(meta=_meta(title="Finale 🥇 dell'anno"), body="Corpo.")
+        content_writer.write_article_file(tmp_path, article)
+        frontmatter = _frontmatter(tmp_path / "articles" / "intervista-a-marco.md")
+        assert "Finale 🥇 dell" in frontmatter
+        assert yaml.safe_load(frontmatter)["title"] == "Finale 🥇 dell'anno"
+        assert _plain_strings(yaml.compose(frontmatter)) == []
+
     def test_committed_content_is_found(self) -> None:
         assert _COMMITTED_CONTENT, "no committed content under src/frontend/content"
 
     @pytest.mark.parametrize("path", _COMMITTED_CONTENT, ids=lambda p: p.name)
     def test_requoting_committed_content_keeps_its_data(self, path: Path) -> None:
-        frontmatter = yaml.safe_load(path.read_text(encoding="utf-8").split("---\n")[1])
+        frontmatter = yaml.safe_load(_frontmatter(path))
         redumped = content_writer.dump_frontmatter(frontmatter)
         assert yaml.safe_load(redumped) == frontmatter
+
+
+def _frontmatter(path: Path) -> str:
+    return path.read_text(encoding="utf-8").split("---\n")[1]
 
 
 def _plain_strings(node: yaml.Node) -> list[str]:

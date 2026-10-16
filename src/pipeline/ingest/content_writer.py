@@ -28,16 +28,21 @@ class _FrontmatterDumper(yaml.SafeDumper):
 
 
 def _represent_str(dumper: yaml.SafeDumper, data: str) -> yaml.ScalarNode:
-    return dumper.represent_scalar("tag:yaml.org,2002:str", data, style='"')
+    # Double quotes escape non-BMP characters (emoji), single quotes keep
+    # them literal but double every apostrophe, which Italian has plenty of.
+    style = "'" if any(ord(ch) > 0xFFFF for ch in data) else '"'
+    return dumper.represent_scalar("tag:yaml.org,2002:str", data, style=style)
 
 
 _FrontmatterDumper.add_representer(str, _represent_str)
 
+# Wide enough that no quoted value is folded with `\` line continuations.
+_NO_WRAP_WIDTH = 2**31 - 1
+
 
 def dump_frontmatter(data: dict[str, Any]) -> str:
-    # Unlimited width: no `\` line continuations inside long quoted values.
     return yaml.dump(
-        data, Dumper=_FrontmatterDumper, allow_unicode=True, sort_keys=False, width=float("inf")
+        data, Dumper=_FrontmatterDumper, allow_unicode=True, sort_keys=False, width=_NO_WRAP_WIDTH
     )
 
 
