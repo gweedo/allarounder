@@ -11,6 +11,7 @@ a type assertion, not runtime validation.
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 from typing import Any
 
@@ -22,15 +23,19 @@ _INDEX_KEYS = ("articles", "categories", "authors", "guests", "tags")
 
 
 class _FrontmatterDumper(yaml.SafeDumper):
-    """Double-quotes every string (keys included). PyYAML resolves scalars by
-    YAML 1.1 rules, so it leaves e.g. `1e3` plain, which a YAML 1.2 reader
-    (the frontend's js-yaml) reads as a number."""
+    """Quotes every string, keys included: double quotes, or single quotes
+    for strings with non-BMP characters (see `_represent_str`). PyYAML
+    resolves scalars by YAML 1.1 rules, so it leaves e.g. `1e3` plain, which
+    a YAML 1.2 reader (the frontend's js-yaml) reads as a number."""
+
+
+_NON_BMP = re.compile("[\U00010000-\U0010ffff]")
 
 
 def _represent_str(dumper: yaml.SafeDumper, data: str) -> yaml.ScalarNode:
     # Double quotes escape non-BMP characters (emoji), single quotes keep
     # them literal but double every apostrophe, which Italian has plenty of.
-    style = "'" if any(ord(ch) > 0xFFFF for ch in data) else '"'
+    style = "'" if _NON_BMP.search(data) else '"'
     return dumper.represent_scalar("tag:yaml.org,2002:str", data, style=style)
 
 

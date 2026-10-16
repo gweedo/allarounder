@@ -90,36 +90,46 @@ class TestWriteArticleFile:
         text = (tmp_path / "articles" / "intervista-a-marco.md").read_text(encoding="utf-8")
         assert f'"excerpt": "{excerpt}"\n' in text
 
-    def test_emoji_are_written_literally(self, tmp_path: Path) -> None:
-        article = GeneratedArticle(meta=_meta(title="Finale 🥇 dell'anno"), body="Corpo.")
+    @pytest.mark.parametrize("title", ["Finale 🥇 dell'anno", "🥇 riga\n---\naltro", "🥇\tx"])
+    def test_emoji_are_written_literally(self, tmp_path: Path, title: str) -> None:
+        article = GeneratedArticle(meta=_meta(title=title), body="Corpo.")
         content_writer.write_article_file(tmp_path, article)
         frontmatter = _frontmatter(tmp_path / "articles" / "intervista-a-marco.md")
-        assert "Finale 🥇 dell" in frontmatter
-        assert yaml.safe_load(frontmatter)["title"] == "Finale 🥇 dell'anno"
+        assert yaml.safe_load(frontmatter)["title"] == title
         assert _plain_strings(yaml.compose(frontmatter)) == []
+        if "\t" not in title:  # a tab forces double quotes, which escape emoji
+            assert "🥇" in frontmatter
 
     def test_committed_content_is_found(self) -> None:
         assert _COMMITTED_CONTENT, "no committed content under src/frontend/content"
 
-    @pytest.mark.parametrize("path", _COMMITTED_CONTENT, ids=lambda p: p.name)
+    @pytest.mark.parametrize(
+        "path", _COMMITTED_CONTENT, ids=lambda p: f"{p.parent.name}/{p.name}"
+    )
     def test_requoting_committed_content_keeps_its_data(self, path: Path) -> None:
         frontmatter = yaml.safe_load(_frontmatter(path))
         redumped = content_writer.dump_frontmatter(frontmatter)
         assert yaml.safe_load(redumped) == frontmatter
+        assert _plain_strings(yaml.compose(redumped)) == []
 
 
 def _frontmatter(path: Path) -> str:
-    return path.read_text(encoding="utf-8").split("---\n")[1]
+    """The text between the opening `---` line and the next `---` line."""
+    text = path.read_text(encoding="utf-8")
+    return text.removeprefix("---\n").split("\n---\n")[0] + "\n"
 
 
 def _plain_strings(node: yaml.Node) -> list[str]:
-    """String scalars (keys and values) left unquoted."""
+    """Unquoted scalars, keys included, other than the null and int values
+    the writer emits plain. Checking style rather than the resolved tag also
+    catches strings like `yes` that YAML 1.1 would resolve to a bool."""
     if isinstance(node, yaml.MappingNode):
         return [s for kv in node.value for n in kv for s in _plain_strings(n)]
     if isinstance(node, yaml.SequenceNode):
         return [s for v in node.value for s in _plain_strings(v)]
-    is_str = node.tag == "tag:yaml.org,2002:str"
-    return [node.value] if is_str and node.style not in ('"', "'") else []
+    assert isinstance(node, yaml.ScalarNode)
+    plain_ok = node.tag in ("tag:yaml.org,2002:null", "tag:yaml.org,2002:int")
+    return [] if plain_ok or node.style in ('"', "'") else [node.value]
 
 
 class TestUpsertArticle:
