@@ -33,7 +33,7 @@ describe("parseFrontmatter", () => {
   });
 
   it("ignores a leading UTF-8 byte order mark", () => {
-    expect(parseFrontmatter("﻿---\ntitle: Ciao\n---\nCorpo\n")).toEqual({
+    expect(parseFrontmatter("\uFEFF---\ntitle: Ciao\n---\nCorpo\n")).toEqual({
       data: { title: "Ciao" },
       content: "Corpo\n",
     });
