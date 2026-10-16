@@ -11,10 +11,18 @@ import { rankRelated } from "./related";
 
 const CONTENT_DIR = path.join(process.cwd(), "content");
 
-// Reads a content Markdown file; a malformed one fails the build naming it.
-function readMarkdownFile<T extends object>(filePath: string) {
+// Reads content/<dir>/<slug>.md as its frontmatter fields plus the trimmed
+// body, or null when there is no such file. A malformed file fails the build
+// with an error that names it.
+function readMarkdownFile<T extends object>(
+  dir: string,
+  slug: string,
+): (T & { body: string }) | null {
+  const filePath = path.join(CONTENT_DIR, dir, `${slug}.md`);
+  if (!fs.existsSync(filePath)) return null;
   try {
-    return parseFrontmatter<T>(fs.readFileSync(filePath, "utf-8"));
+    const { data, content } = parseFrontmatter<T>(fs.readFileSync(filePath, "utf-8"));
+    return { ...data, body: content.trim() };
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     throw new Error(`${path.relative(process.cwd(), filePath)}: ${message}`, { cause: error });
@@ -115,10 +123,7 @@ export function getAllArticleSlugs(): string[] {
 }
 
 export function getArticleBySlug(slug: string): Article | null {
-  const filePath = path.join(CONTENT_DIR, "articles", `${slug}.md`);
-  if (!fs.existsSync(filePath)) return null;
-  const { data, content } = readMarkdownFile<ArticleMeta>(filePath);
-  return { ...data, body: content.trim() };
+  return readMarkdownFile<ArticleMeta>("articles", slug);
 }
 
 export function getRelatedArticles(article: ArticleMeta, limit: number): ArticleMeta[] {
@@ -221,8 +226,5 @@ export interface StaticPage {
 }
 
 export function getStaticPageBySlug(slug: string): StaticPage | null {
-  const filePath = path.join(CONTENT_DIR, "pages", `${slug}.md`);
-  if (!fs.existsSync(filePath)) return null;
-  const { data, content } = readMarkdownFile<Omit<StaticPage, "body">>(filePath);
-  return { ...data, body: content.trim() };
+  return readMarkdownFile<Omit<StaticPage, "body">>("pages", slug);
 }

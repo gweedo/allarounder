@@ -3,7 +3,8 @@
 // unpatchable runtime packages. It gives the same result as gray-matter 4 on
 // well-formed files (see lib/__tests__/frontmatter.test.ts) and throws where
 // gray-matter guessed: a malformed opening line (including gray-matter's
-// "---js", which it eval'ed), a missing closing line, or a non-mapping block.
+// "---js", which it eval'ed), a missing or malformed closing line, or a
+// non-mapping block.
 //
 // Unquoted timestamps still load as Date, as they did with gray-matter; the
 // pipeline quotes its dates. js-yaml 4 resolves other plain scalars by YAML
@@ -18,7 +19,9 @@ export interface ParsedFrontmatter<T> {
 }
 
 const OPEN = /^---[ \t]*\r?\n/;
-const CLOSE = /\r?\n---[ \t]*(?:\r?\n|$)/;
+// The first line that starts with --- closes the block, as in gray-matter;
+// anything but spaces after it is an error rather than stray body text.
+const CLOSE = /\r?\n---([^\r\n]*)(?:\r?\n|$)/;
 
 // The type parameter is not checked: callers name the shape they expect, as
 // they did with gray-matter's untyped data. Field validation is the
@@ -38,6 +41,9 @@ export function parseFrontmatter<T extends object = Record<string, unknown>>(
   const rest = raw.slice(3);
   const close = CLOSE.exec(rest);
   if (!close) throw new Error("Frontmatter has no closing --- line");
+  if (close[1].trim() !== "") {
+    throw new Error("Frontmatter closing line must be exactly --- (no other text)");
+  }
   // js-yaml 4 `load` uses the safe default schema; an empty block loads as undefined.
   const data = load(rest.slice(0, close.index)) ?? {};
   if (Object.getPrototypeOf(data) !== Object.prototype) {

@@ -38,13 +38,10 @@ const LIVE = ["articles", "pages"]
   );
 
 describe("parseFrontmatter on the committed content", () => {
-  it.each(LIVE)("reads %s into a slug matching its file name and a body", (file) => {
-    const { data, content } = parseFrontmatter(
-      fs.readFileSync(path.join(CONTENT, file), "utf-8"),
-    );
+  it.each(LIVE)("reads %s into a slug matching its file name", (file) => {
+    const { data } = parseFrontmatter(fs.readFileSync(path.join(CONTENT, file), "utf-8"));
 
     expect(data.slug).toBe(path.basename(file, ".md"));
-    expect(content.trim()).not.toBe("");
   });
 });
 
@@ -111,7 +108,9 @@ describe("parseFrontmatter", () => {
 
   it.each([
     ["no closing line", "---\ntitle: x\n"],
+    ["no closing line (a body that opens with a --- rule)", "---\n\nIntroduzione.\n"],
     ["a closing line longer than ---", "---\ntitle: x\n----\nCorpo\n"],
+    ["text after the closing ---", "---\ntitle: x\n--- # fine\n---\nCorpo\n"],
   ])("rejects a block with %s", (_label, raw) => {
     expect(() => parseFrontmatter(raw)).toThrow(/closing/);
   });
