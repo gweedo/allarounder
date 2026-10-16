@@ -1,0 +1,3 @@
+# Frozen gray-matter parity fixtures: gray-matter-golden.json stores character
+# offsets into these files, so keep LF endings on every checkout (Windows too).
+*.md text eol=lf
