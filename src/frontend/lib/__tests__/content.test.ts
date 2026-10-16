@@ -37,6 +37,8 @@ const INDEX = {
 const FILES: Record<string, string> = {
   "articles/a1.md": "---\ntitle: Primo\nslug: a1\n---\n\n## Corpo\n",
   "pages/chi-siamo.md": "---\ntitle: Chi siamo\nslug: chi-siamo\n---\n\nTesto.\n",
+  "articles/rotto.md": "---\ntitle: Rotto\n",
+  "pages/rotta.md": "---js\nmodule.exports = {};\n---\n",
 };
 
 function relative(file: string): string {
@@ -73,6 +75,10 @@ describe("article loaders", () => {
 
   it("returns null for an unknown article", () => {
     expect(content.getArticleBySlug("missing")).toBeNull();
+  });
+
+  it("names the file when an article's frontmatter is malformed", () => {
+    expect(() => content.getArticleBySlug("rotto")).toThrow(/articles[\\/]rotto\.md.*closing/);
   });
 });
 
@@ -115,6 +121,10 @@ describe("static page loader", () => {
 
   it("returns null for an unknown page", () => {
     expect(content.getStaticPageBySlug("missing")).toBeNull();
+  });
+
+  it("names the file when a page's frontmatter is malformed", () => {
+    expect(() => content.getStaticPageBySlug("rotta")).toThrow(/pages[\\/]rotta\.md.*opening line/);
   });
 });
 
