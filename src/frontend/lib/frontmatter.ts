@@ -7,8 +7,12 @@
 //   gray-matter's "---js", which it eval'ed), a missing or malformed closing
 //   line, or frontmatter that is not a mapping (a scalar, list or null).
 // - Untagged numbers that js-yaml 3 read as numbers now load as strings:
-//   leading-zero numbers (0755 was octal 493, 007 was 7), sexagesimal (1:30
-//   was 90) and underscore numbers (1_000 was 1000).
+//   leading-zero numbers (0755 was octal 493, 007 was 7), and sexagesimal and
+//   underscore ints and floats (1:30 was 90, 1:30.5 was 90.5, 1_000 was 1000,
+//   1_000.5 was 1000.5).
+// - A body with no frontmatter that opens with a --- rule is read as
+//   frontmatter up to the next --- line, as in gray-matter; with no later
+//   --- line it is now an error (gray-matter returned an empty body).
 // - Explicitly tagged leading-zero ints use YAML 1.2: !!int 010 is 10, not 8.
 //
 // Leading-zero values stay strings on purpose: PyYAML's safe_dump leaves 08,
@@ -31,7 +35,7 @@ function withoutLeadingZero(tag: string, base: Type): Type {
   return new Type(tag, {
     kind: "scalar",
     resolve: (data: string) => !LEADING_ZERO.test(data) && base.resolve(data),
-    construct: (data: string) => base.construct(data),
+    construct: base.construct,
   });
 }
 

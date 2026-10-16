@@ -37,7 +37,8 @@ const LIVE = ["articles", "pages"]
       .map((f) => path.join(dir, f)),
   );
 
-describe("parseFrontmatter on the committed content", () => {
+// Skipped when there is no live content: an empty it.each fails its suite.
+describe.skipIf(LIVE.length === 0)("parseFrontmatter on the committed content", () => {
   it.each(LIVE)("reads %s into a slug matching its file name", (file) => {
     const { data } = parseFrontmatter(fs.readFileSync(path.join(CONTENT, file), "utf-8"));
 
