@@ -64,7 +64,7 @@ class TestWriteArticleFile:
         content_writer.write_article_file(tmp_path, article)
         text = (tmp_path / "articles" / "intervista-a-marco.md").read_text(encoding="utf-8")
         assert text.startswith("---\n")
-        assert 'doc_id: "doc-1"' in text
+        assert '"doc_id": "doc-1"' in text
         assert text.rstrip().endswith("Corpo dell'articolo.")
 
     @pytest.mark.parametrize(
@@ -82,7 +82,14 @@ class TestWriteArticleFile:
         assert data["title"] == value
         assert data["tags"] == [{"id": value, "name": value, "slug": value}]
         # A quoted scalar is a string under YAML 1.1 and 1.2 alike.
-        assert _plain_string_values(yaml.compose(frontmatter)) == []
+        assert _plain_strings(yaml.compose(frontmatter)) == []
+
+    def test_long_values_stay_on_one_line(self, tmp_path: Path) -> None:
+        excerpt = "parola " * 30
+        article = GeneratedArticle(meta=_meta(excerpt=excerpt), body="Corpo.")
+        content_writer.write_article_file(tmp_path, article)
+        text = (tmp_path / "articles" / "intervista-a-marco.md").read_text(encoding="utf-8")
+        assert f'"excerpt": "{excerpt}"\n' in text
 
     def test_committed_content_is_found(self) -> None:
         assert _COMMITTED_CONTENT, "no committed content under src/frontend/content"
@@ -94,12 +101,12 @@ class TestWriteArticleFile:
         assert yaml.safe_load(redumped) == frontmatter
 
 
-def _plain_string_values(node: yaml.Node) -> list[str]:
-    """String-typed value scalars left unquoted (keys are not checked)."""
+def _plain_strings(node: yaml.Node) -> list[str]:
+    """String scalars (keys and values) left unquoted."""
     if isinstance(node, yaml.MappingNode):
-        return [s for _, v in node.value for s in _plain_string_values(v)]
+        return [s for kv in node.value for n in kv for s in _plain_strings(n)]
     if isinstance(node, yaml.SequenceNode):
-        return [s for v in node.value for s in _plain_string_values(v)]
+        return [s for v in node.value for s in _plain_strings(v)]
     is_str = node.tag == "tag:yaml.org,2002:str"
     return [node.value] if is_str and node.style not in ('"', "'") else []
 

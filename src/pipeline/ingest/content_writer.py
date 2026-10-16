@@ -22,28 +22,23 @@ _INDEX_KEYS = ("articles", "categories", "authors", "guests", "tags")
 
 
 class _FrontmatterDumper(yaml.SafeDumper):
-    """Double-quotes every string value. PyYAML resolves scalars by YAML 1.1
-    rules, so it leaves e.g. `1e3` plain, which a YAML 1.2 reader (the
-    frontend's js-yaml) reads as a number. Mapping keys stay plain."""
+    """Double-quotes every string (keys included). PyYAML resolves scalars by
+    YAML 1.1 rules, so it leaves e.g. `1e3` plain, which a YAML 1.2 reader
+    (the frontend's js-yaml) reads as a number."""
 
 
 def _represent_str(dumper: yaml.SafeDumper, data: str) -> yaml.ScalarNode:
     return dumper.represent_scalar("tag:yaml.org,2002:str", data, style='"')
 
 
-def _represent_dict(dumper: yaml.SafeDumper, data: dict[Any, Any]) -> yaml.MappingNode:
-    node = dumper.represent_dict(data)
-    for key_node, _ in node.value:
-        key_node.style = None
-    return node
-
-
 _FrontmatterDumper.add_representer(str, _represent_str)
-_FrontmatterDumper.add_representer(dict, _represent_dict)
 
 
 def dump_frontmatter(data: dict[str, Any]) -> str:
-    return yaml.dump(data, Dumper=_FrontmatterDumper, allow_unicode=True, sort_keys=False)
+    # Unlimited width: no `\` line continuations inside long quoted values.
+    return yaml.dump(
+        data, Dumper=_FrontmatterDumper, allow_unicode=True, sort_keys=False, width=float("inf")
+    )
 
 
 def load_index(content_dir: Path) -> dict[str, Any]:
