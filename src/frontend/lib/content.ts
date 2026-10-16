@@ -108,8 +108,8 @@ export function getArticleBySlug(slug: string): Article | null {
   const filePath = path.join(CONTENT_DIR, "articles", `${slug}.md`);
   if (!fs.existsSync(filePath)) return null;
   const raw = fs.readFileSync(filePath, "utf-8");
-  const { data, content } = parseFrontmatter(raw);
-  return { ...(data as unknown as ArticleMeta), body: content.trim() };
+  const { data, content } = parseFrontmatter<ArticleMeta>(raw);
+  return { ...data, body: content.trim() };
 }
 
 export function getRelatedArticles(article: ArticleMeta, limit: number): ArticleMeta[] {
@@ -215,6 +215,6 @@ export function getStaticPageBySlug(slug: string): StaticPage | null {
   const filePath = path.join(CONTENT_DIR, "pages", `${slug}.md`);
   if (!fs.existsSync(filePath)) return null;
   const raw = fs.readFileSync(filePath, "utf-8");
-  const { data, content } = parseFrontmatter(raw);
-  return { ...(data as unknown as Omit<StaticPage, "body">), body: content.trim() };
+  const { data, content } = parseFrontmatter<Omit<StaticPage, "body">>(raw);
+  return { ...data, body: content.trim() };
 }

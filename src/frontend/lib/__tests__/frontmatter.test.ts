@@ -22,6 +22,27 @@ describe("parseFrontmatter parity with gray-matter", () => {
   });
 });
 
+// The fixtures above are frozen; this keeps content the pipeline publishes
+// later covered by a basic check.
+const CONTENT = path.join(__dirname, "..", "..", "content");
+const LIVE = ["articles", "pages"].flatMap((dir) =>
+  fs
+    .readdirSync(path.join(CONTENT, dir))
+    .filter((f) => f.endsWith(".md"))
+    .map((f) => path.join(dir, f)),
+);
+
+describe("parseFrontmatter on the committed content", () => {
+  it.each(LIVE)("reads %s into a slug matching its file name and a body", (file) => {
+    const { data, content } = parseFrontmatter(
+      fs.readFileSync(path.join(CONTENT, file), "utf-8"),
+    );
+
+    expect(data.slug).toBe(path.basename(file, ".md"));
+    expect(content.trim()).not.toBe("");
+  });
+});
+
 describe("parseFrontmatter", () => {
   it("splits the leading YAML block into data and returns the rest as content", () => {
     const raw = "---\ntitle: Chi siamo\nslug: chi-siamo\n---\nCorpo del testo.\n";
@@ -86,4 +107,25 @@ describe("parseFrontmatter", () => {
   it("treats an unclosed block as all frontmatter and no body, as gray-matter did", () => {
     expect(parseFrontmatter("---\ntitle: x\n")).toEqual({ data: { title: "x" }, content: "" });
   });
+
+  it.each([
+    ["a scalar", "---\nsolo testo\n---\nCorpo\n"],
+    ["a list", "---\n- a\n- b\n---\nCorpo\n"],
+  ])("rejects frontmatter that is %s rather than a mapping", (_label, raw) => {
+    expect(() => parseFrontmatter(raw)).toThrow(/mapping/);
+  });
+
+  it("accepts trailing spaces after the opening and closing delimiters", () => {
+    expect(parseFrontmatter("--- \ntitle: x\n---\t\nCorpo\n")).toEqual({
+      data: { title: "x" },
+      content: "Corpo\n",
+    });
+  });
+
+  it.each(["---js", "---yaml"])(
+    "rejects a %s language opener instead of evaluating or ignoring it",
+    (opener) => {
+      expect(() => parseFrontmatter(`${opener}\ntitle: x\n---\nCorpo\n`)).toThrow(/language/);
+    },
+  );
 });
