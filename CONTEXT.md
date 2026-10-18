@@ -53,3 +53,17 @@ _Avoid_: Topic (use for tags), section, type
 **Tag**:
 A freeform keyword that describes an article's subject matter. An article can have zero or more tags. Tags support related-content discovery and SEO long-tail.
 _Avoid_: Label, keyword (internally), topic (use Category for broad areas)
+
+## Authoring
+
+**Article template**:
+The Google Doc copied for every new article by "Nuovo articolo". Holds the template notes, the cut line, and a starting structure below it.
+_Avoid_: Boilerplate, skeleton, starter doc
+
+**Template notes**:
+Writer-facing guidance at the top of an article Doc, above the cut line — what formatting the site supports, with samples. Never published. Writers see it as "Promemoria".
+_Avoid_: Instructions, header, preamble
+
+**Cut line**:
+The fixed marker line in an article Doc that separates the template notes from the body: only what is below it becomes the Body. A Doc without a cut line is all Body.
+_Avoid_: Separator, divider, marker
