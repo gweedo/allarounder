@@ -48,6 +48,23 @@ E1 installed `ponytail` (PR #178, a trial). E2's report,
 
 ### E3 — Rethink the Google Docs → HTML conversion (deep brainstorm)
 
+**Status: grill paused (2026-10-18), waiting for the writers.** The
+formatting questionnaire (Google Form built from
+`docs/product/formatting-questionnaire-form.gs`) went out to the writers on
+2026-10-18. Work so far is on branch `docs/e3-conversion-grill` (not yet a
+PR); full state is in `.claude/handoffs/e3-conversion-grill-paused.md`
+(gitignored, local only). To resume, in a fresh session:
+
+1. Export the answers from the form's **Risposte** tab (or paste them in).
+2. If a writer shared a real Doc in the form's last question, check it sits
+   in the shared articles folder (`ARTICLES_FOLDER_ID`), so the pipeline's
+   service account can read it for the `/prototype` export test.
+3. Check out `docs/e3-conversion-grill` and run `/grill-with-docs`, pointing
+   it at the handoff file and the answers. It resumes at Q4 (policy for
+   unsupported formats; the writers will likely want tables). Don't re-ask
+   what's settled: the cut line, sample content above it, and empty headings
+   dropped silently (`CONTEXT.md` § Authoring).
+
 Big review of the whole chain: Doc export → HTML → Markdown
 (`src/pipeline/`) → `lib/markdown.ts` → rendered HTML. Run it along the main
 flow:
