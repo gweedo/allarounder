@@ -164,6 +164,55 @@ you actually loading it, not just a successful build log.
 **Acceptance:** `allarounder.it` serves the static site; `allarounder.eu`
 redirects to it; both over valid HTTPS.
 
+## Queued next steps (E1 → E2 → E3, in this order)
+
+Independent of Phase D's credentials; do them in this order. Each is its own
+session.
+
+### E1 — Install the `ponytail` skill
+
+Source: <https://github.com/DietrichGebert/ponytail/blob/main/skills/ponytail/SKILL.md>
+(MIT, a single `SKILL.md`). It is a "lazy senior dev" mode: smallest complete
+change, no speculative abstraction, ends each reply with what was skipped and
+any risk. Levels `lite|full|ultra`.
+
+1. Read the upstream `SKILL.md` in full before copying it.
+2. Add it as `.claude/skills/ponytail/SKILL.md` (keep the license header);
+   commit on a branch + PR.
+3. Check it doesn't conflict with `CLAUDE.md` rules (TDD, two-language rule)
+   — CLAUDE.md wins on any conflict.
+
+**Acceptance:** `/ponytail` is listed and invocable in a fresh session.
+
+### E2 — Deep research: better context handling
+
+Run `anthropic-skills:deep-research` on how to manage Claude Code context
+well across long, multi-session work. Start from what the Matt Pocock flow
+already says (see `/ask-matt`): the ~120k-token "smart zone", `/handoff`
+(fork to a fresh session with a file) vs `/compact` (continue in place),
+one fresh session per `/implement` issue. Research beyond that, e.g.
+subagent use, memory files, CLAUDE.md sizing, handoff-file shape.
+
+**Output:** a short report with concrete recommendations for this repo
+(what to change in CLAUDE.md / memory / workflow). Do this before E3 — its
+findings decide how E3's long brainstorm is run.
+
+### E3 — Rethink the Google Docs → HTML conversion (deep brainstorm)
+
+Big review of the whole chain: Doc export → HTML → Markdown
+(`src/pipeline/`) → `lib/markdown.ts` → rendered HTML. Run it along the main
+flow:
+
+1. `/grill-with-docs` — deep brainstorm; record terms in `CONTEXT.md` and
+   any decision as a new ADR superseding the current conversion approach.
+2. `/prototype` if a question needs a runnable answer (e.g. export a real
+   Doc and diff each stage's output), bridged with `/handoff` both ways.
+3. `/to-prd` → `/to-issues`.
+4. `/implement` — one fresh session per issue, given the PRD + that issue.
+
+Keep steps 1–3 in one unbroken context window (`/handoff` if it nears the
+smart-zone limit, applying E2's findings).
+
 ## Do not
 
 - Create, commit, or mock any credential (service-account key, PAT,
