@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This is the build repo for **Allarounder**, an Italian written-articles blog that promotes a gymnastics podcast hosted on Spotify. As of **2026-08-26** (ADR-0018) it builds a **static site**: writers author in Google Docs, a CI pipeline turns that into Markdown, and Next.js exports a static site deployed to Cloudflare Pages. There is no backend server, no database, no admin UI, and no authentication anywhere in this stack.
 
-The repo holds two things: the static frontend (`src/frontend/`) and the content pipeline (`src/pipeline/`, in progress — see `NEXT-STEPS-PROMPT.md` for the remaining build tasks). `infra/` (Bicep), `src/backend/` (FastAPI), and Docker Compose are gone; a frozen copy of that pre-pivot application lives at `gweedo/allarounder-legacy` (archived, read-only).
+The repo holds two things: the static frontend (`src/frontend/`) and the content pipeline (`src/pipeline/`, live — see `NEXT-STEPS-PROMPT.md` for what's left). `infra/` (Bicep), `src/backend/` (FastAPI), and Docker Compose are gone; a frozen copy of that pre-pivot application lives at `gweedo/allarounder-legacy` (archived, read-only).
 
 ## The product in one paragraph
 
@@ -27,6 +27,8 @@ Before proposing architecture or implementation, read the relevant file rather t
 - **`docs/architecture/adr/`** — Architecture Decision Records, one decision per file. **ADR-0018 is the pivot** — read it for the full rationale and what it supersedes. See `adr/README.md` for the index and current status of every ADR.
 - **`docs/architecture/TECH-SPEC.md`** and **`docs/architecture/SITE-STRUCTURE.md`** — describe the **retired** FastAPI/Postgres/Azure architecture and its API surface. Useful for the data-model shape (categories, tags, guests, SEO fields) that `content/index.json` still mirrors, but the API endpoints, backend layering, and infra sections no longer apply. Not yet rewritten for the pivot.
 - **`docs/product/PRD.md`** — the original Product Requirements Document (Draft v1, 2026-06-17). Vision, audience, and v1 content scope (articles, categories, tags, guests, SEO) still apply; its build sequence and API surface sections describe the retired architecture.
+- **`docs/architecture/CONTENT-CONTRACT.md`** — the **live** contract for the content chain: Sheet columns, slug locking, publish rule, image paths, validation errors. Read it before touching `src/pipeline/` or `lib/content.ts`.
+- **`docs/handoff/`** — session handoff prompts for past and pending work; **`docs/research/`** — research reports (e.g. Claude Code context handling).
 - **`docs/product/content-team-questionnaire.md`** — the content-team answers that informed the PRD, including why the writers need a Google-Docs-native workflow.
 
 When a decision changes, **add a new ADR that supersedes the old one** and update `docs/DECISIONS.md` — do not rewrite decision history.
@@ -34,7 +36,7 @@ When a decision changes, **add a new ADR that supersedes the old one** and updat
 ## Settled architecture (do not re-litigate without a new ADR)
 
 - **Editorial workflow:** writers author articles in **Google Docs**, indexed by a **Google Sheet** (one row per article: title, Doc link, category, tags, author, guest, Spotify link, cover image, meta description, publish date, status). Publishing is triggered by a **"Pubblica" button** in the Sheet (Apps Script → GitHub `repository_dispatch`), not automatically on save.
-- **Content pipeline (`src/pipeline/`, Python, in progress):** a GitHub Actions job reads the Sheet, exports each Doc, converts HTML → Markdown, validates it against the domain value objects, and writes `content/articles/*.md` + `content/index.json` into `src/frontend/`. Generated content is **committed** — it is the audit trail and the rollback mechanism (`git revert`). See `NEXT-STEPS-PROMPT.md` Task 3 for what's built vs outstanding.
+- **Content pipeline (`src/pipeline/`, Python):** a GitHub Actions job reads the Sheet, exports each Doc, converts HTML → Markdown, validates it against the domain value objects, and writes `content/articles/*.md` + `content/index.json` into `src/frontend/`. Generated content is **committed** — it is the audit trail and the rollback mechanism (`git revert`). `docs/architecture/CONTENT-CONTRACT.md` is the Sheet → pipeline → frontend contract.
 - **Domain layer (`src/pipeline/domain/`):** framework-free Python, moved from the retired backend. `Article` is the aggregate root; `Slug` (with `from_title`), `Body`, `SpotifyUrl`, `PublicationStatus` are value objects; entities are `Article`, `Author`, `Guest`, `Category`, `Tag`, `StaticPage`. This is the pipeline's build-time content validator — a bad Doc fails the build with an Italian-language error rather than publishing a broken page.
 - **Frontend (`src/frontend/`):** Next.js with **`output: "export"`** — a pure static site, no server. `lib/content.ts` is the filesystem loader (reads `content/index.json` and `content/articles|pages/*.md` splitting YAML frontmatter with `lib/frontmatter.ts`, a `js-yaml` 4 parser) that replaced every page's old `fetch()` call to the retired backend; its exported types are the content contract the pipeline must emit. `images: { unoptimized: true }` — there is no Image Optimization API under static export. Security headers live in `public/_headers` (Cloudflare Pages convention), not `next.config.ts` (`headers()` does not run under export).
 - **Hosting:** **Cloudflare Pages** (free tier), custom domain `allarounder.it`, with `allarounder.eu` 301-redirecting to it (ADR-0007). No server, no always-on compute.
@@ -65,6 +67,8 @@ TDD (red → green → refactor) still applies, scoped to what's left:
 
 **Never push directly to `main`.** Always create a feature branch and open a PR. Branch protection is enforced — direct pushes will be rejected, but don't attempt them regardless.
 
+**Never create, commit, or mock credentials** (service-account keys, PATs, Cloudflare tokens) — the user generates every one and pastes it into a secrets UI. **Get explicit go-ahead before any DNS change** to `allarounder.it`/`allarounder.eu`; it is the one outward-facing, not casually reversible step.
+
 ## Commands
 
 **Frontend** (`src/frontend/`, deps installed via `npm install`):
@@ -79,7 +83,11 @@ TDD (red → green → refactor) still applies, scoped to what's left:
 **Pipeline domain** (`src/pipeline/`, Python venv at `src/pipeline/.venv`):
 - Tests: `cd src/pipeline && .venv/bin/python -m pytest -q`
 
-The working directory is on Windows; available shells are PowerShell (primary) and a Bash tool for POSIX scripts.
+The environment is a Debian 12 devcontainer (WSL2 kernel) with bash.
+
+## Compact instructions
+
+When compacting, preserve: the current issue/PRD links, the list of files modified, the test commands run and their results, and approaches rejected (with why).
 
 ## Agent skills
 

@@ -55,3 +55,6 @@ tools/apps-script/.clasp.json
 # Deferred esito writes, written by ingest/cli.py and consumed by
 # ingest/flush_esito.py within the same publish.yml job run
 deferred-esito.json
+
+# Claude Code /handoff files (session-local)
+.claude/handoffs/

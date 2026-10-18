@@ -18,9 +18,9 @@ Single-context repo:
 /
 ├── CONTEXT.md
 ├── docs/architecture/adr/
-│   ├── 0001-backend-framework-fastapi.md
-│   └── 0002-decoupled-frontend-nextjs.md
-│   └── ... (0003–0012)
+│   ├── README.md   (index + status of every ADR)
+│   ├── 0018-drive-cms-static-site.md   (the pivot)
+│   └── ... (0001–0019)
 └── src/
 ```
 
