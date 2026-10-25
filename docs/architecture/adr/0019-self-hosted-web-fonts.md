@@ -40,6 +40,10 @@ Commit the font files to the repository and load them with **`next/font/local`**
 - Characters outside the Latin subset fall back to a system font. This already happens in one live Article, which quotes the Greek *agōn (ἀγών)*: those characters render in a system fallback font. If such text becomes common, add Literata's `latin-ext` or `greek` files.
 - **Revisit if:** the site adds a language or content that needs another script, or the design changes typefaces.
 
+## Amendment (2026-10-25)
+
+The display and label faces changed (see the 2026-10-25 amendment to "Visual design: direction B · Tabellone" in `docs/DECISIONS.md`); the loading mechanism above is unchanged. The committed files are now **Archivo Narrow** 600 and 700 (`--font-archivo-narrow`, metric-adjusted Arial fallback, preloaded) and **Barlow** 600 (`--font-barlow`, metric-adjusted Arial fallback, not preloaded), from the Fontsource 5.3.0 packages `@fontsource/archivo-narrow` and `@fontsource/barlow`, with the same Latin subset. Barlow Condensed and IBM Plex Mono are removed. `globals.css` maps them into `--font-display` and `--font-ui` (formerly `--font-mono-ui`).
+
 ## Action Items
 
 1. [x] Commit the woff2 files and OFL licences, load them in the root layout, and map the tokens (#153).

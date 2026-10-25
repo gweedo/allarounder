@@ -8,21 +8,21 @@ import { SPOTIFY_SHOW_URL } from "../lib/site";
 // Brand faces, self-hosted (ADR-0019): Latin-subset woff2 files committed
 // under app/fonts/ with their OFL licences. Each exposes a CSS variable on
 // <html> that globals.css maps into --font-display, --font-serif and
-// --font-mono-ui. Only the display face is preloaded.
-const barlowCondensed = localFont({
+// --font-ui. Only the display face is preloaded.
+const archivoNarrow = localFont({
   src: [
     {
-      path: "./fonts/barlow-condensed/barlow-condensed-latin-600-normal.woff2",
+      path: "./fonts/archivo-narrow/archivo-narrow-latin-600-normal.woff2",
       weight: "600",
       style: "normal",
     },
     {
-      path: "./fonts/barlow-condensed/barlow-condensed-latin-700-normal.woff2",
+      path: "./fonts/archivo-narrow/archivo-narrow-latin-700-normal.woff2",
       weight: "700",
       style: "normal",
     },
   ],
-  variable: "--font-barlow-condensed",
+  variable: "--font-archivo-narrow",
   display: "swap",
   adjustFontFallback: "Arial",
 });
@@ -39,18 +39,11 @@ const literata = localFont({
   preload: false,
 });
 
-const plexMono = localFont({
-  src: [
-    {
-      path: "./fonts/ibm-plex-mono/ibm-plex-mono-latin-500-normal.woff2",
-      weight: "500",
-      style: "normal",
-    },
-  ],
-  variable: "--font-plex-mono",
+const barlow = localFont({
+  src: [{ path: "./fonts/barlow/barlow-latin-600-normal.woff2", weight: "600", style: "normal" }],
+  variable: "--font-barlow",
   display: "swap",
-  adjustFontFallback: false,
-  fallback: ["ui-monospace", "SFMono-Regular", "Consolas", "monospace"],
+  adjustFontFallback: "Arial",
   preload: false,
 });
 
@@ -70,7 +63,7 @@ export default function RootLayout({
   return (
     <html
       lang="it"
-      className={`${barlowCondensed.variable} ${literata.variable} ${plexMono.variable}`}
+      className={`${archivoNarrow.variable} ${literata.variable} ${barlow.variable}`}
     >
       <body>
         <SiteHeader spotifyShowUrl={SPOTIFY_SHOW_URL} />
