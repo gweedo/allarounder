@@ -9,7 +9,7 @@ const publishedArticles: { slug: string }[] = JSON.parse(
 // next/font names each family after the const in app/layout.tsx, plus a hash.
 // Its metric-adjusted fallbacks ("… Fallback") load from local system fonts,
 // so they're excluded: only the self-hosted faces count.
-const FAMILIES = [/barlowCondensed/i, /literata/i, /plexMono/i];
+const FAMILIES = [/archivoNarrow/i, /literata/i, /barlow/i];
 
 // The brand faces are self-hosted (ADR-0019): every font comes from the
 // site's own origin, and each family actually renders on the page.
