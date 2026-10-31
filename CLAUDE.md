@@ -101,4 +101,4 @@ Default mattpocock/skills label vocabulary (no overrides). See `docs/agents/tria
 
 ### Domain docs
 
-Single-context: `CONTEXT.md` at repo root + ADRs at `docs/architecture/adr/`. See `docs/agents/domain.md`.
+Single-context: `GLOSSARY.md` at repo root + ADRs at `docs/architecture/adr/`. See `docs/agents/domain.md`.

@@ -52,22 +52,22 @@ Big review of the whole chain: Doc export → HTML → Markdown
 (`src/pipeline/`) → `lib/markdown.ts` → rendered HTML. Run it along the main
 flow:
 
-1. `/grill-with-docs` — deep brainstorm; record terms in `CONTEXT.md` and
+1. `/grill-with-docs` — deep brainstorm; record terms in `GLOSSARY.md` and
    any decision as a new ADR superseding the current conversion approach.
 2. `/prototype` if a question needs a runnable answer (e.g. export a real
    Doc and diff each stage's output), bridged with `/handoff` both ways.
-3. `/to-prd` → `/to-issues`.
+3. `/to-spec` → `/to-tickets`.
 4. `/implement` — one fresh session per issue, given the PRD + that issue.
 
 **Context rules (from E2):**
 
-- Before starting, check `CONTEXT.md` and the CLAUDE.md doc map are current
+- Before starting, check `GLOSSARY.md` and the CLAUDE.md doc map are current
   (they were fixed for the pivot on 2026-10-18), then start E3 in a fresh
   session — CLAUDE.md edits only apply after a restart.
 - Keep steps 1–3 in **one unbroken window**: no `/compact`, no `/clear`.
   Watch the token count with `/context`. This model auto-compacts only near
   ~967k tokens, so nothing stops you at the ~120k smart zone — if you pass it
-  before `/to-issues`, `/handoff` and continue in a fresh session instead.
+  before `/to-tickets`, `/handoff` and continue in a fresh session instead.
 - Delegate the code reading of the conversion chain (Doc export →
   `src/pipeline/ingest/` → Markdown → `lib/markdown.ts` → HTML) to a
   subagent that returns a summary with `file:line` pointers, so it never
@@ -77,7 +77,7 @@ flow:
   rebuild: tell it to save under `.claude/handoffs/` (gitignored) instead.
 - `/implement`: `/clear`, then one fresh session per issue with the PRD and
   that issue — the issue is the handoff. Finish with a fresh-context
-  `/review`.
+  `/code-review`.
 
 ## Do not
 
