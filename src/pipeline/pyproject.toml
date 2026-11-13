@@ -24,14 +24,14 @@ dev = [
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["domain*", "ingest*"]
+include = ["domain*", "ingest*", "stats*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "--tb=short"
 
 [tool.coverage.run]
-source = ["domain", "ingest"]
+source = ["domain", "ingest", "stats"]
 omit = ["ingest/cli.py", "ingest/flush_esito.py"]
 
 [tool.coverage.report]

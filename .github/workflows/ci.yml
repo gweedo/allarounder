@@ -63,7 +63,7 @@ jobs:
 
       - name: Type-check (mypy)
         working-directory: src/pipeline
-        run: mypy domain ingest
+        run: mypy domain ingest stats
 
   test-vitest:
     name: Test (Vitest)
