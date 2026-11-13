@@ -181,3 +181,20 @@ export function siteCounters() {
   }
   return { gare: competitions.length, atleti: athletes.length, punteggi: scores, azzurre, finaliAzzurre };
 }
+
+// ---- Italian URL slugs for the leaderboard pages ---------------------------
+
+export const DISCIPLINE_SLUG: Record<Discipline, string> = { WAG: "femminile", MAG: "maschile" };
+export const APPARATUS_SLUG: Record<Apparatus, string> = {
+  AA: "all-around", VT: "volteggio", UB: "parallele-asimmetriche", BB: "trave", FX: "corpo-libero",
+  PH: "cavallo-con-maniglie", SR: "anelli", PB: "parallele-simmetriche", HB: "sbarra",
+};
+export const leaderboardApparatus = (d: Discipline): Apparatus[] => ["AA", ...APPARATUS_ORDER[d]];
+export const leaderboardHref = (d: Discipline, a: Apparatus) =>
+  `/statistiche/migliori-punteggi/${DISCIPLINE_SLUG[d]}/${APPARATUS_SLUG[a]}`;
+export function leaderboardFromSlugs(dSlug: string, aSlug: string) {
+  const d = (Object.keys(DISCIPLINE_SLUG) as Discipline[]).find((k) => DISCIPLINE_SLUG[k] === dSlug);
+  if (!d) return undefined;
+  const a = leaderboardApparatus(d).find((k) => APPARATUS_SLUG[k] === aSlug);
+  return a ? { discipline: d, apparatus: a } : undefined;
+}

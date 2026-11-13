@@ -160,7 +160,7 @@ export default async function AthletePage({ params }: Props) {
 
   return (
     <main id="contenuto" className="page-container page-container--wide stats-page has-switcher">
-      <Breadcrumb items={[{ name: "Home", href: "/" }, { name: "Statistiche", href: "/statistiche" }, { name: a.name }]} />
+      <Breadcrumb items={[{ name: "Home", href: "/" }, { name: "Statistiche", href: "/statistiche" }, { name: "Atleti", href: "/statistiche/atleti" }, { name: a.name }]} />
       <p className="stats-kicker">Ginnastica artistica {DISCIPLINE_LABEL[a.discipline].toLowerCase()}</p>
       <h1>{a.name}</h1>
 

@@ -261,3 +261,71 @@ html[data-variant="B"] .variant-b { display: block; }
 }
 .proto-switcher button:focus-visible { outline: 2px solid #fff; }
 .has-switcher { padding-bottom: 6rem; }
+
+/* ---- Split hub: section cards + link tabs ---- */
+.stats-sections {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: var(--space-4);
+  margin: var(--space-6) 0 0;
+  padding: 0;
+  list-style: none;
+}
+.stats-sections > li {
+  position: relative;
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-top: 4px solid var(--color-brand);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+}
+.stats-sections h2 { margin: 0 0 var(--space-2); }
+.stats-sections h2 a { color: var(--color-text); text-decoration: none; }
+.stats-sections h2 a::after { content: " →"; color: var(--color-brand-ink); }
+.stats-sections h2 a:hover { text-decoration: underline; }
+.stats-sections p { margin: 0 0 var(--space-3); color: var(--color-text-muted); }
+.stats-sections__facts {
+  margin: 0;
+  padding: var(--space-3) 0 0;
+  border-top: 1px solid var(--color-border);
+  list-style: none;
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
+}
+.stats-sections__facts a { color: var(--color-brand-ink); }
+
+.stats-tabs {
+  display: flex;
+  gap: var(--space-2);
+  margin: var(--space-4) 0 var(--space-2);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  font-family: var(--font-ui);
+}
+.stats-tabs a {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  min-height: var(--tap-target);
+  padding: 0 var(--space-4);
+  border: 1px solid var(--color-brand-deep);
+  border-radius: var(--radius-pill);
+  color: var(--color-brand-deep);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+.stats-tabs a[aria-current="page"] { background: var(--color-brand-deep); color: #fff; }
+/* Wrap, don't scroll: the selected apparatus must always be visible. */
+.stats-tabs--secondary { flex-wrap: wrap; margin-bottom: var(--space-4); overflow: visible; }
+.stats-tabs--secondary a {
+  min-height: 2.25rem;
+  border-color: var(--color-border);
+  color: var(--color-brand-ink);
+  letter-spacing: 0;
+  text-transform: none;
+  background: var(--color-surface);
+}
+.stats-tabs--secondary a[aria-current="page"] { border-color: var(--color-brand); background: var(--color-brand); color: var(--color-on-brand); }

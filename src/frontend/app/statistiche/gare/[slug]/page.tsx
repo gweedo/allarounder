@@ -157,7 +157,7 @@ export default async function CompetitionPage({ params }: Props) {
 
   return (
     <main id="contenuto" className="page-container page-container--wide stats-page">
-      <Breadcrumb items={[{ name: "Home", href: "/" }, { name: "Statistiche", href: "/statistiche" }, { name: c.name }]} />
+      <Breadcrumb items={[{ name: "Home", href: "/" }, { name: "Statistiche", href: "/statistiche" }, { name: "Gare", href: "/statistiche/gare" }, { name: c.name }]} />
       <p className="stats-kicker">{c.tier} · {c.level === "internazionale" ? "Internazionale" : "Nazionale"}</p>
       <h1>{c.name}</h1>
       <p className="stats-updated">
