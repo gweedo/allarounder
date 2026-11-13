@@ -6,7 +6,9 @@ We can turn a Wikipedia championship article into validated JSON that the build 
 
 - 4 have a wrong published total;
 - 5 have the right total, but a wrong apparatus subtotal or member score;
-- 1 (Italy's team vault, off by 0.033) is unconfirmed. That makes validation the core of the job. Only Wikipedia data is committed: World Gymnastics and FGI data stays out of the repo until [#191](https://github.com/gweedo/allarounder/issues/191) gets a written yes. The World Gymnastics API was exercised as a dry run only, with its output kept outside the repo.
+- 1 (Italy's team vault, off by 0.033) is unconfirmed.
+
+That makes validation the core of the job, and it is why **Wikipedia is only a backup source**, verified against official data or approved by an editor before anything is published (see [Source priority](#source-priority-decided-by-guido-2026-11-13)). [Storage](#storage) describes where the data lives. Only Wikipedia data is committed: World Gymnastics and FGI data stays out of the repo until [#191](https://github.com/gweedo/allarounder/issues/191) gets a written yes. The World Gymnastics API was exercised as a dry run only, with its output kept outside the repo.
 
 ## Files
 
@@ -145,15 +147,49 @@ interface TeamResult {    // NEW: results of a TEAM phase
 
 The rest of the prototype contract held up: `round` (`qualifica` / `finale-aa` / `finale`), per-apparatus `d/e/bonus/penalty/total`, `vaults[]` with a result-level `bonus` for women, and AA `parts`. As in the prototype, medals, leaderboards and counters stay derived at build time, never stored. Competition metadata (name, city, dates, tier) is hard-coded in the spike. In production it should come from the editorial Sheet (one row per competition) rather than be scraped.
 
+## Source priority (decided by Guido, 2026-11-13)
+
+**Official data comes first. Wikipedia is only a backup, and every row from Wikipedia must be verified before it is published.**
+
+1. **Primary: World Gymnastics, once #191 grants permission.** The JSON feed supplies totals, ranks and the full field. The result books supply D/E, if we take on PDF parsing.
+2. **Backup: Wikipedia, in two cases only:**
+   - **(a)** to fill fields the official JSON lacks, mainly the D/E/bonus/penalty breakdown in finals;
+   - **(b)** for an event where the official source is missing or broken.
+3. **What "verified" means for a Wikipedia row:**
+   - **Automatic.** The row's total and rank must match the official total and rank (the cross-check in `dryrun_world_gymnastics.py`), and its own arithmetic must add up. A row that fails either check is not published.
+   - **Manual,** when no official figure exists (case b, or if #191 is refused). The row is stored as `verified: false` and stays hidden on the site until an editor approves it in the stats PR. Approval flips the row to `verified: true` and records who approved it, so the approval sits in the git history.
+4. **Each stored row records where it came from** in `source`: `"wg"` or `"wikipedia"`. The page credits Wikipedia (CC BY-SA) only where Wikipedia rows are actually shown.
+
+**Consequence:** if #191 is refused, nothing goes live automatically. Every number from Wikipedia then passes through an editor's approval. That is slower, but no unverified number reaches the site.
+
+## Storage
+
+Everything lives in git, like article content (ADR-0018: no database). The committed file is both the audit trail and the rollback.
+
+```text
+src/frontend/content/stats/
+├── athletes.json                  # identity registry: slug ↔ wgId ↔ wikidata ↔ wiki title, name, nation
+└── competitions/
+    ├── mondiali-2026-rotterdam.json   # one file per competition: metadata + phases + results + per-row source/verified
+    └── europei-2026-….json
+```
+
+- **One file per competition.** Results don't change after the event, so a file is written once and rarely touched again. Each update's PR diff covers only one event. Medals, leaderboards and athlete histories are derived at build time from all the files together, as in the prototype, and never stored.
+- **`athletes.json` is the identity registry.** A slug is locked once published, like article slugs (CONTENT-CONTRACT). The key is the World Gymnastics gymnast ID where we have it. The extractor reads this file to reuse existing slugs, and adds new athletes in the same PR.
+- **The frontend reads it through `lib/stats.ts`,** a sibling of `lib/content.ts`, at build time only. Pages are server components, so the JSON is never shipped to the browser. Only the rendered HTML tables are.
+- **Raw source responses are not committed:** Wikipedia HTML, World Gymnastics JSON and PDFs. They are kept as a GitHub Actions artifact for 90 days to debug a run (free), and each competition file pins the exact source version (`revid`, retrieval date). This keeps unlicensed raw material out of the repo.
+- **Size.** The Worlds sample is 140 KB pretty-printed, with finals plus qualifiers only. With the full official field it is roughly 0.5 MB per big event, so 20–30 events a season comes to 5–15 MB a year in git. That's fine. Pretty-printing stays on, because readable diffs are the review step.
+- **Competition metadata** (Italian name, dates, tier, source IDs) comes from a new tab in the editorial Sheet, so editors decide which competitions appear. This is the same flow as articles.
+
 ## How the extraction should run (recommendation)
 
 - **Trigger.** A `stats.yml` workflow with `workflow_dispatch` (an editor or Guido runs it after a competition). The Sheet's "Pubblica" button could also send a second `repository_dispatch` type. There is no nightly cron: results don't change after the event, so a cron would only re-fetch the same numbers and add noise.
 - **Input.** A competitions list (Sheet tab or a file in the repo): slug, Italian name, dates, tier, source page/ID, and the source revid it was checked against.
-- **Output.** `src/frontend/content/stats/<competition-slug>.json`, committed. `lib/content.ts` (or a sibling `lib/stats.ts`) reads it at build time, like `content/index.json`.
+- **Output.** See [Storage](#storage). The output is committed.
 - **Commit path.** The same as `publish.yml`: a `content/stats-<run_id>` branch, a PR, then `gh pr merge --auto --squash` once CI passes. Never push to `main`. The PR diff is the review step: a changed number shows up in the diff before it goes live.
 - **Failure behaviour.**
   - **Shape errors, a failed canary, or a fetch failure exit non-zero, and nothing is written.** The job fails visibly and the site keeps the last good JSON, because the committed file is the fallback. Never publish an empty or partial file.
-  - **Arithmetic inconsistencies** should also fail by default. The fix is either to correct the Wikipedia article (good citizenship, and the next run picks up the fix) or to add an explicit override entry for that row in the competitions list, which records who decided and why. `--mark-inconsistent` is for the spike sample only.
+  - **Wikipedia rows that fail arithmetic or the official cross-check are never published.** The fix is to correct the Wikipedia article (good citizenship, and the next run picks up the fix). Rows with no official figure to check against go in as `verified: false` and wait for an editor's approval in the PR. `--mark-inconsistent` is for the spike sample only.
   - **Pinning.** Every file records the `revid` it came from, so a re-run against a vandalised revision shows up as a diff.
 - **Cost.** €0 (GitHub Actions minutes: about 1 minute per run).
 - **Politeness.** Use serial requests, 1 s apart, with `maxlag=5` and `Retry-After` honoured. Wikimedia policy wants a **descriptive User-Agent with a contact address**. The spike deliberately used a generic name. Guido should choose the production UA (a project URL or a dedicated mailbox, not a personal email).
@@ -172,11 +208,11 @@ The rest of the prototype contract held up: `round` (`qualifica` / `finale-aa` /
 
 ## Open points for the ADR
 
-1. **Source choice.**
-   - **If #191 gets a yes:** World Gymnastics JSON for totals and the full field, plus Wikipedia for D/E in finals, joined by athlete ID.
-   - **If #191 gets no answer or a no:** Wikipedia only. That means finals plus qualifiers, and the "season best" view goes away.
+1. **Source priority.** This is decided (see [Source priority](#source-priority-decided-by-guido-2026-11-13)): official first, Wikipedia as a verified backup. Still open:
+   - what we do if #191 is refused (only editor-approved Wikipedia rows, no "season best" view);
+   - whether D/E is worth the PDF parsing, or comes from verified Wikipedia finals only.
 2. **Identity.** Key athletes on the World Gymnastics gymnast ID, via Wikidata P2696/P7440 when using Wikipedia. Slugs stay as the URL form but are locked once published, like article slugs (CONTENT-CONTRACT). Decide how a slug collision is resolved.
-3. **Inconsistent rows.** Decide between failing the run, hiding those rows, or using an override file. Who reviews?
+3. **Who approves unverified Wikipedia rows** in the stats PR: Guido, or an editor. If an editor, they need a GitHub account.
 4. **CC BY-SA obligations on the page.** We need an attribution line and a link to the revision. Share-alike covers the stats JSON and tables derived from Wikipedia: does that also cover the page around them? (Probably not, but the ADR should state it.)
 5. **Neutral athletes.** How to show "World Gymnastics 1/2" (BLR/RUS) athletes: under the country code as World Gymnastics does, or as neutral athletes.
 6. **Disciplines and levels.** Artistic only for v1? Rhythmic and trampoline are in World Gymnastics, but were not tested here. These are the open questions for the creative team in #185.
