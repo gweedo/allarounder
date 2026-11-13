@@ -329,10 +329,12 @@ h3,
  */
 .site-header-inner {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  /* PROTOTYPE (#189): four section links (Statistiche added). */
+  grid-template-columns: repeat(4, auto);
+  justify-content: space-between;
   grid-template-areas:
-    "brand brand cta"
-    ". . .";
+    "brand brand brand cta"
+    ". . . .";
   align-items: center;
   max-width: 1100px;
   margin: 0 auto;
@@ -383,6 +385,14 @@ h3,
   text-underline-offset: 4px;
 }
 
+/* PROTOTYPE (#189): tighter links so four fit on a 320px phone. */
+@media (max-width: 22rem) {
+  .site-header-nav a:not(.site-header-cta) {
+    padding: 0 2px;
+    letter-spacing: 0.02em;
+  }
+}
+
 /* Section links go on row 2; the CTA is placed by its own rule below. */
 .site-header-nav a:not(.site-header-cta) {
   grid-row: 2;
@@ -408,8 +418,8 @@ h3,
 /* Desktop: one row, wordmark left, nav centred, CTA right. */
 @media (min-width: 50rem) {
   .site-header-inner {
-    grid-template-columns: 1fr repeat(3, auto) 1fr;
-    grid-template-areas: "brand . . . cta";
+    grid-template-columns: 1fr repeat(4, auto) 1fr;
+    grid-template-areas: "brand . . . . cta";
     column-gap: var(--space-5);
   }
 
@@ -947,5 +957,23 @@ h3,
     transition: none !important;
     animation: none !important;
     scroll-behavior: auto !important;
+  }
+}
+
+/* PROTOTYPE (#189): with four section links the desktop row overflows below
+   ~64rem; keep the short "Ascolta" pill and tighter gaps there. */
+@media (min-width: 50rem) and (max-width: 64rem) {
+  .site-header-inner {
+    column-gap: var(--space-3);
+  }
+
+  .site-header-cta-long {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
   }
 }

@@ -36,6 +36,7 @@ describe("SiteHeader", () => {
     expect(within(nav).getAllByRole("link").map((a) => [a.textContent, a.getAttribute("href")])).toEqual([
       ["Articoli", "/articoli"],
       ["Argomenti", "/argomenti"],
+      ["Statistiche", "/statistiche"], // PROTOTYPE (#189)
       ["Chi siamo", "/chi-siamo"],
     ]);
   });

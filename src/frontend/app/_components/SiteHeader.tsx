@@ -33,6 +33,8 @@ export function SiteHeader({ spotifyShowUrl }: Props) {
           <nav aria-label="Principale" className="site-header-nav">
             <Link href="/articoli">Articoli</Link>
             <Link href="/argomenti">Argomenti</Link>
+            {/* PROTOTYPE (#189): menu entry exists only on the prototype branch. */}
+            <Link href="/statistiche">Statistiche</Link>
             <Link href="/chi-siamo">Chi siamo</Link>
             {spotifyShowUrl && (
               <a
