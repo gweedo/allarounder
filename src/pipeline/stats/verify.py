@@ -21,11 +21,9 @@ from domain.stats.model import (
     SourceResult,
     TeamResult,
 )
+from stats.sources import SourceError
 
-
-class SourceError(Exception):
-    """Raised by a source adapter when its input no longer has the expected
-    shape (unknown nation, missing column, too few rows...). Always fatal."""
+__all__ = ["CompetitionRejected", "Dropped", "Source", "SourceError", "Verified", "verify_competition"]
 
 
 class CompetitionRejected(Exception):
