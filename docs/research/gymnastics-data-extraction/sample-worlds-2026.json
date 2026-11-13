@@ -1,0 +1,7230 @@
+{
+ "source": {
+  "name": "Wikipedia (en)",
+  "title": "2026 World Artistic Gymnastics Championships",
+  "url": "https://en.wikipedia.org/w/index.php?title=2026_World_Artistic_Gymnastics_Championships&oldid=1385215085",
+  "revid": 1385215085,
+  "license": "CC BY-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+  "attribution": "Dati tratti da Wikipedia (inglese), licenza CC BY-SA 4.0",
+  "retrievedAt": "2026-11-13T21:45:16+00:00"
+ },
+ "season": 2026,
+ "updatedAt": "2026-11-13",
+ "athletes": [
+  {
+   "slug": "abigail-martin",
+   "name": "Abigail Martin",
+   "nation": "GBR",
+   "discipline": "WAG",
+   "wiki": "Abigail Martin (gymnast)"
+  },
+  {
+   "slug": "aiko-sugihara",
+   "name": "Aiko Sugihara",
+   "nation": "JPN",
+   "discipline": "WAG",
+   "wiki": "Aiko Sugihara"
+  },
+  {
+   "slug": "alba-petisco",
+   "name": "Alba Petisco",
+   "nation": "ESP",
+   "discipline": "WAG",
+   "wiki": "Alba Petisco"
+  },
+  {
+   "slug": "aleksandra-anufrieva",
+   "name": "Aleksandra Anufrieva",
+   "nation": "RUS",
+   "discipline": "WAG",
+   "wiki": "Aleksandra Anufrieva"
+  },
+  {
+   "slug": "alena-glotova",
+   "name": "Alena Glotova",
+   "nation": "RUS",
+   "discipline": "WAG",
+   "wiki": "Alena Glotova"
+  },
+  {
+   "slug": "alia-leat",
+   "name": "Alia Leat",
+   "nation": "GBR",
+   "discipline": "WAG",
+   "wiki": "Alia Leat"
+  },
+  {
+   "slug": "alice-kinsella",
+   "name": "Alice Kinsella",
+   "nation": "GBR",
+   "discipline": "WAG",
+   "wiki": "Alice Kinsella"
+  },
+  {
+   "slug": "alice-vlkova",
+   "name": "Alice Vlková",
+   "nation": "CZE",
+   "discipline": "WAG"
+  },
+  {
+   "slug": "amine-abaidi",
+   "name": "Amine Abaidi",
+   "nation": "NED",
+   "discipline": "MAG"
+  },
+  {
+   "slug": "angel-barajas",
+   "name": "Ángel Barajas",
+   "nation": "COL",
+   "discipline": "MAG",
+   "wiki": "Ángel Barajas"
+  },
+  {
+   "slug": "anthony-mansard",
+   "name": "Anthony Mansard",
+   "nation": "FRA",
+   "discipline": "MAG",
+   "wiki": "Anthony Mansard"
+  },
+  {
+   "slug": "armine-abaidi",
+   "name": "Armine Abaidi",
+   "nation": "NED",
+   "discipline": "MAG"
+  },
+  {
+   "slug": "arsenii-dukhno",
+   "name": "Arsenii Dukhno",
+   "nation": "RUS",
+   "discipline": "MAG",
+   "wiki": "Arsenii Dukhno"
+  },
+  {
+   "slug": "artem-dolgopyat",
+   "name": "Artem Dolgopyat",
+   "nation": "ISR",
+   "discipline": "MAG",
+   "wiki": "Artem Dolgopyat"
+  },
+  {
+   "slug": "artur-avetisyan",
+   "name": "Artur Avetisyan",
+   "nation": "ARM",
+   "discipline": "MAG",
+   "wiki": "Artur Avetisyan"
+  },
+  {
+   "slug": "artur-davtyan",
+   "name": "Artur Davtyan",
+   "nation": "ARM",
+   "discipline": "MAG",
+   "wiki": "Artur Davtyan"
+  },
+  {
+   "slug": "becky-downie",
+   "name": "Becky Downie",
+   "nation": "GBR",
+   "discipline": "WAG",
+   "wiki": "Becky Downie"
+  },
+  {
+   "slug": "breanna-scott",
+   "name": "Breanna Scott",
+   "nation": "AUS",
+   "discipline": "WAG",
+   "wiki": "Breanna Scott"
+  },
+  {
+   "slug": "camilo-vera",
+   "name": "Camilo Vera",
+   "nation": "COL",
+   "discipline": "MAG",
+   "wiki": "Camilo Vera"
+  },
+  {
+   "slug": "carlos-yulo",
+   "name": "Carlos Yulo",
+   "nation": "PHI",
+   "discipline": "MAG",
+   "wiki": "Carlos Yulo"
+  },
+  {
+   "slug": "casimir-schmidt",
+   "name": "Casimir Schmidt",
+   "nation": "NED",
+   "discipline": "MAG",
+   "wiki": "Casimir Schmidt"
+  },
+  {
+   "slug": "celia-serber",
+   "name": "Célia Serber",
+   "nation": "FRA",
+   "discipline": "WAG",
+   "wiki": "Célia Serber"
+  },
+  {
+   "slug": "charleigh-bullock",
+   "name": "Charleigh Bullock",
+   "nation": "USA",
+   "discipline": "WAG",
+   "wiki": "Charleigh Bullock"
+  },
+  {
+   "slug": "claire-pease",
+   "name": "Claire Pease",
+   "nation": "USA",
+   "discipline": "WAG",
+   "wiki": "Claire Pease"
+  },
+  {
+   "slug": "coralie-demers",
+   "name": "Coralie Demers",
+   "nation": "CAN",
+   "discipline": "WAG",
+   "wiki": "Coralie Demers"
+  },
+  {
+   "slug": "courtney-tulloch",
+   "name": "Courtney Tulloch",
+   "nation": "GBR",
+   "discipline": "MAG",
+   "wiki": "Courtney Tulloch"
+  },
+  {
+   "slug": "daiki-hashimoto",
+   "name": "Daiki Hashimoto",
+   "nation": "JPN",
+   "discipline": "MAG",
+   "wiki": "Daiki Hashimoto"
+  },
+  {
+   "slug": "daniel-marinov",
+   "name": "Daniel Marinov",
+   "nation": "RUS",
+   "discipline": "MAG",
+   "wiki": "Daniel Marinov"
+  },
+  {
+   "slug": "danila-leykin",
+   "name": "Danila Leykin",
+   "nation": "USA",
+   "discipline": "MAG",
+   "wiki": "Danila Leykin"
+  },
+  {
+   "slug": "david-rumbutis",
+   "name": "David Rumbutis",
+   "nation": "SWE",
+   "discipline": "MAG",
+   "wiki": "David Rumbutis"
+  },
+  {
+   "slug": "dmitriy-patanin",
+   "name": "Dmitriy Patanin",
+   "nation": "KAZ",
+   "discipline": "MAG"
+  },
+  {
+   "slug": "dominic-tamsel",
+   "name": "Dominic Tamsel",
+   "nation": "SUI",
+   "discipline": "MAG"
+  },
+  {
+   "slug": "du-siyu",
+   "name": "Du Siyu",
+   "nation": "CHN",
+   "discipline": "WAG",
+   "wiki": "Du Siyu"
+  },
+  {
+   "slug": "dulcy-caylor",
+   "name": "Dulcy Caylor",
+   "nation": "USA",
+   "discipline": "WAG",
+   "wiki": "Dulcy Caylor"
+  },
+  {
+   "slug": "eleftherios-petrounias",
+   "name": "Eleftherios Petrounias",
+   "nation": "GRE",
+   "discipline": "MAG",
+   "wiki": "Eleftherios Petrounias"
+  },
+  {
+   "slug": "elena-colas",
+   "name": "Elena Colas",
+   "nation": "FRA",
+   "discipline": "WAG",
+   "wiki": "Elena Colas"
+  },
+  {
+   "slug": "elijah-faverus",
+   "name": "Elijah Faverus",
+   "nation": "NED",
+   "discipline": "MAG"
+  },
+  {
+   "slug": "elisa-iorio",
+   "name": "Elisa Iorio",
+   "nation": "ITA",
+   "discipline": "WAG",
+   "wiki": "Elisa Iorio"
+  },
+  {
+   "slug": "elizaveta-us",
+   "name": "Elizaveta Us",
+   "nation": "RUS",
+   "discipline": "WAG",
+   "wiki": "Elizaveta Us"
+  },
+  {
+   "slug": "ellie-black",
+   "name": "Ellie Black",
+   "nation": "CAN",
+   "discipline": "WAG",
+   "wiki": "Ellie Black"
+  },
+  {
+   "slug": "emily-whitehead",
+   "name": "Emily Whitehead",
+   "nation": "AUS",
+   "discipline": "WAG",
+   "wiki": "Emily Whitehead"
+  },
+  {
+   "slug": "emma-malewski",
+   "name": "Emma Malewski",
+   "nation": "GER",
+   "discipline": "WAG",
+   "wiki": "Emma Malewski"
+  },
+  {
+   "slug": "felix-dolci",
+   "name": "Félix Dolci",
+   "nation": "CAN",
+   "discipline": "MAG",
+   "wiki": "Félix Dolci"
+  },
+  {
+   "slug": "flavia-saraiva",
+   "name": "Flávia Saraiva",
+   "nation": "BRA",
+   "discipline": "WAG",
+   "wiki": "Flávia Saraiva"
+  },
+  {
+   "slug": "florian-langenegger",
+   "name": "Florian Langenegger",
+   "nation": "SUI",
+   "discipline": "MAG",
+   "wiki": "Florian Langenegger"
+  },
+  {
+   "slug": "fred-richard",
+   "name": "Fred Richard",
+   "nation": "USA",
+   "discipline": "MAG",
+   "wiki": "Fred Richard"
+  },
+  {
+   "slug": "fusuke-maeda",
+   "name": "Fusuke Maeda",
+   "nation": "JPN",
+   "discipline": "MAG",
+   "wiki": "Fusuke Maeda"
+  },
+  {
+   "slug": "gabriele-targhetta",
+   "name": "Gabriele Targhetta",
+   "nation": "ITA",
+   "discipline": "MAG",
+   "wiki": "Gabriele Targhetta"
+  },
+  {
+   "slug": "gabrielle-black",
+   "name": "Gabrielle Black",
+   "nation": "CAN",
+   "discipline": "WAG",
+   "wiki": "Gabrielle Black"
+  },
+  {
+   "slug": "giulia-perotti",
+   "name": "Giulia Perotti",
+   "nation": "ITA",
+   "discipline": "WAG",
+   "wiki": "Giulia Perotti"
+  },
+  {
+   "slug": "glen-cuyle",
+   "name": "Glen Cuyle",
+   "nation": "BEL",
+   "discipline": "MAG",
+   "wiki": "Glen Cuyle"
+  },
+  {
+   "slug": "greta-mayer",
+   "name": "Gréta Mayer",
+   "nation": "HUN",
+   "discipline": "WAG",
+   "wiki": "Gréta Mayer"
+  },
+  {
+   "slug": "hamlet-manukyan",
+   "name": "Hamlet Manukyan",
+   "nation": "ARM",
+   "discipline": "MAG",
+   "wiki": "Hamlet Manukyan"
+  },
+  {
+   "slug": "harry-hepworth",
+   "name": "Harry Hepworth",
+   "nation": "GBR",
+   "discipline": "MAG",
+   "wiki": "Harry Hepworth"
+  },
+  {
+   "slug": "haruka-nakamura",
+   "name": "Haruka Nakamura",
+   "nation": "JPN",
+   "discipline": "WAG",
+   "wiki": "Haruka Nakamura"
+  },
+  {
+   "slug": "helen-kevric",
+   "name": "Helen Kevric",
+   "nation": "GER",
+   "discipline": "WAG",
+   "wiki": "Helen Kevric"
+  },
+  {
+   "slug": "hur-woong",
+   "name": "Hur Woong",
+   "nation": "KOR",
+   "discipline": "MAG",
+   "wiki": "Hur Woong (gymnast)"
+  },
+  {
+   "slug": "hwang-seo-hyun",
+   "name": "Hwang Seo-hyun",
+   "nation": "KOR",
+   "discipline": "WAG",
+   "wiki": "Hwang Seo-hyun"
+  },
+  {
+   "slug": "ignacio-yockers",
+   "name": "Ignacio Yockers",
+   "nation": "ESP",
+   "discipline": "MAG",
+   "wiki": "Ignacio Yockers"
+  },
+  {
+   "slug": "ilia-zaika",
+   "name": "Ilia Zaika",
+   "nation": "RUS",
+   "discipline": "MAG",
+   "wiki": "Ilia Zaika"
+  },
+  {
+   "slug": "illia-kovtun",
+   "name": "Illia Kovtun",
+   "nation": "CRO",
+   "discipline": "MAG",
+   "wiki": "Illia Kovtun"
+  },
+  {
+   "slug": "ilyas-azizov",
+   "name": "Ilyas Azizov",
+   "nation": "KAZ",
+   "discipline": "MAG"
+  },
+  {
+   "slug": "jake-jarman",
+   "name": "Jake Jarman",
+   "nation": "GBR",
+   "discipline": "MAG",
+   "wiki": "Jake Jarman"
+  },
+  {
+   "slug": "jermain-grunberg",
+   "name": "Jermain Grünberg",
+   "nation": "NED",
+   "discipline": "MAG",
+   "wiki": "Jermain Grünberg"
+  },
+  {
+   "slug": "jesse-moore",
+   "name": "Jesse Moore",
+   "nation": "AUS",
+   "discipline": "MAG",
+   "wiki": "Jesse Moore (gymnast)"
+  },
+  {
+   "slug": "joe-fraser",
+   "name": "Joe Fraser",
+   "nation": "GBR",
+   "discipline": "MAG",
+   "wiki": "Joe Fraser"
+  },
+  {
+   "slug": "jorman-alvarez",
+   "name": "Jorman Álvarez",
+   "nation": "COL",
+   "discipline": "MAG",
+   "wiki": "Jorman Álvarez"
+  },
+  {
+   "slug": "july-marano",
+   "name": "July Marano",
+   "nation": "ITA",
+   "discipline": "WAG",
+   "wiki": "July Marano"
+  },
+  {
+   "slug": "kameron-nelson",
+   "name": "Kameron Nelson",
+   "nation": "USA",
+   "discipline": "MAG",
+   "wiki": "Kameron Nelson (gymnast)"
+  },
+  {
+   "slug": "karina-schonmaier",
+   "name": "Karina Schönmaier",
+   "nation": "GER",
+   "discipline": "WAG",
+   "wiki": "Karina Schönmaier"
+  },
+  {
+   "slug": "kate-mcdonald",
+   "name": "Kate McDonald",
+   "nation": "AUS",
+   "discipline": "WAG",
+   "wiki": "Kate McDonald (gymnast)"
+  },
+  {
+   "slug": "kaylia-nemour",
+   "name": "Kaylia Nemour",
+   "nation": "ALG",
+   "discipline": "WAG",
+   "wiki": "Kaylia Nemour"
+  },
+  {
+   "slug": "ke-qinqin",
+   "name": "Ke Qinqin",
+   "nation": "CHN",
+   "discipline": "WAG",
+   "wiki": "Ke Qinqin"
+  },
+  {
+   "slug": "kevin-carvalho",
+   "name": "Kevin Carvalho",
+   "nation": "FRA",
+   "discipline": "MAG"
+  },
+  {
+   "slug": "kilan-van-der-aa",
+   "name": "Kilan Van der Aa",
+   "nation": "BEL",
+   "discipline": "MAG"
+  },
+  {
+   "slug": "kristina-hrudetska",
+   "name": "Kristina Hrudetska",
+   "nation": "UKR",
+   "discipline": "WAG"
+  },
+  {
+   "slug": "krisztofer-meszaros",
+   "name": "Krisztofer Mészáros",
+   "nation": "HUN",
+   "discipline": "MAG",
+   "wiki": "Krisztofer Mészáros"
+  },
+  {
+   "slug": "lan-xingyu",
+   "name": "Lan Xingyu",
+   "nation": "CHN",
+   "discipline": "MAG",
+   "wiki": "Lan Xingyu"
+  },
+  {
+   "slug": "lea-marie-quaas",
+   "name": "Lea Marie Quaas",
+   "nation": "GER",
+   "discipline": "WAG",
+   "wiki": "Lea Marie Quaas"
+  },
+  {
+   "slug": "leeroy-traore-malatre",
+   "name": "Leeroy Traore-Malatre",
+   "nation": "FRA",
+   "discipline": "MAG"
+  },
+  {
+   "slug": "lena-bickel",
+   "name": "Lena Bickel",
+   "nation": "SUI",
+   "discipline": "WAG",
+   "wiki": "Lena Bickel"
+  },
+  {
+   "slug": "li-hongyan",
+   "name": "Li Hongyan",
+   "nation": "CHN",
+   "discipline": "MAG",
+   "wiki": "Li Hongyan (gymnast)"
+  },
+  {
+   "slug": "lia-monica-fontaine",
+   "name": "Lia-Monica Fontaine",
+   "nation": "CAN",
+   "discipline": "WAG",
+   "wiki": "Lia-Monica Fontaine"
+  },
+  {
+   "slug": "lia-redick",
+   "name": "Lia Redick",
+   "nation": "CAN",
+   "discipline": "WAG",
+   "wiki": "Lia Redick"
+  },
+  {
+   "slug": "lisa-vaelen",
+   "name": "Lisa Vaelen",
+   "nation": "BEL",
+   "discipline": "WAG",
+   "wiki": "Lisa Vaelen"
+  },
+  {
+   "slug": "liudmila-roshchina",
+   "name": "Liudmila Roshchina",
+   "nation": "RUS",
+   "discipline": "WAG",
+   "wiki": "Liudmila Roshchina"
+  },
+  {
+   "slug": "loran-de-munck",
+   "name": "Loran de Munck",
+   "nation": "NED",
+   "discipline": "MAG",
+   "wiki": "Loran de Munck"
+  },
+  {
+   "slug": "lorette-charpy",
+   "name": "Lorette Charpy",
+   "nation": "FRA",
+   "discipline": "WAG",
+   "wiki": "Lorette Charpy"
+  },
+  {
+   "slug": "lorrane-oliveira",
+   "name": "Lorrane Oliveira",
+   "nation": "BRA",
+   "discipline": "WAG",
+   "wiki": "Lorrane Oliveira"
+  },
+  {
+   "slug": "lucy-stewart",
+   "name": "Lucy Stewart",
+   "nation": "AUS",
+   "discipline": "WAG"
+  },
+  {
+   "slug": "madita-mayr",
+   "name": "Madita Mayr",
+   "nation": "GER",
+   "discipline": "WAG"
+  },
+  {
+   "slug": "maiana-prat",
+   "name": "Maïana Prat",
+   "nation": "FRA",
+   "discipline": "WAG",
+   "wiki": "Maïana Prat"
+  },
+  {
+   "slug": "mamikon-khachatryan",
+   "name": "Mamikon Khachatryan",
+   "nation": "ARM",
+   "discipline": "MAG",
+   "wiki": "Mamikon Khachatryan"
+  },
+  {
+   "slug": "mana-okamura",
+   "name": "Mana Okamura",
+   "nation": "JPN",
+   "discipline": "WAG",
+   "wiki": "Mana Okamura"
+  },
+  {
+   "slug": "manila-esposito",
+   "name": "Manila Esposito",
+   "nation": "ITA",
+   "discipline": "WAG",
+   "wiki": "Manila Esposito"
+  },
+  {
+   "slug": "mario-macchiati",
+   "name": "Mario Macchiati",
+   "nation": "ITA",
+   "discipline": "MAG",
+   "wiki": "Mario Macchiati"
+  },
+  {
+   "slug": "matteo-giubellini",
+   "name": "Matteo Giubellini",
+   "nation": "SUI",
+   "discipline": "MAG",
+   "wiki": "Matteo Giubellini"
+  },
+  {
+   "slug": "mattia-piffaretti",
+   "name": "Mattia Piffaretti",
+   "nation": "SUI",
+   "discipline": "MAG"
+  },
+  {
+   "slug": "mehmet-ayberk-kosak",
+   "name": "Mehmet Ayberk Koşak",
+   "nation": "TUR",
+   "discipline": "MAG",
+   "wiki": "Mehmet Ayberk Koşak"
+  },
+  {
+   "slug": "melwin-touchais",
+   "name": "Melwin Touchais",
+   "nation": "FRA",
+   "discipline": "MAG"
+  },
+  {
+   "slug": "michelle-pineda",
+   "name": "Michelle Pineda",
+   "nation": "MEX",
+   "discipline": "WAG",
+   "wiki": "Michelle Pineda"
+  },
+  {
+   "slug": "milad-karimi",
+   "name": "Milad Karimi",
+   "nation": "KAZ",
+   "discipline": "MAG",
+   "wiki": "Milad Karimi"
+  },
+  {
+   "slug": "milana-kaiumova",
+   "name": "Milana Kaiumova",
+   "nation": "RUS",
+   "discipline": "WAG",
+   "wiki": "Milana Kaiumova"
+  },
+  {
+   "slug": "misa-nishiyama",
+   "name": "Misa Nishiyama",
+   "nation": "JPN",
+   "discipline": "WAG",
+   "wiki": "Misa Nishiyama"
+  },
+  {
+   "slug": "morgane-osyssek",
+   "name": "Morgane Osyssek-Reimer",
+   "nation": "FRA",
+   "discipline": "WAG",
+   "wiki": "Morgane Osyssek"
+  },
+  {
+   "slug": "nael-sakouhi",
+   "name": "Nael Sakouhi",
+   "nation": "FRA",
+   "discipline": "MAG"
+  },
+  {
+   "slug": "naomi-visser",
+   "name": "Naomi Visser",
+   "nation": "NED",
+   "discipline": "WAG",
+   "wiki": "Naomi Visser"
+  },
+  {
+   "slug": "nariman-kurbanov",
+   "name": "Nariman Kurbanov",
+   "nation": "KAZ",
+   "discipline": "MAG",
+   "wiki": "Nariman Kurbanov"
+  },
+  {
+   "slug": "nazar-chepurnyi",
+   "name": "Nazar Chepurnyi",
+   "nation": "UKR",
+   "discipline": "MAG",
+   "wiki": "Nazar Chepurnyi"
+  },
+  {
+   "slug": "niccolo-vannucchi",
+   "name": "Niccolò Vannucchi",
+   "nation": "ITA",
+   "discipline": "MAG"
+  },
+  {
+   "slug": "nicola-cuyle",
+   "name": "Nicola Cuyle",
+   "nation": "BEL",
+   "discipline": "MAG"
+  },
+  {
+   "slug": "nikita-simonov",
+   "name": "Nikita Simonov",
+   "nation": "AZE",
+   "discipline": "MAG"
+  },
+  {
+   "slug": "noah-kuavita",
+   "name": "Noah Kuavita",
+   "nation": "BEL",
+   "discipline": "MAG",
+   "wiki": "Noah Kuavita"
+  },
+  {
+   "slug": "noam-berkovich",
+   "name": "Noam Berkovich",
+   "nation": "ISR",
+   "discipline": "MAG",
+   "wiki": "Noam Berkovich"
+  },
+  {
+   "slug": "noe-seifert",
+   "name": "Noe Seifert",
+   "nation": "SUI",
+   "discipline": "MAG",
+   "wiki": "Noe Seifert"
+  },
+  {
+   "slug": "nurtan-idrissov",
+   "name": "Nurtan Idrissov",
+   "nation": "KAZ",
+   "discipline": "MAG"
+  },
+  {
+   "slug": "omar-mohamed",
+   "name": "Omar Mohamed",
+   "nation": "EGY",
+   "discipline": "MAG",
+   "wiki": "Omar Mohamed (gymnast)"
+  },
+  {
+   "slug": "patrick-hoopes",
+   "name": "Patrick Hoopes",
+   "nation": "USA",
+   "discipline": "MAG",
+   "wiki": "Patrick Hoopes"
+  },
+  {
+   "slug": "qiu-qiyuan",
+   "name": "Qiu Qiyuan",
+   "nation": "CHN",
+   "discipline": "WAG",
+   "wiki": "Qiu Qiyuan"
+  },
+  {
+   "slug": "rebeca-andrade",
+   "name": "Rebeca Andrade",
+   "nation": "BRA",
+   "discipline": "WAG",
+   "wiki": "Rebeca Andrade"
+  },
+  {
+   "slug": "reese-esponda",
+   "name": "Reese Esponda",
+   "nation": "USA",
+   "discipline": "WAG",
+   "wiki": "Reese Esponda"
+  },
+  {
+   "slug": "reuben-ward",
+   "name": "Reuben Ward",
+   "nation": "GBR",
+   "discipline": "MAG",
+   "wiki": "Reuben Ward"
+  },
+  {
+   "slug": "rhys-mcclenaghan",
+   "name": "Rhys McClenaghan",
+   "nation": "IRL",
+   "discipline": "MAG",
+   "wiki": "Rhys McClenaghan"
+  },
+  {
+   "slug": "rina-kishi",
+   "name": "Rina Kishi",
+   "nation": "JPN",
+   "discipline": "WAG",
+   "wiki": "Rina Kishi"
+  },
+  {
+   "slug": "ruby-evans",
+   "name": "Ruby Evans",
+   "nation": "GBR",
+   "discipline": "WAG",
+   "wiki": "Ruby Evans"
+  },
+  {
+   "slug": "ruby-pass",
+   "name": "Ruby Pass",
+   "nation": "AUS",
+   "discipline": "WAG",
+   "wiki": "Ruby Pass"
+  },
+  {
+   "slug": "ryosuke-doi",
+   "name": "Ryosuke Doi",
+   "nation": "JPN",
+   "discipline": "MAG",
+   "wiki": "Ryosuke Doi"
+  },
+  {
+   "slug": "samuel-zakutney",
+   "name": "Samuel Zakutney",
+   "nation": "CAN",
+   "discipline": "MAG",
+   "wiki": "Samuel Zakutney"
+  },
+  {
+   "slug": "sanna-veerman",
+   "name": "Sanna Veerman",
+   "nation": "NED",
+   "discipline": "WAG",
+   "wiki": "Sanna Veerman"
+  },
+  {
+   "slug": "sanne-wevers",
+   "name": "Sanne Wevers",
+   "nation": "NED",
+   "discipline": "WAG",
+   "wiki": "Sanne Wevers"
+  },
+  {
+   "slug": "savelii-sieedin",
+   "name": "Savelii Sieedin",
+   "nation": "RUS",
+   "discipline": "MAG",
+   "wiki": "Savelii Sieedin"
+  },
+  {
+   "slug": "sebastian-sponevik",
+   "name": "Sebastian Sponevik",
+   "nation": "NOR",
+   "discipline": "MAG",
+   "wiki": "Sebastian Sponevik"
+  },
+  {
+   "slug": "sergei-naidin",
+   "name": "Sergei Naidin",
+   "nation": "RUS",
+   "discipline": "MAG",
+   "wiki": "Sergei Naidin"
+  },
+  {
+   "slug": "shane-wiskus",
+   "name": "Shane Wiskus",
+   "nation": "USA",
+   "discipline": "MAG",
+   "wiki": "Shane Wiskus"
+  },
+  {
+   "slug": "shinnosuke-oka",
+   "name": "Shinnosuke Oka",
+   "nation": "JPN",
+   "discipline": "MAG",
+   "wiki": "Shinnosuke Oka"
+  },
+  {
+   "slug": "shohei-kawakami",
+   "name": "Shohei Kawakami",
+   "nation": "JPN",
+   "discipline": "MAG",
+   "wiki": "Shohei Kawakami (gymnast)"
+  },
+  {
+   "slug": "simone-speranza",
+   "name": "Simone Speranza",
+   "nation": "ITA",
+   "discipline": "MAG",
+   "wiki": "Simone Speranza"
+  },
+  {
+   "slug": "skye-blakely",
+   "name": "Skye Blakely",
+   "nation": "USA",
+   "discipline": "WAG",
+   "wiki": "Skye Blakely"
+  },
+  {
+   "slug": "sofia-tonelli",
+   "name": "Sofia Tonelli",
+   "nation": "ITA",
+   "discipline": "WAG",
+   "wiki": "Sofia Tonelli"
+  },
+  {
+   "slug": "sophia-weisberg",
+   "name": "Sophia Weisberg",
+   "nation": "BRA",
+   "discipline": "WAG",
+   "wiki": "Sophia Weisberg"
+  },
+  {
+   "slug": "tang-chia-hung",
+   "name": "Tang Chia-hung",
+   "nation": "TPE",
+   "discipline": "MAG",
+   "wiki": "Tang Chia-hung"
+  },
+  {
+   "slug": "thais-fidelis",
+   "name": "Thaís Fidélis",
+   "nation": "BRA",
+   "discipline": "WAG",
+   "wiki": "Thaís Fidélis"
+  },
+  {
+   "slug": "thomas-mejia",
+   "name": "Thomas Mejía",
+   "nation": "COL",
+   "discipline": "MAG",
+   "wiki": "Thomas Mejía"
+  },
+  {
+   "slug": "tian-hao",
+   "name": "Tian Hao",
+   "nation": "CHN",
+   "discipline": "MAG",
+   "wiki": "Tian Hao"
+  },
+  {
+   "slug": "timo-eder",
+   "name": "Timo Eder",
+   "nation": "GER",
+   "discipline": "MAG",
+   "wiki": "Timo Eder"
+  },
+  {
+   "slug": "vera-ubbink",
+   "name": "Vera Ubbink",
+   "nation": "NED",
+   "discipline": "WAG"
+  },
+  {
+   "slug": "vera-van-pol",
+   "name": "Vera van Pol",
+   "nation": "NED",
+   "discipline": "WAG",
+   "wiki": "Vera van Pol"
+  },
+  {
+   "slug": "victor-martinez",
+   "name": "Victor Martinez",
+   "nation": "BEL",
+   "discipline": "MAG"
+  },
+  {
+   "slug": "victoria-mata",
+   "name": "Victoria Mata",
+   "nation": "MEX",
+   "discipline": "WAG",
+   "wiki": "Victoria Mata (gymnast)"
+  },
+  {
+   "slug": "yahor-sharamkou",
+   "name": "Yahor Sharamkou",
+   "nation": "BLR",
+   "discipline": "MAG",
+   "wiki": "Yahor Sharamkou"
+  },
+  {
+   "slug": "yan-zabala",
+   "name": "Yan Zabala",
+   "nation": "COL",
+   "discipline": "MAG",
+   "wiki": "Yan Zabala"
+  },
+  {
+   "slug": "yang-haonan",
+   "name": "Yang Haonan",
+   "nation": "CHN",
+   "discipline": "MAG",
+   "wiki": "Yang Haonan"
+  },
+  {
+   "slug": "yeo-seo-jeong",
+   "name": "Yeo Seo-jeong",
+   "nation": "KOR",
+   "discipline": "WAG",
+   "wiki": "Yeo Seo-jeong"
+  },
+  {
+   "slug": "yumin-abbadini",
+   "name": "Yumin Abbadini",
+   "nation": "ITA",
+   "discipline": "MAG",
+   "wiki": "Yumin Abbadini"
+  },
+  {
+   "slug": "zhang-qingying",
+   "name": "Zhang Qingying",
+   "nation": "CHN",
+   "discipline": "WAG",
+   "wiki": "Zhang Qingying"
+  },
+  {
+   "slug": "zhang-yihan",
+   "name": "Zhang Yihan",
+   "nation": "CHN",
+   "discipline": "WAG",
+   "wiki": "Zhang Yihan"
+  },
+  {
+   "slug": "zou-jingyuan",
+   "name": "Zou Jingyuan",
+   "nation": "CHN",
+   "discipline": "MAG",
+   "wiki": "Zou Jingyuan"
+  }
+ ],
+ "competitions": [
+  {
+   "slug": "mondiali-2026-rotterdam",
+   "name": "Campionati mondiali di ginnastica artistica 2026",
+   "level": "internazionale",
+   "tier": "Mondiali",
+   "city": "Rotterdam",
+   "country": "NED",
+   "startDate": "2026-10-17",
+   "endDate": "2026-10-25",
+   "phases": [
+    {
+     "round": "finale",
+     "discipline": "MAG",
+     "apparatus": "TEAM",
+     "results": [
+      {
+       "nation": "JPN",
+       "rank": 1,
+       "total": 251.928,
+       "parts": {
+        "FX": 41.299,
+        "PH": 42.332,
+        "SR": 40.933,
+        "VT": 42.966,
+        "PB": 42.099,
+        "HB": 42.299
+       },
+       "members": [
+        {
+         "athlete": "ryosuke-doi",
+         "parts": {
+          "FX": 13.733,
+          "PH": 14.1,
+          "VT": 14.2
+         }
+        },
+        {
+         "athlete": "daiki-hashimoto",
+         "parts": {
+          "FX": 13.7,
+          "PH": 14.466,
+          "SR": 13.5,
+          "VT": 14.4,
+          "PB": 13.933,
+          "HB": 14.866
+         }
+        },
+        {
+         "athlete": "shohei-kawakami",
+         "parts": {
+          "PH": 13.766,
+          "SR": 13.333,
+          "VT": 14.366,
+          "PB": 14.566,
+          "HB": 13.1
+         }
+        },
+        {
+         "athlete": "fusuke-maeda",
+         "parts": {
+          "HB": 14.333
+         }
+        },
+        {
+         "athlete": "shinnosuke-oka",
+         "parts": {
+          "FX": 13.866,
+          "SR": 14.1,
+          "PB": 13.6
+         }
+        }
+       ]
+      },
+      {
+       "nation": "RUS",
+       "rank": 2,
+       "total": 250.329,
+       "parts": {
+        "FX": 41.333,
+        "PH": 41.166,
+        "SR": 39.666,
+        "VT": 42.666,
+        "PB": 42.933,
+        "HB": 42.565
+       },
+       "members": [
+        {
+         "athlete": "arsenii-dukhno",
+         "parts": {
+          "FX": 14.5,
+          "PH": 13.833,
+          "SR": 13.1,
+          "VT": 14.2,
+          "PB": 14.233,
+          "HB": 14.066
+         }
+        },
+        {
+         "athlete": "daniel-marinov",
+         "parts": {
+          "FX": 14.1,
+          "SR": 13.266,
+          "VT": 14.3,
+          "PB": 14.7
+         }
+        },
+        {
+         "athlete": "sergei-naidin",
+         "parts": {
+          "FX": 12.733,
+          "PH": 13.233,
+          "HB": 14.566
+         }
+        },
+        {
+         "athlete": "savelii-sieedin",
+         "parts": {
+          "PH": 14.1,
+          "VT": 14.166,
+          "PB": 14.0,
+          "HB": 13.933
+         }
+        },
+        {
+         "athlete": "ilia-zaika",
+         "parts": {
+          "SR": 13.3
+         }
+        }
+       ]
+      },
+      {
+       "nation": "CHN",
+       "rank": 3,
+       "total": 249.193,
+       "parts": {
+        "FX": 42.698,
+        "PH": 39.633,
+        "SR": 41.466,
+        "VT": 44.166,
+        "PB": 43.166,
+        "HB": 41.299
+       },
+       "members": [
+        {
+         "athlete": "lan-xingyu",
+         "parts": {
+          "SR": 14.733,
+          "VT": 13.466,
+          "PB": 13.8
+         }
+        },
+        {
+         "athlete": "li-hongyan",
+         "parts": {
+          "FX": 13.533,
+          "VT": 13.066,
+          "HB": 13.033
+         }
+        },
+        {
+         "athlete": "tian-hao",
+         "parts": {
+          "FX": 13.7,
+          "PH": 13.666,
+          "HB": 14.566
+         }
+        },
+        {
+         "athlete": "yang-haonan",
+         "parts": {
+          "FX": 12.466,
+          "PH": 13.466,
+          "SR": 14.0,
+          "VT": 14.466,
+          "PB": 14.2,
+          "HB": 13.633
+         }
+        },
+        {
+         "athlete": "zou-jingyuan",
+         "parts": {
+          "PH": 14.0,
+          "SR": 14.033,
+          "PB": 15.366
+         }
+        }
+       ],
+       "inconsistent": [
+        "team parts sum != total",
+        "FX top-3 members 39.699 != 42.698",
+        "PH top-3 members 41.132 != 39.633",
+        "SR top-3 members 42.766 != 41.466",
+        "VT top-3 members 40.998 != 44.166",
+        "PB top-3 members 43.366 != 43.166",
+        "HB top-3 members 41.232 != 41.299"
+       ]
+      },
+      {
+       "nation": "GBR",
+       "rank": 4,
+       "total": 247.395,
+       "parts": {
+        "FX": 41.3,
+        "PH": 41.965,
+        "SR": 41.899,
+        "VT": 43.499,
+        "PB": 39.999,
+        "HB": 38.733
+       },
+       "members": [
+        {
+         "athlete": "joe-fraser",
+         "parts": {
+          "FX": 12.5,
+          "PH": 14.166,
+          "SR": 13.733,
+          "PB": 14.066,
+          "HB": 12.0
+         }
+        },
+        {
+         "athlete": "harry-hepworth",
+         "parts": {
+          "FX": 14.3,
+          "SR": 14.666,
+          "VT": 14.6
+         }
+        },
+        {
+         "athlete": "jake-jarman",
+         "parts": {
+          "FX": 14.5,
+          "PH": 13.366,
+          "VT": 14.866,
+          "PB": 13.7,
+          "HB": 13.233
+         }
+        },
+        {
+         "athlete": "courtney-tulloch",
+         "parts": {
+          "SR": 13.5,
+          "VT": 14.033,
+          "PB": 12.233
+         }
+        },
+        {
+         "athlete": "reuben-ward",
+         "parts": {
+          "PH": 14.433,
+          "HB": 13.5
+         }
+        }
+       ]
+      },
+      {
+       "nation": "SUI",
+       "rank": 5,
+       "total": 246.497,
+       "parts": {
+        "FX": 40.333,
+        "PH": 41.7,
+        "SR": 39.433,
+        "VT": 41.699,
+        "PB": 42.766,
+        "HB": 40.566
+       },
+       "members": [
+        {
+         "athlete": "matteo-giubellini",
+         "parts": {
+          "PH": 14.0,
+          "SR": 13.0,
+          "VT": 13.8,
+          "PB": 14.3,
+          "HB": 13.233
+         }
+        },
+        {
+         "athlete": "florian-langenegger",
+         "parts": {
+          "FX": 13.1,
+          "PH": 14.0,
+          "VT": 14.066
+         }
+        },
+        {
+         "athlete": "mattia-piffaretti",
+         "parts": {
+          "FX": 13.7,
+          "SR": 13.433,
+          "VT": 13.833,
+          "PB": 14.2
+         }
+        },
+        {
+         "athlete": "noe-seifert",
+         "parts": {
+          "FX": 13.533,
+          "SR": 13.0,
+          "PB": 14.266,
+          "HB": 14.0
+         }
+        },
+        {
+         "athlete": "dominic-tamsel",
+         "parts": {
+          "PH": 13.7,
+          "HB": 13.333
+         }
+        }
+       ]
+      },
+      {
+       "nation": "USA",
+       "rank": 6,
+       "total": 245.161,
+       "parts": {
+        "FX": 41.466,
+        "PH": 41.499,
+        "SR": 39.565,
+        "VT": 42.133,
+        "PB": 41.599,
+        "HB": 38.899
+       },
+       "members": [
+        {
+         "athlete": "patrick-hoopes",
+         "parts": {
+          "PH": 14.833
+         }
+        },
+        {
+         "athlete": "danila-leykin",
+         "parts": {
+          "FX": 13.5,
+          "PH": 13.8,
+          "VT": 14.1,
+          "PB": 13.033,
+          "HB": 11.466
+         }
+        },
+        {
+         "athlete": "kameron-nelson",
+         "parts": {
+          "FX": 14.133,
+          "SR": 13.366,
+          "VT": 14.033
+         }
+        },
+        {
+         "athlete": "fred-richard",
+         "parts": {
+          "FX": 13.833,
+          "PH": 12.866,
+          "SR": 13.366,
+          "PB": 14.233,
+          "HB": 14.1
+         }
+        },
+        {
+         "athlete": "shane-wiskus",
+         "parts": {
+          "SR": 12.833,
+          "VT": 14.0,
+          "PB": 14.333,
+          "HB": 13.333
+         }
+        }
+       ]
+      },
+      {
+       "nation": "NED",
+       "rank": 7,
+       "total": 241.294,
+       "parts": {
+        "FX": 39.832,
+        "PH": 41.866,
+        "SR": 38.299,
+        "VT": 41.766,
+        "PB": 40.599,
+        "HB": 38.932
+       },
+       "members": [
+        {
+         "athlete": "armine-abaidi",
+         "parts": {
+          "FX": 13.633,
+          "SR": 12.5,
+          "VT": 13.866,
+          "PB": 13.333,
+          "HB": 13.466
+         }
+        },
+        {
+         "athlete": "loran-de-munck",
+         "parts": {
+          "PH": 14.1
+         }
+        },
+        {
+         "athlete": "elijah-faverus",
+         "parts": {
+          "PH": 14.1,
+          "SR": 13.166,
+          "VT": 13.9,
+          "HB": 11.866
+         }
+        },
+        {
+         "athlete": "jermain-grunberg",
+         "parts": {
+          "FX": 13.233,
+          "PB": 13.9,
+          "HB": 13.6
+         }
+        },
+        {
+         "athlete": "casimir-schmidt",
+         "parts": {
+          "FX": 12.966,
+          "PH": 13.666,
+          "SR": 12.633,
+          "VT": 14.0,
+          "PB": 13.366
+         }
+        }
+       ]
+      },
+      {
+       "nation": "COL",
+       "rank": 8,
+       "total": 240.093,
+       "parts": {
+        "FX": 40.066,
+        "PH": 38.565,
+        "SR": 39.266,
+        "VT": 41.365,
+        "PB": 39.232,
+        "HB": 41.599
+       },
+       "members": [
+        {
+         "athlete": "jorman-alvarez",
+         "parts": {
+          "SR": 13.066
+         }
+        },
+        {
+         "athlete": "angel-barajas",
+         "parts": {
+          "FX": 13.9,
+          "PH": 13.933,
+          "SR": 13.1,
+          "VT": 13.966,
+          "PB": 13.633,
+          "HB": 14.9
+         }
+        },
+        {
+         "athlete": "thomas-mejia",
+         "parts": {
+          "FX": 12.833,
+          "PH": 10.966,
+          "VT": 13.266,
+          "PB": 12.266
+         }
+        },
+        {
+         "athlete": "camilo-vera",
+         "parts": {
+          "FX": 13.333,
+          "PH": 13.666,
+          "SR": 13.1,
+          "VT": 14.133,
+          "PB": 13.333,
+          "HB": 13.666
+         }
+        },
+        {
+         "athlete": "yan-zabala",
+         "parts": {
+          "HB": 13.033
+         }
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "round": "finale-aa",
+     "discipline": "MAG",
+     "apparatus": "AA",
+     "results": [
+      {
+       "athlete": "daiki-hashimoto",
+       "rank": 1,
+       "total": 85.998,
+       "parts": {
+        "FX": 13.666,
+        "PH": 14.5,
+        "SR": 13.9,
+        "VT": 14.666,
+        "PB": 14.7,
+        "HB": 14.766
+       },
+       "inconsistent": [
+        "AA parts sum != total 85.998"
+       ]
+      },
+      {
+       "athlete": "yang-haonan",
+       "rank": 2,
+       "total": 84.199,
+       "parts": {
+        "FX": 13.7,
+        "PH": 13.9,
+        "SR": 14.1,
+        "VT": 14.4,
+        "PB": 14.566,
+        "HB": 13.533
+       }
+      },
+      {
+       "athlete": "joe-fraser",
+       "rank": 3,
+       "total": 83.531,
+       "parts": {
+        "FX": 13.266,
+        "PH": 14.033,
+        "SR": 13.9,
+        "VT": 13.866,
+        "PB": 14.566,
+        "HB": 13.9
+       }
+      },
+      {
+       "athlete": "daniel-marinov",
+       "rank": 4,
+       "total": 83.297,
+       "parts": {
+        "FX": 13.566,
+        "PH": 13.766,
+        "SR": 13.366,
+        "VT": 14.366,
+        "PB": 14.5,
+        "HB": 13.733
+       }
+      },
+      {
+       "athlete": "angel-barajas",
+       "rank": 5,
+       "total": 83.232,
+       "parts": {
+        "FX": 13.833,
+        "PH": 13.8,
+        "SR": 13.1,
+        "VT": 14.1,
+        "PB": 14.333,
+        "HB": 14.066
+       }
+      },
+      {
+       "athlete": "jake-jarman",
+       "rank": 6,
+       "total": 82.865,
+       "parts": {
+        "FX": 13.933,
+        "PH": 13.366,
+        "SR": 13.066,
+        "VT": 14.9,
+        "PB": 14.2,
+        "HB": 13.4
+       }
+      },
+      {
+       "athlete": "arsenii-dukhno",
+       "rank": 7,
+       "total": 82.697,
+       "parts": {
+        "FX": 14.666,
+        "PH": 14.1,
+        "SR": 12.933,
+        "VT": 14.766,
+        "PB": 14.666,
+        "HB": 11.566
+       }
+      },
+      {
+       "athlete": "shinnosuke-oka",
+       "rank": 8,
+       "total": 82.165,
+       "parts": {
+        "FX": 13.966,
+        "PH": 13.866,
+        "SR": 14.0,
+        "VT": 12.7,
+        "PB": 14.3,
+        "HB": 13.333
+       }
+      },
+      {
+       "athlete": "fred-richard",
+       "rank": 9,
+       "total": 82.165,
+       "parts": {
+        "FX": 13.866,
+        "PH": 12.9,
+        "SR": 13.566,
+        "VT": 13.533,
+        "PB": 14.1,
+        "HB": 14.2
+       }
+      },
+      {
+       "athlete": "noe-seifert",
+       "rank": 10,
+       "total": 81.198,
+       "parts": {
+        "FX": 13.666,
+        "PH": 13.666,
+        "SR": 13.033,
+        "VT": 13.5,
+        "PB": 13.733,
+        "HB": 13.6
+       }
+      },
+      {
+       "athlete": "illia-kovtun",
+       "rank": 11,
+       "total": 80.264,
+       "parts": {
+        "FX": 12.466,
+        "PH": 12.466,
+        "SR": 12.866,
+        "VT": 13.933,
+        "PB": 14.7,
+        "HB": 13.833
+       }
+      },
+      {
+       "athlete": "danila-leykin",
+       "rank": 12,
+       "total": 79.665,
+       "parts": {
+        "FX": 13.8,
+        "PH": 13.033,
+        "SR": 12.4,
+        "VT": 13.533,
+        "PB": 13.433,
+        "HB": 13.466
+       }
+      },
+      {
+       "athlete": "yumin-abbadini",
+       "rank": 13,
+       "total": 79.632,
+       "parts": {
+        "FX": 13.766,
+        "PH": 14.1,
+        "SR": 12.7,
+        "VT": 13.4,
+        "PB": 13.333,
+        "HB": 12.333
+       }
+      },
+      {
+       "athlete": "timo-eder",
+       "rank": 14,
+       "total": 79.632,
+       "parts": {
+        "FX": 13.133,
+        "PH": 13.3,
+        "SR": 12.366,
+        "VT": 14.0,
+        "PB": 13.533,
+        "HB": 13.3
+       }
+      },
+      {
+       "athlete": "nael-sakouhi",
+       "rank": 15,
+       "total": 79.498,
+       "parts": {
+        "FX": 13.366,
+        "PH": 13.0,
+        "SR": 12.533,
+        "VT": 14.033,
+        "PB": 13.266,
+        "HB": 13.3
+       }
+      },
+      {
+       "athlete": "florian-langenegger",
+       "rank": 16,
+       "total": 77.798,
+       "parts": {
+        "FX": 13.6,
+        "PH": 10.933,
+        "SR": 12.233,
+        "VT": 13.9,
+        "PB": 14.066,
+        "HB": 13.066
+       }
+      },
+      {
+       "athlete": "anthony-mansard",
+       "rank": 17,
+       "total": 77.533,
+       "parts": {
+        "FX": 13.233,
+        "PH": 11.1,
+        "SR": 12.2,
+        "VT": 14.0,
+        "PB": 13.2,
+        "HB": 13.8
+       }
+      },
+      {
+       "athlete": "victor-martinez",
+       "rank": 18,
+       "total": 77.465,
+       "parts": {
+        "FX": 11.7,
+        "PH": 12.133,
+        "SR": 12.833,
+        "VT": 14.266,
+        "PB": 13.7,
+        "HB": 12.833
+       }
+      },
+      {
+       "athlete": "samuel-zakutney",
+       "rank": 19,
+       "total": 77.432,
+       "parts": {
+        "FX": 12.866,
+        "PH": 12.8,
+        "SR": 12.0,
+        "VT": 13.333,
+        "PB": 13.8,
+        "HB": 12.633
+       }
+      },
+      {
+       "athlete": "elijah-faverus",
+       "rank": 20,
+       "total": 76.264,
+       "parts": {
+        "FX": 12.766,
+        "PH": 13.766,
+        "SR": 12.966,
+        "VT": 13.3,
+        "PB": 12.2,
+        "HB": 11.266
+       }
+      },
+      {
+       "athlete": "krisztofer-meszaros",
+       "rank": 21,
+       "total": 75.165,
+       "parts": {
+        "FX": 11.9,
+        "PH": 12.0,
+        "SR": 12.366,
+        "VT": 12.033,
+        "PB": 13.533,
+        "HB": 13.333
+       }
+      },
+      {
+       "athlete": "jermain-grunberg",
+       "rank": 22,
+       "total": 74.697,
+       "parts": {
+        "FX": 12.966,
+        "PH": 10.5,
+        "SR": 11.966,
+        "VT": 12.866,
+        "PB": 12.833,
+        "HB": 13.566
+       }
+      },
+      {
+       "athlete": "nurtan-idrissov",
+       "rank": 23,
+       "total": 74.397,
+       "parts": {
+        "FX": 12.266,
+        "PH": 12.066,
+        "SR": 13.366,
+        "VT": 13.866,
+        "PB": 11.433,
+        "HB": 11.4
+       }
+      },
+      {
+       "athlete": "camilo-vera",
+       "rank": 24,
+       "total": 73.899,
+       "parts": {
+        "FX": 9.833,
+        "PH": 11.2,
+        "SR": 13.233,
+        "VT": 14.0,
+        "PB": 13.933,
+        "HB": 11.7
+       }
+      }
+     ]
+    },
+    {
+     "round": "finale",
+     "discipline": "MAG",
+     "apparatus": "FX",
+     "results": [
+      {
+       "athlete": "fred-richard",
+       "rank": 1,
+       "d": 5.7,
+       "e": 8.833,
+       "penalty": 0.0,
+       "bonus": 0.1,
+       "total": 14.633
+      },
+      {
+       "athlete": "jake-jarman",
+       "rank": 2,
+       "d": 6.3,
+       "e": 8.3,
+       "penalty": 0.0,
+       "total": 14.6
+      },
+      {
+       "athlete": "artem-dolgopyat",
+       "rank": 3,
+       "d": 5.8,
+       "e": 8.666,
+       "penalty": 0.0,
+       "total": 14.466
+      },
+      {
+       "athlete": "ryosuke-doi",
+       "rank": 4,
+       "d": 5.8,
+       "e": 8.566,
+       "penalty": 0.1,
+       "bonus": 0.1,
+       "total": 14.366
+      },
+      {
+       "athlete": "yahor-sharamkou",
+       "rank": 5,
+       "d": 5.8,
+       "e": 8.2,
+       "penalty": 0.0,
+       "total": 14.0
+      },
+      {
+       "athlete": "arsenii-dukhno",
+       "rank": 6,
+       "d": 5.9,
+       "e": 8.066,
+       "penalty": 0.3,
+       "total": 13.666
+      },
+      {
+       "athlete": "noam-berkovich",
+       "rank": 7,
+       "d": 5.7,
+       "e": 8.0,
+       "penalty": 0.2,
+       "total": 13.5
+      },
+      {
+       "athlete": "carlos-yulo",
+       "rank": 8,
+       "d": 5.8,
+       "e": 7.633,
+       "penalty": 0.3,
+       "bonus": 0.1,
+       "total": 13.233
+      }
+     ]
+    },
+    {
+     "round": "finale",
+     "discipline": "MAG",
+     "apparatus": "PH",
+     "results": [
+      {
+       "athlete": "hamlet-manukyan",
+       "rank": 1,
+       "d": 5.9,
+       "e": 9.4,
+       "penalty": 0.0,
+       "total": 15.3
+      },
+      {
+       "athlete": "gabriele-targhetta",
+       "rank": 2,
+       "d": 5.9,
+       "e": 9.333,
+       "penalty": 0.0,
+       "total": 15.233
+      },
+      {
+       "athlete": "mamikon-khachatryan",
+       "rank": 3,
+       "d": 5.8,
+       "e": 9.2,
+       "penalty": 0.0,
+       "total": 15.0
+      },
+      {
+       "athlete": "nariman-kurbanov",
+       "rank": 4,
+       "d": 5.8,
+       "e": 9.133,
+       "penalty": 0.0,
+       "total": 14.933
+      },
+      {
+       "athlete": "patrick-hoopes",
+       "rank": 5,
+       "d": 6.1,
+       "e": 8.833,
+       "penalty": 0.0,
+       "total": 14.933
+      },
+      {
+       "athlete": "hur-woong",
+       "rank": 6,
+       "d": 6.0,
+       "e": 9.133,
+       "penalty": 0.3,
+       "total": 14.833
+      },
+      {
+       "athlete": "kilan-van-der-aa",
+       "rank": 7,
+       "d": 5.7,
+       "e": 9.033,
+       "penalty": 0.0,
+       "total": 14.733
+      },
+      {
+       "athlete": "daiki-hashimoto",
+       "rank": 8,
+       "d": 4.8,
+       "e": 8.666,
+       "penalty": 0.0,
+       "total": 13.466
+      }
+     ]
+    },
+    {
+     "round": "finale",
+     "discipline": "MAG",
+     "apparatus": "SR",
+     "results": [
+      {
+       "athlete": "lan-xingyu",
+       "rank": 1,
+       "d": 6.0,
+       "e": 8.766,
+       "penalty": 0.0,
+       "total": 14.766
+      },
+      {
+       "athlete": "eleftherios-petrounias",
+       "rank": 2,
+       "d": 5.7,
+       "e": 8.533,
+       "penalty": 0.0,
+       "bonus": 0.1,
+       "total": 14.333
+      },
+      {
+       "athlete": "artur-avetisyan",
+       "rank": 3,
+       "d": 5.4,
+       "e": 8.833,
+       "penalty": 0.0,
+       "total": 14.233
+      },
+      {
+       "athlete": "shinnosuke-oka",
+       "rank": 4,
+       "d": 5.1,
+       "e": 8.933,
+       "penalty": 0.0,
+       "bonus": 0.1,
+       "total": 14.133
+      },
+      {
+       "athlete": "ilia-zaika",
+       "rank": 5,
+       "d": 5.7,
+       "e": 8.4,
+       "penalty": 0.0,
+       "total": 14.1
+      },
+      {
+       "athlete": "mehmet-ayberk-kosak",
+       "rank": 6,
+       "d": 5.5,
+       "e": 8.3,
+       "penalty": 0.0,
+       "total": 13.8
+      },
+      {
+       "athlete": "courtney-tulloch",
+       "rank": 7,
+       "d": 5.7,
+       "e": 7.666,
+       "penalty": 0.0,
+       "total": 13.366
+      },
+      {
+       "athlete": "glen-cuyle",
+       "rank": 8,
+       "d": 5.3,
+       "e": 7.533,
+       "penalty": 0.0,
+       "total": 12.833
+      }
+     ]
+    },
+    {
+     "round": "finale",
+     "discipline": "MAG",
+     "apparatus": "VT",
+     "results": [
+      {
+       "athlete": "artur-davtyan",
+       "rank": 1,
+       "vaults": [
+        {
+         "d": 5.2,
+         "e": 9.5,
+         "penalty": 0.0,
+         "bonus": 0.1,
+         "total": 14.8
+        },
+        {
+         "d": 5.2,
+         "e": 9.6,
+         "penalty": 0.0,
+         "bonus": 0.1,
+         "total": 14.9
+        }
+       ],
+       "total": 14.85
+      },
+      {
+       "athlete": "jake-jarman",
+       "rank": 2,
+       "vaults": [
+        {
+         "d": 5.6,
+         "e": 9.3,
+         "penalty": 0.0,
+         "total": 14.9
+        },
+        {
+         "d": 5.2,
+         "e": 9.2,
+         "penalty": 0.0,
+         "total": 14.4
+        }
+       ],
+       "total": 14.65
+      },
+      {
+       "athlete": "sebastian-sponevik",
+       "rank": 3,
+       "vaults": [
+        {
+         "d": 5.2,
+         "e": 9.133,
+         "penalty": 0.0,
+         "total": 14.333
+        },
+        {
+         "d": 5.2,
+         "e": 9.2,
+         "penalty": 0.0,
+         "total": 14.4
+        }
+       ],
+       "total": 14.366
+      },
+      {
+       "athlete": "nazar-chepurnyi",
+       "rank": 4,
+       "vaults": [
+        {
+         "d": 5.2,
+         "e": 9.1,
+         "penalty": 0.0,
+         "total": 14.3
+        },
+        {
+         "d": 5.2,
+         "e": 9.2,
+         "penalty": 0.0,
+         "total": 14.4
+        }
+       ],
+       "total": 14.35
+      },
+      {
+       "athlete": "arsenii-dukhno",
+       "rank": 4,
+       "vaults": [
+        {
+         "d": 5.2,
+         "e": 9.2,
+         "penalty": 0.0,
+         "total": 14.4
+        },
+        {
+         "d": 5.2,
+         "e": 9.1,
+         "penalty": 0.0,
+         "total": 14.3
+        }
+       ],
+       "total": 14.35
+      },
+      {
+       "athlete": "harry-hepworth",
+       "rank": 6,
+       "vaults": [
+        {
+         "d": 5.2,
+         "e": 9.0,
+         "penalty": 0.0,
+         "total": 14.2
+        },
+        {
+         "d": 5.6,
+         "e": 8.333,
+         "penalty": 0.0,
+         "total": 13.933
+        }
+       ],
+       "total": 14.066
+      },
+      {
+       "athlete": "carlos-yulo",
+       "rank": 7,
+       "vaults": [
+        {
+         "d": 5.6,
+         "e": 8.033,
+         "penalty": 0.3,
+         "total": 13.333
+        },
+        {
+         "d": 5.2,
+         "e": 9.233,
+         "penalty": 0.0,
+         "total": 14.433
+        }
+       ],
+       "total": 13.883
+      },
+      {
+       "athlete": "shohei-kawakami",
+       "rank": 8,
+       "vaults": [
+        {
+         "d": 5.2,
+         "e": 8.0,
+         "penalty": 0.0,
+         "total": 13.2
+        },
+        {
+         "d": 5.2,
+         "e": 8.566,
+         "penalty": 0.3,
+         "total": 13.466
+        }
+       ],
+       "total": 13.333
+      }
+     ]
+    },
+    {
+     "round": "finale",
+     "discipline": "MAG",
+     "apparatus": "PB",
+     "results": [
+      {
+       "athlete": "zou-jingyuan",
+       "rank": 1,
+       "d": 6.0,
+       "e": 9.633,
+       "penalty": 0.0,
+       "bonus": 0.1,
+       "total": 15.733
+      },
+      {
+       "athlete": "illia-kovtun",
+       "rank": 2,
+       "d": 6.0,
+       "e": 8.9,
+       "penalty": 0.0,
+       "total": 14.9
+      },
+      {
+       "athlete": "daniel-marinov",
+       "rank": 3,
+       "d": 5.9,
+       "e": 8.966,
+       "penalty": 0.0,
+       "total": 14.866
+      },
+      {
+       "athlete": "daiki-hashimoto",
+       "rank": 4,
+       "d": 5.6,
+       "e": 8.9,
+       "penalty": 0.0,
+       "bonus": 0.1,
+       "total": 14.6
+      },
+      {
+       "athlete": "shinnosuke-oka",
+       "rank": 5,
+       "d": 5.6,
+       "e": 8.966,
+       "penalty": 0.0,
+       "total": 14.566
+      },
+      {
+       "athlete": "arsenii-dukhno",
+       "rank": 6,
+       "d": 5.6,
+       "e": 8.4,
+       "penalty": 0.0,
+       "bonus": 0.1,
+       "total": 14.1
+      },
+      {
+       "athlete": "david-rumbutis",
+       "rank": 7,
+       "d": 5.4,
+       "e": 8.366,
+       "penalty": 0.0,
+       "bonus": 0.1,
+       "total": 13.866
+      },
+      {
+       "athlete": "noe-seifert",
+       "rank": 8,
+       "d": 5.3,
+       "e": 7.2,
+       "penalty": 0.0,
+       "total": 12.5
+      }
+     ]
+    },
+    {
+     "round": "finale",
+     "discipline": "MAG",
+     "apparatus": "HB",
+     "results": [
+      {
+       "athlete": "tang-chia-hung",
+       "rank": 1,
+       "d": 6.6,
+       "e": 8.366,
+       "penalty": 0.0,
+       "total": 14.966
+      },
+      {
+       "athlete": "shinnosuke-oka",
+       "rank": 2,
+       "d": 5.8,
+       "e": 8.9,
+       "penalty": 0.0,
+       "bonus": 0.1,
+       "total": 14.8
+      },
+      {
+       "athlete": "sergei-naidin",
+       "rank": 3,
+       "d": 6.4,
+       "e": 8.4,
+       "penalty": 0.0,
+       "total": 14.8
+      },
+      {
+       "athlete": "shohei-kawakami",
+       "rank": 4,
+       "d": 5.9,
+       "e": 8.6,
+       "penalty": 0.0,
+       "bonus": 0.1,
+       "total": 14.6
+      },
+      {
+       "athlete": "jesse-moore",
+       "rank": 5,
+       "d": 5.6,
+       "e": 8.733,
+       "penalty": 0.0,
+       "bonus": 0.1,
+       "total": 14.433
+      },
+      {
+       "athlete": "camilo-vera",
+       "rank": 6,
+       "d": 5.6,
+       "e": 7.633,
+       "penalty": 0.0,
+       "bonus": 0.1,
+       "total": 13.333
+      },
+      {
+       "athlete": "angel-barajas",
+       "rank": 7,
+       "d": 6.6,
+       "e": 6.733,
+       "penalty": 0.0,
+       "total": 13.333
+      },
+      {
+       "athlete": "yumin-abbadini",
+       "rank": 8,
+       "d": 5.3,
+       "e": 7.3,
+       "penalty": 0.0,
+       "total": 12.6
+      }
+     ]
+    },
+    {
+     "round": "finale",
+     "discipline": "WAG",
+     "apparatus": "TEAM",
+     "results": [
+      {
+       "nation": "CHN",
+       "rank": 1,
+       "total": 165.764,
+       "parts": {
+        "VT": 40.966,
+        "UB": 42.466,
+        "BB": 43.366,
+        "FX": 38.966
+       },
+       "members": [
+        {
+         "athlete": "du-siyu",
+         "parts": {
+          "VT": 14.1,
+          "UB": 14.3
+         }
+        },
+        {
+         "athlete": "ke-qinqin",
+         "parts": {
+          "VT": 13.633,
+          "BB": 14.4,
+          "FX": 13.1
+         }
+        },
+        {
+         "athlete": "qiu-qiyuan",
+         "parts": {
+          "UB": 14.233,
+          "BB": 13.9,
+          "FX": 12.833
+         }
+        },
+        {
+         "athlete": "zhang-yihan",
+         "parts": {}
+        },
+        {
+         "athlete": "zhang-qingying",
+         "parts": {
+          "VT": 13.233,
+          "UB": 13.933,
+          "BB": 15.066,
+          "FX": 13.033
+         }
+        }
+       ]
+      },
+      {
+       "nation": "USA",
+       "rank": 2,
+       "total": 165.531,
+       "parts": {
+        "VT": 42.633,
+        "UB": 42.766,
+        "BB": 39.199,
+        "FX": 40.933
+       },
+       "members": [
+        {
+         "athlete": "skye-blakely",
+         "parts": {
+          "VT": 14.3,
+          "UB": 14.4,
+          "BB": 13.266
+         }
+        },
+        {
+         "athlete": "charleigh-bullock",
+         "parts": {
+          "VT": 14.133,
+          "UB": 14.0
+         }
+        },
+        {
+         "athlete": "dulcy-caylor",
+         "parts": {
+          "BB": 12.333,
+          "FX": 13.6
+         }
+        },
+        {
+         "athlete": "reese-esponda",
+         "parts": {
+          "FX": 13.4
+         }
+        },
+        {
+         "athlete": "claire-pease",
+         "parts": {
+          "VT": 14.2,
+          "UB": 14.366,
+          "BB": 13.6,
+          "FX": 13.933
+         }
+        }
+       ]
+      },
+      {
+       "nation": "JPN",
+       "rank": 3,
+       "total": 164.063,
+       "parts": {
+        "VT": 42.132,
+        "UB": 40.432,
+        "BB": 41.066,
+        "FX": 40.433
+       },
+       "members": [
+        {
+         "athlete": "rina-kishi",
+         "parts": {
+          "VT": 13.966,
+          "FX": 13.233
+         }
+        },
+        {
+         "athlete": "haruka-nakamura",
+         "parts": {
+          "UB": 13.966,
+          "BB": 14.133
+         }
+        },
+        {
+         "athlete": "misa-nishiyama",
+         "parts": {
+          "VT": 13.966,
+          "UB": 12.533,
+          "BB": 13.233
+         }
+        },
+        {
+         "athlete": "mana-okamura",
+         "parts": {
+          "UB": 13.933,
+          "BB": 13.7,
+          "FX": 13.3
+         }
+        },
+        {
+         "athlete": "aiko-sugihara",
+         "parts": {
+          "VT": 14.2,
+          "FX": 13.9
+         }
+        }
+       ]
+      },
+      {
+       "nation": "FRA",
+       "rank": 4,
+       "total": 161.13,
+       "parts": {
+        "VT": 39.933,
+        "UB": 39.732,
+        "BB": 41.366,
+        "FX": 40.099
+       },
+       "members": [
+        {
+         "athlete": "lorette-charpy",
+         "parts": {
+          "VT": 13.2,
+          "UB": 11.866
+         }
+        },
+        {
+         "athlete": "elena-colas",
+         "parts": {
+          "UB": 14.433,
+          "BB": 14.2,
+          "FX": 13.1
+         }
+        },
+        {
+         "athlete": "morgane-osyssek",
+         "parts": {
+          "BB": 13.266,
+          "FX": 13.566
+         }
+        },
+        {
+         "athlete": "maiana-prat",
+         "parts": {
+          "VT": 13.8,
+          "BB": 13.9,
+          "FX": 13.433
+         }
+        },
+        {
+         "athlete": "celia-serber",
+         "parts": {
+          "VT": 12.933,
+          "UB": 13.433
+         }
+        }
+       ]
+      },
+      {
+       "nation": "BRA",
+       "rank": 5,
+       "total": 159.73,
+       "parts": {
+        "VT": 41.433,
+        "UB": 39.132,
+        "BB": 40.532,
+        "FX": 38.633
+       },
+       "members": [
+        {
+         "athlete": "rebeca-andrade",
+         "parts": {
+          "VT": 14.4,
+          "BB": 13.433
+         }
+        },
+        {
+         "athlete": "thais-fidelis",
+         "parts": {
+          "UB": 12.466,
+          "BB": 13.033,
+          "FX": 12.933
+         }
+        },
+        {
+         "athlete": "lorrane-oliveira",
+         "parts": {
+          "UB": 13.533,
+          "FX": 12.9
+         }
+        },
+        {
+         "athlete": "flavia-saraiva",
+         "parts": {
+          "VT": 13.0,
+          "UB": 13.133,
+          "BB": 14.066,
+          "FX": 12.8
+         }
+        },
+        {
+         "athlete": "sophia-weisberg",
+         "parts": {
+          "VT": 14.033
+         }
+        }
+       ]
+      },
+      {
+       "nation": "RUS",
+       "rank": 6,
+       "total": 159.394,
+       "parts": {
+        "VT": 40.299,
+        "UB": 41.332,
+        "BB": 38.498,
+        "FX": 39.265
+       },
+       "members": [
+        {
+         "athlete": "alena-glotova",
+         "parts": {
+          "UB": 13.966,
+          "BB": 12.166,
+          "FX": 12.766
+         }
+        },
+        {
+         "athlete": "milana-kaiumova",
+         "parts": {
+          "UB": 14.433
+         }
+        },
+        {
+         "athlete": "aleksandra-anufrieva",
+         "parts": {
+          "VT": 12.7,
+          "FX": 13.066
+         }
+        },
+        {
+         "athlete": "elizaveta-us",
+         "parts": {
+          "VT": 13.633,
+          "BB": 13.566
+         }
+        },
+        {
+         "athlete": "liudmila-roshchina",
+         "parts": {
+          "VT": 13.966,
+          "UB": 12.933,
+          "BB": 12.766,
+          "FX": 13.433
+         }
+        }
+       ]
+      },
+      {
+       "nation": "ITA",
+       "rank": 7,
+       "total": 158.129,
+       "parts": {
+        "VT": 39.632,
+        "UB": 42.166,
+        "BB": 37.732,
+        "FX": 38.599
+       },
+       "members": [
+        {
+         "athlete": "manila-esposito",
+         "parts": {
+          "BB": 13.1,
+          "FX": 13.133
+         }
+        },
+        {
+         "athlete": "elisa-iorio",
+         "parts": {
+          "VT": 13.166,
+          "UB": 14.3
+         }
+        },
+        {
+         "athlete": "july-marano",
+         "parts": {
+          "VT": 13.5,
+          "FX": 12.8
+         }
+        },
+        {
+         "athlete": "giulia-perotti",
+         "parts": {
+          "UB": 14.4,
+          "BB": 12.566
+         }
+        },
+        {
+         "athlete": "sofia-tonelli",
+         "parts": {
+          "VT": 12.966,
+          "UB": 13.466,
+          "BB": 12.066,
+          "FX": 12.666
+         }
+        }
+       ]
+      },
+      {
+       "nation": "CAN",
+       "rank": 8,
+       "total": 158.096,
+       "parts": {
+        "VT": 41.565,
+        "UB": 39.599,
+        "BB": 37.866,
+        "FX": 39.066
+       },
+       "members": [
+        {
+         "athlete": "ellie-black",
+         "parts": {
+          "VT": 13.933,
+          "UB": 13.0,
+          "BB": 13.733
+         }
+        },
+        {
+         "athlete": "gabrielle-black",
+         "parts": {
+          "FX": 12.4
+         }
+        },
+        {
+         "athlete": "coralie-demers",
+         "parts": {
+          "UB": 13.366
+         }
+        },
+        {
+         "athlete": "lia-monica-fontaine",
+         "parts": {
+          "VT": 14.166,
+          "UB": 13.233,
+          "BB": 13.0,
+          "FX": 13.366
+         }
+        },
+        {
+         "athlete": "lia-redick",
+         "parts": {
+          "VT": 13.466,
+          "BB": 11.133,
+          "FX": 13.3
+         }
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "round": "finale-aa",
+     "discipline": "WAG",
+     "apparatus": "AA",
+     "results": [
+      {
+       "athlete": "skye-blakely",
+       "rank": 1,
+       "total": 55.733,
+       "parts": {
+        "VT": 14.2,
+        "UB": 14.4,
+        "BB": 14.2,
+        "FX": 12.933
+       }
+      },
+      {
+       "athlete": "liudmila-roshchina",
+       "rank": 2,
+       "total": 55.199,
+       "parts": {
+        "VT": 14.033,
+        "UB": 14.333,
+        "BB": 13.433,
+        "FX": 13.4
+       }
+      },
+      {
+       "athlete": "ke-qinqin",
+       "rank": 3,
+       "total": 55.032,
+       "parts": {
+        "VT": 14.033,
+        "UB": 13.9,
+        "BB": 13.833,
+        "FX": 13.266
+       }
+      },
+      {
+       "athlete": "kaylia-nemour",
+       "rank": 4,
+       "total": 54.998,
+       "parts": {
+        "VT": 12.366,
+        "UB": 14.866,
+        "BB": 14.5,
+        "FX": 13.266
+       }
+      },
+      {
+       "athlete": "aiko-sugihara",
+       "rank": 5,
+       "total": 54.765,
+       "parts": {
+        "VT": 14.266,
+        "UB": 13.533,
+        "BB": 13.566,
+        "FX": 13.4
+       }
+      },
+      {
+       "athlete": "elena-colas",
+       "rank": 6,
+       "total": 54.666,
+       "parts": {
+        "VT": 13.2,
+        "UB": 14.433,
+        "BB": 13.933,
+        "FX": 13.1
+       }
+      },
+      {
+       "athlete": "claire-pease",
+       "rank": 7,
+       "total": 54.232,
+       "parts": {
+        "VT": 14.133,
+        "UB": 13.833,
+        "BB": 12.533,
+        "FX": 13.733
+       }
+      },
+      {
+       "athlete": "alba-petisco",
+       "rank": 8,
+       "total": 54.198,
+       "parts": {
+        "VT": 13.633,
+        "UB": 13.766,
+        "BB": 13.466,
+        "FX": 13.333
+       }
+      },
+      {
+       "athlete": "zhang-qingying",
+       "rank": 9,
+       "total": 54.098,
+       "parts": {
+        "VT": 13.066,
+        "UB": 13.933,
+        "BB": 14.233,
+        "FX": 12.866
+       }
+      },
+      {
+       "athlete": "giulia-perotti",
+       "rank": 10,
+       "total": 54.098,
+       "parts": {
+        "VT": 13.1,
+        "UB": 14.366,
+        "BB": 13.766,
+        "FX": 12.866
+       }
+      },
+      {
+       "athlete": "naomi-visser",
+       "rank": 11,
+       "total": 52.866,
+       "parts": {
+        "VT": 13.2,
+        "UB": 14.033,
+        "BB": 12.533,
+        "FX": 13.1
+       }
+      },
+      {
+       "athlete": "flavia-saraiva",
+       "rank": 12,
+       "total": 52.799,
+       "parts": {
+        "VT": 13.066,
+        "UB": 13.3,
+        "BB": 13.233,
+        "FX": 13.2
+       }
+      },
+      {
+       "athlete": "alice-kinsella",
+       "rank": 13,
+       "total": 52.765,
+       "parts": {
+        "VT": 13.833,
+        "UB": 13.466,
+        "BB": 12.166,
+        "FX": 13.3
+       }
+      },
+      {
+       "athlete": "sofia-tonelli",
+       "rank": 14,
+       "total": 52.666,
+       "parts": {
+        "VT": 13.5,
+        "UB": 13.3,
+        "BB": 13.3,
+        "FX": 12.566
+       }
+      },
+      {
+       "athlete": "rina-kishi",
+       "rank": 15,
+       "total": 52.632,
+       "parts": {
+        "VT": 13.9,
+        "UB": 13.066,
+        "BB": 12.5,
+        "FX": 13.166
+       }
+      },
+      {
+       "athlete": "ellie-black",
+       "rank": 16,
+       "total": 52.532,
+       "parts": {
+        "VT": 13.433,
+        "UB": 13.833,
+        "BB": 12.366,
+        "FX": 12.9
+       }
+      },
+      {
+       "athlete": "maiana-prat",
+       "rank": 17,
+       "total": 52.066,
+       "parts": {
+        "VT": 13.666,
+        "UB": 12.2,
+        "BB": 12.9,
+        "FX": 13.3
+       }
+      },
+      {
+       "athlete": "abigail-martin",
+       "rank": 18,
+       "total": 51.599,
+       "parts": {
+        "VT": 13.8,
+        "UB": 13.166,
+        "BB": 11.5,
+        "FX": 13.133
+       }
+      },
+      {
+       "athlete": "alena-glotova",
+       "rank": 19,
+       "total": 51.165,
+       "parts": {
+        "VT": 13.066,
+        "UB": 14.333,
+        "BB": 11.066,
+        "FX": 12.7
+       }
+      },
+      {
+       "athlete": "lisa-vaelen",
+       "rank": 20,
+       "total": 50.966,
+       "parts": {
+        "VT": 14.033,
+        "UB": 12.833,
+        "BB": 11.0,
+        "FX": 13.1
+       }
+      },
+      {
+       "athlete": "lorrane-oliveira",
+       "rank": 21,
+       "total": 50.932,
+       "parts": {
+        "VT": 13.066,
+        "UB": 13.7,
+        "BB": 11.066,
+        "FX": 13.1
+       }
+      },
+      {
+       "athlete": "greta-mayer",
+       "rank": 22,
+       "total": 50.632,
+       "parts": {
+        "VT": 13.4,
+        "UB": 13.033,
+        "BB": 12.033,
+        "FX": 12.166
+       }
+      },
+      {
+       "athlete": "breanna-scott",
+       "rank": 23,
+       "total": 50.532,
+       "parts": {
+        "VT": 12.066,
+        "UB": 13.1,
+        "BB": 12.9,
+        "FX": 12.466
+       }
+      },
+      {
+       "athlete": "lia-redick",
+       "rank": 24,
+       "total": 48.231,
+       "parts": {
+        "VT": 13.666,
+        "UB": 12.033,
+        "BB": 10.466,
+        "FX": 12.066
+       }
+      }
+     ]
+    },
+    {
+     "round": "finale",
+     "discipline": "WAG",
+     "apparatus": "VT",
+     "results": [
+      {
+       "athlete": "rebeca-andrade",
+       "rank": 1,
+       "vaults": [
+        {
+         "d": 5.0,
+         "e": 9.4,
+         "penalty": 0.0,
+         "total": 14.4
+        },
+        {
+         "d": 4.8,
+         "e": 9.333,
+         "penalty": 0.0,
+         "total": 14.133
+        }
+       ],
+       "bonus": 0.2,
+       "total": 14.466
+      },
+      {
+       "athlete": "claire-pease",
+       "rank": 2,
+       "vaults": [
+        {
+         "d": 5.6,
+         "e": 8.766,
+         "penalty": 0.0,
+         "total": 14.366
+        },
+        {
+         "d": 5.0,
+         "e": 9.0,
+         "penalty": 0.3,
+         "total": 13.7
+        }
+       ],
+       "bonus": 0.2,
+       "total": 14.233
+      },
+      {
+       "athlete": "skye-blakely",
+       "rank": 3,
+       "vaults": [
+        {
+         "d": 5.0,
+         "e": 9.1,
+         "penalty": 0.0,
+         "total": 14.1
+        },
+        {
+         "d": 4.8,
+         "e": 9.033,
+         "penalty": 0.0,
+         "total": 13.833
+        }
+       ],
+       "bonus": 0.2,
+       "total": 14.166
+      },
+      {
+       "athlete": "lia-monica-fontaine",
+       "rank": 4,
+       "vaults": [
+        {
+         "d": 5.0,
+         "e": 9.0,
+         "penalty": 0.0,
+         "total": 14.0
+        },
+        {
+         "d": 4.8,
+         "e": 8.966,
+         "penalty": 0.0,
+         "total": 13.766
+        }
+       ],
+       "bonus": 0.2,
+       "total": 14.083
+      },
+      {
+       "athlete": "ellie-black",
+       "rank": 5,
+       "vaults": [
+        {
+         "d": 4.8,
+         "e": 9.266,
+         "penalty": 0.0,
+         "total": 14.066
+        },
+        {
+         "d": 4.4,
+         "e": 9.066,
+         "penalty": 0.0,
+         "total": 13.466
+        }
+       ],
+       "bonus": 0.2,
+       "total": 13.966
+      },
+      {
+       "athlete": "victoria-mata",
+       "rank": 6,
+       "vaults": [
+        {
+         "d": 5.4,
+         "e": 8.966,
+         "penalty": 0.0,
+         "total": 14.366
+        },
+        {
+         "d": 4.2,
+         "e": 8.9,
+         "penalty": 0.0,
+         "total": 13.1
+        }
+       ],
+       "bonus": 0.2,
+       "total": 13.933
+      },
+      {
+       "athlete": "yeo-seo-jeong",
+       "rank": 7,
+       "vaults": [
+        {
+         "d": 5.4,
+         "e": 9.2,
+         "penalty": 0.0,
+         "total": 14.6
+        },
+        {
+         "d": 5.0,
+         "e": 7.833,
+         "penalty": 0.0,
+         "total": 12.833
+        }
+       ],
+       "total": 13.716
+      },
+      {
+       "athlete": "abigail-martin",
+       "rank": 8,
+       "vaults": [
+        {
+         "d": 5.0,
+         "e": 8.6,
+         "penalty": 0.0,
+         "total": 13.6
+        },
+        {
+         "d": 4.8,
+         "e": 8.633,
+         "penalty": 0.0,
+         "total": 13.433
+        }
+       ],
+       "bonus": 0.2,
+       "total": 13.716
+      }
+     ]
+    },
+    {
+     "round": "finale",
+     "discipline": "WAG",
+     "apparatus": "UB",
+     "results": [
+      {
+       "athlete": "kaylia-nemour",
+       "rank": 1,
+       "d": 7.0,
+       "e": 8.333,
+       "penalty": 0.0,
+       "total": 15.333
+      },
+      {
+       "athlete": "helen-kevric",
+       "rank": 2,
+       "d": 6.4,
+       "e": 8.433,
+       "penalty": 0.0,
+       "total": 14.833
+      },
+      {
+       "athlete": "skye-blakely",
+       "rank": 3,
+       "d": 6.2,
+       "e": 8.4,
+       "penalty": 0.0,
+       "total": 14.6
+      },
+      {
+       "athlete": "elena-colas",
+       "rank": 4,
+       "d": 6.3,
+       "e": 8.233,
+       "penalty": 0.0,
+       "total": 14.533
+      },
+      {
+       "athlete": "naomi-visser",
+       "rank": 5,
+       "d": 6.3,
+       "e": 8.066,
+       "penalty": 0.0,
+       "total": 14.366
+      },
+      {
+       "athlete": "alena-glotova",
+       "rank": 6,
+       "d": 6.2,
+       "e": 8.033,
+       "penalty": 0.0,
+       "total": 14.233
+      },
+      {
+       "athlete": "giulia-perotti",
+       "rank": 7,
+       "d": 5.9,
+       "e": 7.366,
+       "penalty": 0.0,
+       "total": 13.266
+      },
+      {
+       "athlete": "elisa-iorio",
+       "rank": 8,
+       "d": 5.7,
+       "e": 6.8,
+       "penalty": 0.0,
+       "total": 12.5
+      }
+     ]
+    },
+    {
+     "round": "finale",
+     "discipline": "WAG",
+     "apparatus": "BB",
+     "results": [
+      {
+       "athlete": "kaylia-nemour",
+       "rank": 1,
+       "d": 6.3,
+       "e": 8.266,
+       "penalty": 0.0,
+       "total": 14.566
+      },
+      {
+       "athlete": "zhang-qingying",
+       "rank": 2,
+       "d": 6.5,
+       "e": 8.066,
+       "penalty": 0.0,
+       "total": 14.566
+      },
+      {
+       "athlete": "flavia-saraiva",
+       "rank": 3,
+       "d": 6.1,
+       "e": 8.2,
+       "penalty": 0.0,
+       "total": 14.3
+      },
+      {
+       "athlete": "elena-colas",
+       "rank": 4,
+       "d": 5.9,
+       "e": 8.2,
+       "penalty": 0.0,
+       "total": 14.1
+      },
+      {
+       "athlete": "manila-esposito",
+       "rank": 5,
+       "d": 5.8,
+       "e": 8.266,
+       "penalty": 0.0,
+       "total": 14.066
+      },
+      {
+       "athlete": "skye-blakely",
+       "rank": 6,
+       "d": 5.9,
+       "e": 7.733,
+       "penalty": 0.0,
+       "total": 13.633
+      },
+      {
+       "athlete": "qiu-qiyuan",
+       "rank": 7,
+       "d": 6.1,
+       "e": 7.533,
+       "penalty": 0.0,
+       "total": 13.633
+      },
+      {
+       "athlete": "mana-okamura",
+       "rank": 8,
+       "d": 5.9,
+       "e": 6.766,
+       "penalty": 0.0,
+       "total": 12.666
+      }
+     ]
+    },
+    {
+     "round": "finale",
+     "discipline": "WAG",
+     "apparatus": "FX",
+     "results": [
+      {
+       "athlete": "claire-pease",
+       "rank": 1,
+       "d": 6.1,
+       "e": 7.866,
+       "penalty": 0.1,
+       "total": 13.866
+      },
+      {
+       "athlete": "reese-esponda",
+       "rank": 2,
+       "d": 6.0,
+       "e": 7.566,
+       "penalty": 0.0,
+       "total": 13.566
+      },
+      {
+       "athlete": "maiana-prat",
+       "rank": 3,
+       "d": 5.6,
+       "e": 7.866,
+       "penalty": 0.0,
+       "total": 13.466
+      },
+      {
+       "athlete": "abigail-martin",
+       "rank": 4,
+       "d": 5.8,
+       "e": 7.666,
+       "penalty": 0.0,
+       "total": 13.466
+      },
+      {
+       "athlete": "lia-redick",
+       "rank": 5,
+       "d": 5.4,
+       "e": 7.9,
+       "penalty": 0.0,
+       "total": 13.3
+      },
+      {
+       "athlete": "lia-monica-fontaine",
+       "rank": 6,
+       "d": 5.4,
+       "e": 7.8,
+       "penalty": 0.0,
+       "total": 13.2
+      },
+      {
+       "athlete": "liudmila-roshchina",
+       "rank": 7,
+       "d": 5.6,
+       "e": 7.5,
+       "penalty": 0.0,
+       "total": 13.1
+      },
+      {
+       "athlete": "alice-kinsella",
+       "rank": 8,
+       "d": 5.1,
+       "e": 7.866,
+       "penalty": 0.0,
+       "total": 12.966
+      }
+     ]
+    },
+    {
+     "round": "qualifica",
+     "discipline": "MAG",
+     "apparatus": "TEAM",
+     "results": [
+      {
+       "nation": "JPN",
+       "rank": 1,
+       "total": 254.529,
+       "parts": {
+        "FX": 41.433,
+        "PH": 41.966,
+        "SR": 41.265,
+        "VT": 42.599,
+        "PB": 44.466,
+        "HB": 42.8
+       },
+       "members": [
+        {
+         "athlete": "ryosuke-doi",
+         "parts": {
+          "FX": 14.033,
+          "PH": 13.533,
+          "SR": 12.566,
+          "VT": 14.033,
+          "PB": 14.266
+         }
+        },
+        {
+         "athlete": "daiki-hashimoto",
+         "parts": {
+          "FX": 13.6,
+          "PH": 14.533,
+          "SR": 13.733,
+          "VT": 14.266,
+          "PB": 14.8,
+          "HB": 13.7
+         }
+        },
+        {
+         "athlete": "shohei-kawakami",
+         "parts": {
+          "FX": 13.333,
+          "PH": 13.2,
+          "SR": 13.466,
+          "VT": 14.3,
+          "PB": 14.8,
+          "HB": 14.6
+         }
+        },
+        {
+         "athlete": "fusuke-maeda",
+         "parts": {
+          "HB": 13.566
+         }
+        },
+        {
+         "athlete": "shinnosuke-oka",
+         "parts": {
+          "FX": 13.8,
+          "PH": 13.9,
+          "SR": 14.066,
+          "VT": 13.966,
+          "PB": 14.866,
+          "HB": 14.5
+         }
+        }
+       ],
+       "qualified": "Q"
+      },
+      {
+       "nation": "GBR",
+       "rank": 2,
+       "total": 251.46,
+       "parts": {
+        "FX": 41.599,
+        "PH": 42.199,
+        "SR": 41.832,
+        "VT": 42.799,
+        "PB": 42.899,
+        "HB": 40.132
+       },
+       "members": [
+        {
+         "athlete": "joe-fraser",
+         "parts": {
+          "FX": 13.5,
+          "PH": 13.7,
+          "SR": 13.666,
+          "VT": 13.866,
+          "PB": 14.4,
+          "HB": 13.933
+         }
+        },
+        {
+         "athlete": "harry-hepworth",
+         "parts": {
+          "FX": 13.966,
+          "SR": 13.666,
+          "VT": 14.033
+         }
+        },
+        {
+         "athlete": "jake-jarman",
+         "parts": {
+          "FX": 14.133,
+          "PH": 14.033,
+          "SR": 12.833,
+          "VT": 14.9,
+          "PB": 14.466,
+          "HB": 13.333
+         }
+        },
+        {
+         "athlete": "courtney-tulloch",
+         "parts": {
+          "SR": 14.5,
+          "VT": 13.533,
+          "PB": 14.033
+         }
+        },
+        {
+         "athlete": "reuben-ward",
+         "parts": {
+          "FX": 13.066,
+          "PH": 14.466,
+          "PB": 13.733,
+          "HB": 12.866
+         }
+        }
+       ],
+       "qualified": "Q"
+      },
+      {
+       "nation": "RUS",
+       "rank": 3,
+       "total": 249.162,
+       "parts": {
+        "FX": 39.633,
+        "PH": 40.799,
+        "SR": 40.999,
+        "VT": 42.499,
+        "PB": 43.133,
+        "HB": 42.099
+       },
+       "members": [
+        {
+         "athlete": "arsenii-dukhno",
+         "parts": {
+          "FX": 14.7,
+          "PH": 13.133,
+          "SR": 13.1,
+          "VT": 14.3,
+          "PB": 14.6,
+          "HB": 14.033
+         }
+        },
+        {
+         "athlete": "daniel-marinov",
+         "parts": {
+          "FX": 12.233,
+          "PH": 13.566,
+          "SR": 13.366,
+          "VT": 13.966,
+          "PB": 14.7,
+          "HB": 13.733
+         }
+        },
+        {
+         "athlete": "sergei-naidin",
+         "parts": {
+          "FX": 12.7,
+          "PH": 13.233,
+          "VT": 13.433,
+          "PB": 13.833,
+          "HB": 14.233
+         }
+        },
+        {
+         "athlete": "savelii-sieedin",
+         "parts": {
+          "FX": 11.966,
+          "PH": 14.0,
+          "SR": 11.733,
+          "VT": 14.233,
+          "PB": 13.566,
+          "HB": 13.833
+         }
+        },
+        {
+         "athlete": "ilia-zaika",
+         "parts": {
+          "SR": 14.533
+         }
+        }
+       ],
+       "qualified": "Q"
+      },
+      {
+       "nation": "CHN",
+       "rank": 4,
+       "total": 247.493,
+       "parts": {
+        "FX": 40.766,
+        "PH": 40.165,
+        "SR": 41.932,
+        "VT": 41.366,
+        "PB": 43.565,
+        "HB": 39.699
+       },
+       "members": [
+        {
+         "athlete": "lan-xingyu",
+         "parts": {
+          "FX": 10.833,
+          "PH": 8.1,
+          "SR": 14.733,
+          "VT": 13.133,
+          "PB": 13.633,
+          "HB": 12.066
+         }
+        },
+        {
+         "athlete": "li-hongyan",
+         "parts": {
+          "FX": 13.866,
+          "VT": 13.9,
+          "HB": 12.133
+         }
+        },
+        {
+         "athlete": "tian-hao",
+         "parts": {
+          "FX": 13.5,
+          "PH": 12.133,
+          "SR": 7.766,
+          "VT": 11.066,
+          "PB": 12.633,
+          "HB": 14.0
+         }
+        },
+        {
+         "athlete": "yang-haonan",
+         "parts": {
+          "FX": 13.4,
+          "PH": 13.966,
+          "SR": 13.733,
+          "VT": 14.333,
+          "PB": 14.466,
+          "HB": 13.566
+         }
+        },
+        {
+         "athlete": "zou-jingyuan",
+         "parts": {
+          "PH": 14.066,
+          "SR": 13.466,
+          "PB": 15.466
+         }
+        }
+       ],
+       "qualified": "Q"
+      },
+      {
+       "nation": "USA",
+       "rank": 5,
+       "total": 245.961,
+       "parts": {
+        "FX": 41.766,
+        "PH": 40.599,
+        "SR": 39.699,
+        "VT": 42.399,
+        "PB": 50.065,
+        "HB": 41.433
+       },
+       "members": [
+        {
+         "athlete": "patrick-hoopes",
+         "parts": {
+          "PH": 14.666
+         }
+        },
+        {
+         "athlete": "danila-leykin",
+         "parts": {
+          "FX": 14.0,
+          "PH": 11.666,
+          "SR": 12.7,
+          "VT": 14.066,
+          "PB": 12.766,
+          "HB": 13.8
+         }
+        },
+        {
+         "athlete": "kameron-nelson",
+         "parts": {
+          "FX": 13.533,
+          "SR": 13.833,
+          "VT": 14.1,
+          "PB": 12.7
+         }
+        },
+        {
+         "athlete": "fred-richard",
+         "parts": {
+          "FX": 14.233,
+          "PH": 13.933,
+          "SR": 13.166,
+          "VT": 13.8,
+          "PB": 12.833,
+          "HB": 14.133
+         }
+        },
+        {
+         "athlete": "shane-wiskus",
+         "parts": {
+          "FX": 11.8,
+          "PH": 12.0,
+          "SR": 12.1,
+          "VT": 14.233,
+          "PB": 14.466,
+          "HB": 13.5
+         }
+        }
+       ],
+       "qualified": "Q",
+       "inconsistent": [
+        "team parts sum != total",
+        "PB top-3 members 40.065 != 50.065"
+       ]
+      },
+      {
+       "nation": "SUI",
+       "rank": 6,
+       "total": 244.43,
+       "parts": {
+        "FX": 40.266,
+        "PH": 41.566,
+        "SR": 39.333,
+        "VT": 41.466,
+        "PB": 42.966,
+        "HB": 38.833
+       },
+       "members": [
+        {
+         "athlete": "matteo-giubellini",
+         "parts": {
+          "FX": 13.1,
+          "PH": 14.066,
+          "SR": 13.2,
+          "VT": 13.133,
+          "PB": 14.1,
+          "HB": 11.7
+         }
+        },
+        {
+         "athlete": "florian-langenegger",
+         "parts": {
+          "FX": 12.9,
+          "PH": 13.8,
+          "SR": 12.533,
+          "VT": 13.8,
+          "PB": 14.166,
+          "HB": 13.4
+         }
+        },
+        {
+         "athlete": "mattia-piffaretti",
+         "parts": {
+          "FX": 13.7,
+          "SR": 13.0,
+          "VT": 13.833,
+          "PB": 14.2
+         }
+        },
+        {
+         "athlete": "noe-seifert",
+         "parts": {
+          "FX": 13.466,
+          "PH": 13.266,
+          "SR": 13.133,
+          "VT": 13.833,
+          "PB": 14.6,
+          "HB": 12.3
+         }
+        },
+        {
+         "athlete": "dominic-tamsel",
+         "parts": {
+          "PH": 13.7,
+          "HB": 13.133
+         }
+        }
+       ],
+       "qualified": "Q"
+      },
+      {
+       "nation": "NED",
+       "rank": 7,
+       "total": 242.995,
+       "parts": {
+        "FX": 40.132,
+        "PH": 40.699,
+        "SR": 38.799,
+        "VT": 41.566,
+        "PB": 41.666,
+        "HB": 40.133
+       },
+       "members": [
+        {
+         "athlete": "amine-abaidi",
+         "parts": {
+          "FX": 13.433,
+          "SR": 12.533,
+          "VT": 14.133,
+          "PB": 13.733,
+          "HB": 13.333
+         }
+        },
+        {
+         "athlete": "loran-de-munck",
+         "parts": {
+          "PH": 13.833
+         }
+        },
+        {
+         "athlete": "elijah-faverus",
+         "parts": {
+          "FX": 12.766,
+          "PH": 13.7,
+          "SR": 13.4,
+          "VT": 13.5,
+          "PB": 12.8,
+          "HB": 13.3
+         }
+        },
+        {
+         "athlete": "jermain-grunberg",
+         "parts": {
+          "FX": 13.366,
+          "PH": 12.533,
+          "SR": 11.7,
+          "VT": 13.1,
+          "PB": 14.233,
+          "HB": 13.5
+         }
+        },
+        {
+         "athlete": "casimir-schmidt",
+         "parts": {
+          "FX": 13.333,
+          "PH": 13.166,
+          "SR": 12.866,
+          "VT": 13.933,
+          "PB": 13.7,
+          "HB": 11.266
+         }
+        }
+       ],
+       "qualified": "Q"
+      },
+      {
+       "nation": "COL",
+       "rank": 8,
+       "total": 242.727,
+       "parts": {
+        "FX": 39.198,
+        "PH": 40.099,
+        "SR": 39.566,
+        "VT": 40.932,
+        "PB": 42.433,
+        "HB": 40.499
+       },
+       "members": [
+        {
+         "athlete": "jorman-alvarez",
+         "parts": {
+          "SR": 12.833
+         }
+        },
+        {
+         "athlete": "angel-barajas",
+         "parts": {
+          "FX": 13.566,
+          "PH": 13.666,
+          "SR": 13.3,
+          "VT": 13.666,
+          "PB": 14.3,
+          "HB": 14.333
+         }
+        },
+        {
+         "athlete": "thomas-mejia",
+         "parts": {
+          "FX": 10.766,
+          "PH": 12.9,
+          "SR": 12.466,
+          "VT": 13.333,
+          "PB": 13.8,
+          "HB": 12.0
+         }
+        },
+        {
+         "athlete": "camilo-vera",
+         "parts": {
+          "FX": 13.366,
+          "PH": 13.533,
+          "SR": 13.433,
+          "VT": 13.933,
+          "PB": 14.333,
+          "HB": 14.166
+         }
+        },
+        {
+         "athlete": "yan-zabala",
+         "parts": {
+          "FX": 12.266,
+          "PH": 11.566,
+          "VT": 13.2,
+          "PB": 12.133,
+          "HB": 11.9
+         }
+        }
+       ],
+       "qualified": "Q"
+      },
+      {
+       "nation": "ITA",
+       "rank": 9,
+       "total": 242.495,
+       "parts": {
+        "FX": 39.766,
+        "PH": 40.366,
+        "SR": 39.766,
+        "VT": 41.299,
+        "PB": 41.032,
+        "HB": 40.266
+       },
+       "members": [
+        {
+         "athlete": "yumin-abbadini",
+         "parts": {
+          "FX": 13.6,
+          "PH": 14.0,
+          "SR": 12.7,
+          "VT": 13.233,
+          "PB": 13.366,
+          "HB": 14.166
+         }
+        },
+        {
+         "athlete": "mario-macchiati",
+         "parts": {
+          "FX": 13.2,
+          "PH": 11.533,
+          "SR": 12.233,
+          "VT": 13.766,
+          "PB": 14.133,
+          "HB": 13.1
+         }
+        },
+        {
+         "athlete": "simone-speranza",
+         "parts": {
+          "FX": 12.966,
+          "PH": 9.633,
+          "SR": 13.466,
+          "VT": 14.1,
+          "PB": 13.3,
+          "HB": 12.4
+         }
+        },
+        {
+         "athlete": "gabriele-targhetta",
+         "parts": {
+          "PH": 14.833
+         }
+        },
+        {
+         "athlete": "niccolo-vannucchi",
+         "parts": {
+          "FX": 11.833,
+          "SR": 13.6,
+          "VT": 13.433,
+          "PB": 13.533,
+          "HB": 13.0
+         }
+        }
+       ],
+       "qualified": "R1"
+      },
+      {
+       "nation": "BEL",
+       "rank": 10,
+       "total": 240.894,
+       "parts": {
+        "FX": 39.299,
+        "PH": 38.999,
+        "SR": 40.566,
+        "VT": 41.632,
+        "PB": 41.566,
+        "HB": 39.832
+       },
+       "members": [
+        {
+         "athlete": "nicola-cuyle",
+         "parts": {
+          "FX": 12.9,
+          "PH": 11.833,
+          "SR": 13.4,
+          "VT": 13.533,
+          "PB": 14.033,
+          "HB": 11.066
+         }
+        },
+        {
+         "athlete": "glen-cuyle",
+         "parts": {
+          "FX": 13.033,
+          "SR": 14.1,
+          "VT": 14.066,
+          "PB": 13.9
+         }
+        },
+        {
+         "athlete": "noah-kuavita",
+         "parts": {
+          "FX": 12.033,
+          "PH": 12.233,
+          "VT": 13.8,
+          "PB": 13.633,
+          "HB": 12.733
+         }
+        },
+        {
+         "athlete": "victor-martinez",
+         "parts": {
+          "FX": 13.366,
+          "PH": 12.166,
+          "SR": 13.066,
+          "VT": 13.766,
+          "PB": 13.533,
+          "HB": 13.166
+         }
+        },
+        {
+         "athlete": "kilan-van-der-aa",
+         "parts": {
+          "PH": 14.6,
+          "HB": 12.933
+         }
+        }
+       ],
+       "qualified": "R2",
+       "inconsistent": [
+        "team parts sum != total",
+        "HB top-3 members 38.832 != 39.832"
+       ]
+      },
+      {
+       "nation": "FRA",
+       "rank": 11,
+       "total": 238.663,
+       "parts": {
+        "FX": 39.066,
+        "PH": 39.599,
+        "SR": 38.566,
+        "VT": 41.533,
+        "PB": 39.733,
+        "HB": 40.166
+       },
+       "members": [
+        {
+         "athlete": "kevin-carvalho",
+         "parts": {
+          "FX": 12.066,
+          "VT": 13.8,
+          "PB": 12.7,
+          "HB": 13.833
+         }
+        },
+        {
+         "athlete": "anthony-mansard",
+         "parts": {
+          "FX": 13.0,
+          "PH": 12.633,
+          "SR": 12.633,
+          "VT": 13.7,
+          "PB": 13.533,
+          "HB": 13.7
+         }
+        },
+        {
+         "athlete": "nael-sakouhi",
+         "parts": {
+          "FX": 13.3,
+          "PH": 13.433,
+          "SR": 12.733,
+          "VT": 14.0,
+          "PB": 13.5,
+          "HB": 12.033
+         }
+        },
+        {
+         "athlete": "melwin-touchais",
+         "parts": {
+          "PH": 13.533,
+          "SR": 13.2
+         }
+        },
+        {
+         "athlete": "leeroy-traore-malatre",
+         "parts": {
+          "FX": 12.766,
+          "PH": 12.633,
+          "SR": 11.833,
+          "VT": 13.733,
+          "PB": 11.166,
+          "HB": 12.633
+         }
+        }
+       ],
+       "qualified": "R3"
+      },
+      {
+       "nation": "KAZ",
+       "rank": 12,
+       "total": 237.594,
+       "parts": {
+        "FX": 39.732,
+        "PH": 42.065,
+        "SR": 38.966,
+        "VT": 40.499,
+        "PB": 39.332,
+        "HB": 37.0
+       },
+       "members": [
+        {
+         "athlete": "ilyas-azizov",
+         "parts": {
+          "FX": 13.766,
+          "PH": 14.066,
+          "SR": 12.2,
+          "VT": 13.933,
+          "PB": 11.966,
+          "HB": 11.7
+         }
+        },
+        {
+         "athlete": "nurtan-idrissov",
+         "parts": {
+          "FX": 13.033,
+          "PH": 13.033,
+          "SR": 13.5,
+          "VT": 13.666,
+          "PB": 13.833,
+          "HB": 12.6
+         }
+        },
+        {
+         "athlete": "milad-karimi",
+         "parts": {
+          "FX": 12.566,
+          "PH": 13.133,
+          "HB": 12.7
+         }
+        },
+        {
+         "athlete": "nariman-kurbanov",
+         "parts": {
+          "PH": 14.866
+         }
+        },
+        {
+         "athlete": "dmitriy-patanin",
+         "parts": {
+          "FX": 12.933,
+          "SR": 13.266,
+          "VT": 12.9,
+          "PB": 13.533,
+          "HB": 10.466
+         }
+        }
+       ],
+       "qualified": "R4"
+      }
+     ]
+    },
+    {
+     "round": "qualifica",
+     "discipline": "MAG",
+     "apparatus": "AA",
+     "results": [
+      {
+       "athlete": "shinnosuke-oka",
+       "rank": 1,
+       "total": 85.098,
+       "parts": {
+        "FX": 13.8,
+        "PH": 13.9,
+        "SR": 14.066,
+        "VT": 13.966,
+        "PB": 14.866,
+        "HB": 14.5
+       },
+       "qualified": "Q"
+      },
+      {
+       "athlete": "daiki-hashimoto",
+       "rank": 2,
+       "total": 84.632,
+       "parts": {
+        "FX": 13.6,
+        "PH": 14.533,
+        "SR": 13.733,
+        "VT": 14.266,
+        "PB": 14.8,
+        "HB": 13.7
+       },
+       "qualified": "Q"
+      },
+      {
+       "athlete": "arsenii-dukhno",
+       "rank": 3,
+       "total": 83.866,
+       "parts": {
+        "FX": 14.7,
+        "PH": 13.133,
+        "SR": 13.1,
+        "VT": 14.3,
+        "PB": 14.6,
+        "HB": 14.033
+       },
+       "qualified": "Q"
+      },
+      {
+       "athlete": "shohei-kawakami",
+       "rank": 4,
+       "total": 83.699,
+       "parts": {
+        "FX": 13.333,
+        "PH": 13.2,
+        "SR": 13.466,
+        "VT": 14.3,
+        "PB": 14.8,
+        "HB": 14.6
+       },
+       "qualified": "–"
+      },
+      {
+       "athlete": "jake-jarman",
+       "rank": 5,
+       "total": 83.698,
+       "parts": {
+        "FX": 14.133,
+        "PH": 14.033,
+        "SR": 12.833,
+        "VT": 14.9,
+        "PB": 14.466,
+        "HB": 13.333
+       },
+       "qualified": "Q"
+      },
+      {
+       "athlete": "yang-haonan",
+       "rank": 6,
+       "total": 83.464,
+       "parts": {
+        "FX": 13.4,
+        "PH": 13.966,
+        "SR": 13.733,
+        "VT": 14.333,
+        "PB": 14.466,
+        "HB": 13.566
+       },
+       "qualified": "Q"
+      },
+      {
+       "athlete": "illia-kovtun",
+       "rank": 7,
+       "total": 83.099,
+       "parts": {
+        "FX": 14.0,
+        "PH": 13.4,
+        "SR": 13.1,
+        "VT": 13.966,
+        "PB": 14.9,
+        "HB": 13.733
+       },
+       "qualified": "Q"
+      },
+      {
+       "athlete": "joe-fraser",
+       "rank": 8,
+       "total": 83.065,
+       "parts": {
+        "FX": 13.5,
+        "PH": 13.7,
+        "SR": 13.666,
+        "VT": 13.866,
+        "PB": 14.4,
+        "HB": 13.933
+       },
+       "qualified": "Q"
+      },
+      {
+       "athlete": "angel-barajas",
+       "rank": 9,
+       "total": 82.831,
+       "parts": {
+        "FX": 13.566,
+        "PH": 13.666,
+        "SR": 13.3,
+        "VT": 13.666,
+        "PB": 14.3,
+        "HB": 14.333
+       },
+       "qualified": "Q"
+      },
+      {
+       "athlete": "camilo-vera",
+       "rank": 10,
+       "total": 82.764,
+       "parts": {
+        "FX": 13.366,
+        "PH": 13.533,
+        "SR": 13.433,
+        "VT": 13.933,
+        "PB": 14.333,
+        "HB": 14.166
+       },
+       "qualified": "Q"
+      },
+      {
+       "athlete": "fred-richard",
+       "rank": 11,
+       "total": 82.098,
+       "parts": {
+        "FX": 14.233,
+        "PH": 13.933,
+        "SR": 13.166,
+        "VT": 13.8,
+        "PB": 12.833,
+        "HB": 14.133
+       },
+       "qualified": "Q"
+      },
+      {
+       "athlete": "daniel-marinov",
+       "rank": 12,
+       "total": 81.564,
+       "parts": {
+        "FX": 12.233,
+        "PH": 13.566,
+        "SR": 13.366,
+        "VT": 13.966,
+        "PB": 14.7,
+        "HB": 13.733
+       },
+       "qualified": "Q"
+      },
+      {
+       "athlete": "yumin-abbadini",
+       "rank": 13,
+       "total": 81.065,
+       "parts": {
+        "FX": 13.6,
+        "PH": 14.0,
+        "SR": 12.7,
+        "VT": 13.233,
+        "PB": 13.366,
+        "HB": 14.166
+       },
+       "qualified": "Q"
+      },
+      {
+       "athlete": "florian-langenegger",
+       "rank": 14,
+       "total": 80.599,
+       "parts": {
+        "FX": 12.9,
+        "PH": 13.8,
+        "SR": 12.533,
+        "VT": 13.8,
+        "PB": 14.166,
+        "HB": 13.4
+       },
+       "qualified": "Q"
+      },
+      {
+       "athlete": "noe-seifert",
+       "rank": 15,
+       "total": 80.598,
+       "parts": {
+        "FX": 13.466,
+        "PH": 13.266,
+        "SR": 13.133,
+        "VT": 13.833,
+        "PB": 14.6,
+        "HB": 12.3
+       },
+       "qualified": "Q"
+      },
+      {
+       "athlete": "krisztofer-meszaros",
+       "rank": 16,
+       "total": 80.264,
+       "parts": {
+        "FX": 13.033,
+        "PH": 12.766,
+        "SR": 12.933,
+        "VT": 13.966,
+        "PB": 14.166,
+        "HB": 13.4
+       },
+       "qualified": "Q"
+      },
+      {
+       "athlete": "nurtan-idrissov",
+       "rank": 17,
+       "total": 79.665,
+       "parts": {
+        "FX": 13.033,
+        "PH": 13.033,
+        "SR": 13.5,
+        "VT": 13.666,
+        "PB": 13.833,
+        "HB": 12.6
+       },
+       "qualified": "Q"
+      },
+      {
+       "athlete": "elijah-faverus",
+       "rank": 18,
+       "total": 79.466,
+       "parts": {
+        "FX": 12.766,
+        "PH": 13.7,
+        "SR": 13.4,
+        "VT": 13.5,
+        "PB": 12.8,
+        "HB": 13.3
+       },
+       "qualified": "Q"
+      },
+      {
+       "athlete": "savelii-sieedin",
+       "rank": 19,
+       "total": 79.331,
+       "parts": {
+        "FX": 11.966,
+        "PH": 14.0,
+        "SR": 11.733,
+        "VT": 14.233,
+        "PB": 13.566,
+        "HB": 13.833
+       },
+       "qualified": "–"
+      },
+      {
+       "athlete": "matteo-giubellini",
+       "rank": 20,
+       "total": 79.299,
+       "parts": {
+        "FX": 13.1,
+        "PH": 14.066,
+        "SR": 13.2,
+        "VT": 13.133,
+        "PB": 14.1,
+        "HB": 11.7
+       },
+       "qualified": "–"
+      },
+      {
+       "athlete": "anthony-mansard",
+       "rank": 21,
+       "total": 79.199,
+       "parts": {
+        "FX": 13.0,
+        "PH": 12.633,
+        "SR": 12.633,
+        "VT": 13.7,
+        "PB": 13.533,
+        "HB": 13.7
+       },
+       "qualified": "Q"
+      },
+      {
+       "athlete": "victor-martinez",
+       "rank": 22,
+       "total": 79.063,
+       "parts": {
+        "FX": 13.366,
+        "PH": 12.166,
+        "SR": 13.066,
+        "VT": 13.766,
+        "PB": 13.533,
+        "HB": 13.166
+       },
+       "qualified": "Q"
+      },
+      {
+       "athlete": "nael-sakouhi",
+       "rank": 23,
+       "total": 78.999,
+       "parts": {
+        "FX": 13.3,
+        "PH": 13.433,
+        "SR": 12.733,
+        "VT": 14.0,
+        "PB": 13.5,
+        "HB": 12.033
+       },
+       "qualified": "Q"
+      },
+      {
+       "athlete": "danila-leykin",
+       "rank": 24,
+       "total": 78.998,
+       "parts": {
+        "FX": 14.0,
+        "PH": 11.666,
+        "SR": 12.7,
+        "VT": 14.066,
+        "PB": 12.766,
+        "HB": 13.8
+       },
+       "qualified": "Q"
+      },
+      {
+       "athlete": "samuel-zakutney",
+       "rank": 25,
+       "total": 78.764,
+       "parts": {
+        "FX": 13.333,
+        "PH": 12.666,
+        "SR": 12.366,
+        "VT": 13.066,
+        "PB": 14.0,
+        "HB": 13.333
+       },
+       "qualified": "Q"
+      },
+      {
+       "athlete": "timo-eder",
+       "rank": 26,
+       "total": 78.465,
+       "parts": {
+        "FX": 11.833,
+        "PH": 13.566,
+        "SR": 12.366,
+        "VT": 13.7,
+        "PB": 13.8,
+        "HB": 13.2
+       },
+       "qualified": "Q"
+      },
+      {
+       "athlete": "jermain-grunberg",
+       "rank": 27,
+       "total": 78.432,
+       "parts": {
+        "FX": 13.366,
+        "PH": 12.533,
+        "SR": 11.7,
+        "VT": 13.1,
+        "PB": 14.233,
+        "HB": 13.5
+       },
+       "qualified": "Q"
+      },
+      {
+       "athlete": "casimir-schmidt",
+       "rank": 28,
+       "total": 78.264,
+       "parts": {
+        "FX": 13.333,
+        "PH": 13.166,
+        "SR": 12.866,
+        "VT": 13.933,
+        "PB": 13.7,
+        "HB": 11.266
+       },
+       "qualified": "–"
+      },
+      {
+       "athlete": "tang-chia-hung",
+       "rank": 29,
+       "total": 78.132,
+       "parts": {
+        "FX": 12.033,
+        "PH": 12.6,
+        "SR": 13.6,
+        "VT": 14.133,
+        "PB": 11.2,
+        "HB": 14.566
+       },
+       "qualified": "R1",
+       "reserve": true
+      },
+      {
+       "athlete": "shane-wiskus",
+       "rank": 30,
+       "total": 78.099,
+       "parts": {
+        "FX": 11.8,
+        "PH": 12.0,
+        "SR": 12.1,
+        "VT": 14.233,
+        "PB": 14.466,
+        "HB": 13.5
+       },
+       "qualified": "–"
+      },
+      {
+       "athlete": "mario-macchiati",
+       "rank": 31,
+       "total": 77.965,
+       "parts": {
+        "FX": 13.2,
+        "PH": 11.533,
+        "SR": 12.233,
+        "VT": 13.766,
+        "PB": 14.133,
+        "HB": 13.1
+       },
+       "qualified": "R2",
+       "reserve": true
+      },
+      {
+       "athlete": "omar-mohamed",
+       "rank": 32,
+       "total": 77.899,
+       "parts": {
+        "FX": 12.2,
+        "PH": 12.6,
+        "SR": 13.6,
+        "VT": 13.4,
+        "PB": 13.433,
+        "HB": 12.666
+       },
+       "qualified": "R3",
+       "reserve": true
+      },
+      {
+       "athlete": "ignacio-yockers",
+       "rank": 33,
+       "total": 77.832,
+       "parts": {
+        "FX": 12.433,
+        "PH": 14.3,
+        "SR": 11.666,
+        "VT": 13.3,
+        "PB": 13.533,
+        "HB": 12.6
+       },
+       "qualified": "R4",
+       "reserve": true
+      }
+     ]
+    },
+    {
+     "round": "qualifica",
+     "discipline": "MAG",
+     "apparatus": "FX",
+     "results": [
+      {
+       "athlete": "arsenii-dukhno",
+       "rank": 1,
+       "d": 5.9,
+       "e": 8.7,
+       "penalty": 0.0,
+       "bonus": 0.1,
+       "total": 14.7,
+       "qualified": "Q"
+      },
+      {
+       "athlete": "carlos-yulo",
+       "rank": 2,
+       "d": 5.7,
+       "e": 8.8,
+       "penalty": 0.0,
+       "total": 14.5,
+       "qualified": "Q"
+      },
+      {
+       "athlete": "artem-dolgopyat",
+       "rank": 3,
+       "d": 5.8,
+       "e": 8.5,
+       "penalty": 0.0,
+       "total": 14.3,
+       "qualified": "Q"
+      },
+      {
+       "athlete": "fred-richard",
+       "rank": 4,
+       "d": 5.7,
+       "e": 8.733,
+       "penalty": 0.3,
+       "bonus": 0.1,
+       "total": 14.233,
+       "qualified": "Q"
+      },
+      {
+       "athlete": "jake-jarman",
+       "rank": 5,
+       "d": 6.3,
+       "e": 7.933,
+       "penalty": 0.1,
+       "total": 14.133,
+       "qualified": "Q"
+      },
+      {
+       "athlete": "yahor-sharamkou",
+       "rank": 6,
+       "d": 5.8,
+       "e": 8.4,
+       "penalty": 0.1,
+       "total": 14.1,
+       "qualified": "Q"
+      },
+      {
+       "athlete": "noam-berkovich",
+       "rank": 7,
+       "d": 5.7,
+       "e": 8.233,
+       "penalty": 0.0,
+       "bonus": 0.1,
+       "total": 14.033,
+       "qualified": "Q"
+      },
+      {
+       "athlete": "ryosuke-doi",
+       "rank": 8,
+       "d": 5.7,
+       "e": 8.233,
+       "penalty": 0.0,
+       "bonus": 0.1,
+       "total": 14.033,
+       "qualified": "Q"
+      },
+      {
+       "athlete": "illia-kovtun",
+       "rank": 9,
+       "d": 5.5,
+       "e": 8.5,
+       "penalty": 0.0,
+       "total": 14.0,
+       "qualified": "R1",
+       "reserve": true
+      },
+      {
+       "athlete": "danila-leykin",
+       "rank": 9,
+       "d": 5.5,
+       "e": 8.5,
+       "penalty": 0.0,
+       "total": 14.0,
+       "qualified": "R1",
+       "reserve": true
+      },
+      {
+       "athlete": "harry-hepworth",
+       "rank": 11,
+       "d": 6.1,
+       "e": 7.866,
+       "penalty": 0.1,
+       "bonus": 0.1,
+       "total": 13.966,
+       "qualified": "R3",
+       "reserve": true
+      }
+     ]
+    },
+    {
+     "round": "qualifica",
+     "discipline": "MAG",
+     "apparatus": "PH",
+     "results": [
+      {
+       "athlete": "hamlet-manukyan",
+       "rank": 1,
+       "d": 5.9,
+       "e": 9.033,
+       "penalty": 0.0,
+       "total": 14.933,
+       "qualified": "Q"
+      },
+      {
+       "athlete": "nariman-kurbanov",
+       "rank": 2,
+       "d": 6.0,
+       "e": 8.866,
+       "penalty": 0.0,
+       "total": 14.866,
+       "qualified": "Q"
+      },
+      {
+       "athlete": "gabriele-targhetta",
+       "rank": 3,
+       "d": 5.9,
+       "e": 8.933,
+       "penalty": 0.0,
+       "total": 14.833,
+       "qualified": "Q"
+      },
+      {
+       "athlete": "mamikon-khachatryan",
+       "rank": 4,
+       "d": 5.8,
+       "e": 8.933,
+       "penalty": 0.0,
+       "total": 14.733,
+       "qualified": "Q"
+      },
+      {
+       "athlete": "patrick-hoopes",
+       "rank": 5,
+       "d": 6.1,
+       "e": 8.566,
+       "penalty": 0.0,
+       "total": 14.666,
+       "qualified": "Q"
+      },
+      {
+       "athlete": "hur-woong",
+       "rank": 6,
+       "d": 5.9,
+       "e": 8.733,
+       "penalty": 0.0,
+       "total": 14.633,
+       "qualified": "Q"
+      },
+      {
+       "athlete": "kilan-van-der-aa",
+       "rank": 7,
+       "d": 5.7,
+       "e": 8.9,
+       "penalty": 0.0,
+       "total": 14.6,
+       "qualified": "Q"
+      },
+      {
+       "athlete": "daiki-hashimoto",
+       "rank": 8,
+       "d": 5.7,
+       "e": 8.833,
+       "penalty": 0.0,
+       "total": 14.533,
+       "qualified": "Q"
+      },
+      {
+       "athlete": "reuben-ward",
+       "rank": 9,
+       "d": 5.7,
+       "e": 8.766,
+       "penalty": 0.0,
+       "total": 14.466,
+       "qualified": "R1",
+       "reserve": true
+      },
+      {
+       "athlete": "rhys-mcclenaghan",
+       "rank": 10,
+       "d": 5.8,
+       "e": 8.6,
+       "penalty": 0.0,
+       "total": 14.4,
+       "qualified": "R2",
+       "reserve": true
+      },
+      {
+       "athlete": "ignacio-yockers",
+       "rank": 11,
+       "d": 5.8,
+       "e": 8.5,
+       "penalty": 0.0,
+       "total": 14.3,
+       "qualified": "R3",
+       "reserve": true
+      }
+     ]
+    },
+    {
+     "round": "qualifica",
+     "discipline": "MAG",
+     "apparatus": "SR",
+     "results": [
+      {
+       "athlete": "lan-xingyu",
+       "rank": 1,
+       "d": 6.0,
+       "e": 8.633,
+       "penalty": 0.0,
+       "bonus": 0.1,
+       "total": 14.733,
+       "qualified": "Q"
+      },
+      {
+       "athlete": "ilia-zaika",
+       "rank": 2,
+       "d": 5.7,
+       "e": 8.833,
+       "penalty": 0.0,
+       "total": 14.533,
+       "qualified": "Q"
+      },
+      {
+       "athlete": "courtney-tulloch",
+       "rank": 3,
+       "d": 5.7,
+       "e": 8.7,
+       "penalty": 0.0,
+       "bonus": 0.1,
+       "total": 14.5,
+       "qualified": "Q"
+      },
+      {
+       "athlete": "artur-avetisyan",
+       "rank": 4,
+       "d": 5.4,
+       "e": 8.833,
+       "penalty": 0.0,
+       "total": 14.233,
+       "qualified": "Q"
+      },
+      {
+       "athlete": "mehmet-ayberk-kosak",
+       "rank": 5,
+       "d": 5.5,
+       "e": 8.633,
+       "penalty": 0.0,
+       "bonus": 0.1,
+       "total": 14.233,
+       "qualified": "Q"
+      },
+      {
+       "athlete": "glen-cuyle",
+       "rank": 6,
+       "d": 5.4,
+       "e": 8.6,
+       "penalty": 0.0,
+       "bonus": 0.1,
+       "total": 14.1,
+       "qualified": "Q"
+      },
+      {
+       "athlete": "shinnosuke-oka",
+       "rank": 7,
+       "d": 5.1,
+       "e": 8.866,
+       "penalty": 0.0,
+       "bonus": 0.1,
+       "total": 14.066,
+       "qualified": "Q"
+      },
+      {
+       "athlete": "eleftherios-petrounias",
+       "rank": 8,
+       "d": 5.7,
+       "e": 8.333,
+       "penalty": 0.0,
+       "total": 14.033,
+       "qualified": "Q"
+      },
+      {
+       "athlete": "nikita-simonov",
+       "rank": 9,
+       "d": 5.3,
+       "e": 8.6,
+       "penalty": 0.0,
+       "total": 13.9,
+       "qualified": "R1",
+       "reserve": true
+      },
+      {
+       "athlete": "kameron-nelson",
+       "rank": 10,
+       "d": 5.5,
+       "e": 8.233,
+       "penalty": 0.0,
+       "bonus": 0.1,
+       "total": 13.833,
+       "qualified": "R2",
+       "reserve": true
+      },
+      {
+       "athlete": "daiki-hashimoto",
+       "rank": 11,
+       "d": 5.1,
+       "e": 8.633,
+       "penalty": 0.0,
+       "total": 13.733,
+       "qualified": "R3",
+       "reserve": true
+      }
+     ]
+    },
+    {
+     "round": "qualifica",
+     "discipline": "MAG",
+     "apparatus": "VT",
+     "results": [
+      {
+       "athlete": "jake-jarman",
+       "rank": 1,
+       "vaults": [
+        {
+         "d": 5.6,
+         "e": 9.3,
+         "penalty": 0.0,
+         "total": 14.9
+        },
+        {
+         "d": 5.2,
+         "e": 9.166,
+         "penalty": 0.0,
+         "total": 14.366
+        }
+       ],
+       "total": 14.633,
+       "qualified": "Q"
+      },
+      {
+       "athlete": "artur-davtyan",
+       "rank": 2,
+       "vaults": [
+        {
+         "d": 5.2,
+         "e": 9.266,
+         "penalty": 0.0,
+         "total": 14.466
+        },
+        {
+         "d": 5.2,
+         "e": 9.6,
+         "penalty": 0.1,
+         "bonus": 0.1,
+         "total": 14.8
+        }
+       ],
+       "total": 14.633,
+       "qualified": "Q"
+      },
+      {
+       "athlete": "nazar-chepurnyi",
+       "rank": 3,
+       "vaults": [
+        {
+         "d": 5.2,
+         "e": 9.2,
+         "penalty": 0.0,
+         "total": 14.4
+        },
+        {
+         "d": 5.2,
+         "e": 9.3,
+         "penalty": 0.0,
+         "total": 14.5
+        }
+       ],
+       "total": 14.45,
+       "qualified": "Q"
+      },
+      {
+       "athlete": "arsenii-dukhno",
+       "rank": 4,
+       "vaults": [
+        {
+         "d": 5.2,
+         "e": 9.1,
+         "penalty": 0.0,
+         "total": 14.3
+        },
+        {
+         "d": 5.2,
+         "e": 9.2,
+         "penalty": 0.0,
+         "total": 14.4
+        }
+       ],
+       "total": 14.35,
+       "qualified": "Q"
+      },
+      {
+       "athlete": "shohei-kawakami",
+       "rank": 5,
+       "vaults": [
+        {
+         "d": 5.2,
+         "e": 9.1,
+         "penalty": 0.0,
+         "total": 14.3
+        },
+        {
+         "d": 5.2,
+         "e": 9.066,
+         "penalty": 0.0,
+         "total": 14.266
+        }
+       ],
+       "total": 14.283,
+       "qualified": "Q"
+      },
+      {
+       "athlete": "carlos-yulo",
+       "rank": 6,
+       "vaults": [
+        {
+         "d": 5.2,
+         "e": 8.8,
+         "penalty": 0.0,
+         "total": 14.0
+        },
+        {
+         "d": 5.2,
+         "e": 9.333,
+         "penalty": 0.0,
+         "total": 14.533
+        }
+       ],
+       "total": 14.266,
+       "qualified": "Q"
+      },
+      {
+       "athlete": "sebastian-sponevik",
+       "rank": 7,
+       "vaults": [
+        {
+         "d": 5.2,
+         "e": 9.033,
+         "penalty": 0.0,
+         "total": 14.233
+        },
+        {
+         "d": 5.2,
+         "e": 9.033,
+         "penalty": 0.0,
+         "total": 14.233
+        }
+       ],
+       "total": 14.233,
+       "qualified": "Q"
+      },
+      {
+       "athlete": "harry-hepworth",
+       "rank": 8,
+       "vaults": [
+        {
+         "d": 5.2,
+         "e": 8.833,
+         "penalty": 0.0,
+         "total": 14.033
+        },
+        {
+         "d": 5.2,
+         "e": 9.2,
+         "penalty": 0.0,
+         "total": 14.4
+        }
+       ],
+       "total": 14.216,
+       "qualified": "Q"
+      },
+      {
+       "athlete": "yahor-sharamkou",
+       "rank": 9,
+       "vaults": [
+        {
+         "d": 5.2,
+         "e": 8.966,
+         "penalty": 0.0,
+         "total": 14.166
+        },
+        {
+         "d": 5.2,
+         "e": 8.966,
+         "penalty": 0.0,
+         "total": 14.166
+        }
+       ],
+       "total": 14.166,
+       "qualified": "R1",
+       "reserve": true
+      },
+      {
+       "athlete": "kameron-nelson",
+       "rank": 10,
+       "vaults": [
+        {
+         "d": 5.2,
+         "e": 8.9,
+         "penalty": 0.0,
+         "total": 14.1
+        },
+        {
+         "d": 5.2,
+         "e": 9.0,
+         "penalty": 0.0,
+         "total": 14.2
+        }
+       ],
+       "total": 14.15,
+       "qualified": "R2",
+       "reserve": true
+      },
+      {
+       "athlete": "simone-speranza",
+       "rank": 11,
+       "vaults": [
+        {
+         "d": 5.2,
+         "e": 8.9,
+         "penalty": 0.0,
+         "total": 14.1
+        },
+        {
+         "d": 5.2,
+         "e": 8.7,
+         "penalty": 0.1,
+         "total": 13.8
+        }
+       ],
+       "total": 13.95,
+       "qualified": "R3",
+       "reserve": true
+      }
+     ]
+    },
+    {
+     "round": "qualifica",
+     "discipline": "MAG",
+     "apparatus": "PB",
+     "results": [
+      {
+       "athlete": "zou-jingyuan",
+       "rank": 1,
+       "d": 5.8,
+       "e": 9.566,
+       "penalty": 0.0,
+       "bonus": 0.1,
+       "total": 15.466,
+       "qualified": "Q"
+      },
+      {
+       "athlete": "illia-kovtun",
+       "rank": 2,
+       "d": 6.0,
+       "e": 8.8,
+       "penalty": 0.0,
+       "bonus": 0.1,
+       "total": 14.9,
+       "qualified": "Q"
+      },
+      {
+       "athlete": "shinnosuke-oka",
+       "rank": 3,
+       "d": 5.6,
+       "e": 9.166,
+       "penalty": 0.0,
+       "bonus": 0.1,
+       "total": 14.866,
+       "qualified": "Q"
+      },
+      {
+       "athlete": "daiki-hashimoto",
+       "rank": 4,
+       "d": 5.6,
+       "e": 9.1,
+       "penalty": 0.0,
+       "bonus": 0.1,
+       "total": 14.8,
+       "qualified": "Q"
+      },
+      {
+       "athlete": "shohei-kawakami",
+       "rank": 5,
+       "d": 5.8,
+       "e": 8.9,
+       "penalty": 0.0,
+       "bonus": 0.1,
+       "total": 14.8,
+       "qualified": "–"
+      },
+      {
+       "athlete": "daniel-marinov",
+       "rank": 6,
+       "d": 5.9,
+       "e": 8.8,
+       "penalty": 0.0,
+       "total": 14.7,
+       "qualified": "Q"
+      },
+      {
+       "athlete": "arsenii-dukhno",
+       "rank": 7,
+       "d": 5.6,
+       "e": 8.9,
+       "penalty": 0.0,
+       "bonus": 0.1,
+       "total": 14.6,
+       "qualified": "Q"
+      },
+      {
+       "athlete": "noe-seifert",
+       "rank": 8,
+       "d": 5.9,
+       "e": 8.7,
+       "penalty": 0.0,
+       "total": 14.6,
+       "qualified": "Q"
+      },
+      {
+       "athlete": "david-rumbutis",
+       "rank": 9,
+       "d": 5.4,
+       "e": 9.0,
+       "penalty": 0.0,
+       "bonus": 0.1,
+       "total": 14.5,
+       "qualified": "Q"
+      },
+      {
+       "athlete": "jake-jarman",
+       "rank": 10,
+       "d": 5.4,
+       "e": 8.966,
+       "penalty": 0.0,
+       "bonus": 0.1,
+       "total": 14.466,
+       "qualified": "R1",
+       "reserve": true
+      },
+      {
+       "athlete": "shane-wiskus",
+       "rank": 10,
+       "d": 5.4,
+       "e": 8.966,
+       "penalty": 0.0,
+       "bonus": 0.1,
+       "total": 14.466,
+       "qualified": "R1",
+       "reserve": true
+      },
+      {
+       "athlete": "yang-haonan",
+       "rank": 12,
+       "d": 5.6,
+       "e": 8.766,
+       "penalty": 0.0,
+       "bonus": 0.1,
+       "total": 14.466,
+       "qualified": "R3",
+       "reserve": true
+      }
+     ]
+    },
+    {
+     "round": "qualifica",
+     "discipline": "MAG",
+     "apparatus": "HB",
+     "results": [
+      {
+       "athlete": "shohei-kawakami",
+       "rank": 1,
+       "d": 6.3,
+       "e": 8.3,
+       "penalty": 0.0,
+       "total": 14.6,
+       "qualified": "Q"
+      },
+      {
+       "athlete": "tang-chia-hung",
+       "rank": 2,
+       "d": 6.0,
+       "e": 8.566,
+       "penalty": 0.0,
+       "total": 14.566,
+       "qualified": "Q"
+      },
+      {
+       "athlete": "shinnosuke-oka",
+       "rank": 3,
+       "d": 5.8,
+       "e": 8.7,
+       "penalty": 0.0,
+       "total": 14.5,
+       "qualified": "Q"
+      },
+      {
+       "athlete": "jesse-moore",
+       "rank": 4,
+       "d": 5.6,
+       "e": 8.666,
+       "penalty": 0.0,
+       "bonus": 0.1,
+       "total": 14.366,
+       "qualified": "Q"
+      },
+      {
+       "athlete": "angel-barajas",
+       "rank": 5,
+       "d": 6.3,
+       "e": 7.933,
+       "penalty": 0.0,
+       "bonus": 0.1,
+       "total": 14.333,
+       "qualified": "Q"
+      },
+      {
+       "athlete": "sergei-naidin",
+       "rank": 6,
+       "d": 6.4,
+       "e": 7.833,
+       "penalty": 0.0,
+       "total": 14.233,
+       "qualified": "Q"
+      },
+      {
+       "athlete": "camilo-vera",
+       "rank": 7,
+       "d": 5.6,
+       "e": 8.566,
+       "penalty": 0.0,
+       "total": 14.166,
+       "qualified": "Q"
+      },
+      {
+       "athlete": "yumin-abbadini",
+       "rank": 8,
+       "d": 5.9,
+       "e": 8.266,
+       "penalty": 0.0,
+       "total": 14.166,
+       "qualified": "Q"
+      },
+      {
+       "athlete": "fred-richard",
+       "rank": 9,
+       "d": 5.8,
+       "e": 8.333,
+       "penalty": 0.0,
+       "total": 14.133,
+       "qualified": "R1",
+       "reserve": true
+      },
+      {
+       "athlete": "arsenii-dukhno",
+       "rank": 10,
+       "d": 5.4,
+       "e": 8.533,
+       "penalty": 0.0,
+       "bonus": 0.1,
+       "total": 14.033,
+       "qualified": "R2",
+       "reserve": true
+      },
+      {
+       "athlete": "felix-dolci",
+       "rank": 11,
+       "d": 5.8,
+       "e": 8.133,
+       "penalty": 0.0,
+       "bonus": 0.1,
+       "total": 14.033,
+       "qualified": "R3",
+       "reserve": true
+      }
+     ]
+    },
+    {
+     "round": "qualifica",
+     "discipline": "WAG",
+     "apparatus": "TEAM",
+     "results": [
+      {
+       "nation": "CHN",
+       "rank": 1,
+       "total": 164.996,
+       "parts": {
+        "VT": 42.032,
+        "UB": 41.232,
+        "BB": 43.966,
+        "FX": 37.766
+       },
+       "members": [
+        {
+         "athlete": "du-siyu",
+         "parts": {
+          "VT": 14.166,
+          "UB": 13.233
+         }
+        },
+        {
+         "athlete": "ke-qinqin",
+         "parts": {
+          "VT": 14.266,
+          "UB": 14.133,
+          "BB": 13.9,
+          "FX": 12.4
+         }
+        },
+        {
+         "athlete": "qiu-qiyuan",
+         "parts": {
+          "UB": 13.333,
+          "BB": 14.966,
+          "FX": 12.8
+         }
+        },
+        {
+         "athlete": "zhang-yihan",
+         "parts": {
+          "VT": 13.6,
+          "BB": 13.266,
+          "FX": 10.8
+         }
+        },
+        {
+         "athlete": "zhang-qingying",
+         "parts": {
+          "VT": 13.133,
+          "UB": 13.766,
+          "BB": 15.1,
+          "FX": 12.566
+         }
+        }
+       ],
+       "qualified": "Q"
+      },
+      {
+       "nation": "USA",
+       "rank": 2,
+       "total": 164.529,
+       "parts": {
+        "VT": 42.133,
+        "UB": 41.965,
+        "BB": 40.499,
+        "FX": 39.932
+       },
+       "members": [
+        {
+         "athlete": "skye-blakely",
+         "parts": {
+          "VT": 14.0,
+          "UB": 14.333,
+          "BB": 14.166,
+          "FX": 12.966
+         }
+        },
+        {
+         "athlete": "charleigh-bullock",
+         "parts": {
+          "VT": 14.1,
+          "UB": 13.566,
+          "BB": 13.033,
+          "FX": 12.8
+         }
+        },
+        {
+         "athlete": "dulcy-caylor",
+         "parts": {
+          "BB": 13.3
+         }
+        },
+        {
+         "athlete": "reese-esponda",
+         "parts": {
+          "VT": 13.866,
+          "UB": 12.966,
+          "FX": 13.633
+         }
+        },
+        {
+         "athlete": "claire-pease",
+         "parts": {
+          "VT": 14.033,
+          "UB": 14.066,
+          "BB": 13.0,
+          "FX": 13.333
+         }
+        }
+       ],
+       "qualified": "Q"
+      },
+      {
+       "nation": "RUS",
+       "rank": 3,
+       "total": 163.662,
+       "parts": {
+        "VT": 41.533,
+        "UB": 42.499,
+        "BB": 40.632,
+        "FX": 38.998
+       },
+       "members": [
+        {
+         "athlete": "alena-glotova",
+         "parts": {
+          "VT": 13.1,
+          "UB": 14.4,
+          "BB": 13.666,
+          "FX": 12.766
+         }
+        },
+        {
+         "athlete": "milana-kaiumova",
+         "parts": {
+          "UB": 13.833,
+          "BB": 12.033,
+          "FX": 12.5
+         }
+        },
+        {
+         "athlete": "aleksandra-anufrieva",
+         "parts": {
+          "VT": 14.033,
+          "FX": 12.966
+         }
+        },
+        {
+         "athlete": "elizaveta-us",
+         "parts": {
+          "VT": 13.5,
+          "UB": 12.966,
+          "BB": 13.4
+         }
+        },
+        {
+         "athlete": "liudmila-roshchina",
+         "parts": {
+          "VT": 14.0,
+          "UB": 14.266,
+          "BB": 13.566,
+          "FX": 13.266
+         }
+        }
+       ],
+       "qualified": "Q"
+      },
+      {
+       "nation": "ITA",
+       "rank": 4,
+       "total": 162.43,
+       "parts": {
+        "VT": 40.799,
+        "UB": 42.332,
+        "BB": 41.633,
+        "FX": 37.666
+       },
+       "members": [
+        {
+         "athlete": "manila-esposito",
+         "parts": {
+          "BB": 14.2,
+          "FX": 13.233
+         }
+        },
+        {
+         "athlete": "elisa-iorio",
+         "parts": {
+          "VT": 13.433,
+          "UB": 14.466
+         }
+        },
+        {
+         "athlete": "july-marano",
+         "parts": {
+          "VT": 13.433,
+          "UB": 13.3,
+          "BB": 12.633,
+          "FX": 12.633
+         }
+        },
+        {
+         "athlete": "giulia-perotti",
+         "parts": {
+          "VT": 13.033,
+          "UB": 14.366,
+          "BB": 13.833,
+          "FX": 11.8
+         }
+        },
+        {
+         "athlete": "sofia-tonelli",
+         "parts": {
+          "VT": 13.9,
+          "UB": 13.5,
+          "BB": 13.6,
+          "FX": 11.7
+         }
+        }
+       ],
+       "qualified": "Q",
+       "inconsistent": [
+        "VT top-3 members 40.766 != 40.799"
+       ]
+      },
+      {
+       "nation": "JPN",
+       "rank": 5,
+       "total": 161.63,
+       "parts": {
+        "VT": 41.466,
+        "UB": 41.133,
+        "BB": 40.899,
+        "FX": 38.132
+       },
+       "members": [
+        {
+         "athlete": "rina-kishi",
+         "parts": {
+          "VT": 14.0,
+          "UB": 13.4,
+          "BB": 13.633,
+          "FX": 12.466
+         }
+        },
+        {
+         "athlete": "haruka-nakamura",
+         "parts": {
+          "FX": 12.466
+         }
+        },
+        {
+         "athlete": "misa-nishiyama",
+         "parts": {
+          "VT": 12.233,
+          "UB": 13.933,
+          "BB": 12.666,
+          "FX": 12.566
+         }
+        },
+        {
+         "athlete": "mana-okamura",
+         "parts": {
+          "VT": 13.266,
+          "UB": 13.8,
+          "BB": 14.266
+         }
+        },
+        {
+         "athlete": "aiko-sugihara",
+         "parts": {
+          "VT": 14.2,
+          "UB": 11.966,
+          "BB": 13.0,
+          "FX": 13.1
+         }
+        }
+       ],
+       "qualified": "Q"
+      },
+      {
+       "nation": "FRA",
+       "rank": 6,
+       "total": 161.43,
+       "parts": {
+        "VT": 40.266,
+        "UB": 40.699,
+        "BB": 41.699,
+        "FX": 38.766
+       },
+       "members": [
+        {
+         "athlete": "lorette-charpy",
+         "parts": {
+          "VT": 13.233,
+          "UB": 13.0,
+          "BB": 13.4,
+          "FX": 12.066
+         }
+        },
+        {
+         "athlete": "elena-colas",
+         "parts": {
+          "VT": 13.233,
+          "UB": 14.533,
+          "BB": 14.133,
+          "FX": 13.133
+         }
+        },
+        {
+         "athlete": "morgane-osyssek",
+         "parts": {
+          "BB": 13.666,
+          "FX": 12.333
+         }
+        },
+        {
+         "athlete": "maiana-prat",
+         "parts": {
+          "VT": 13.733,
+          "UB": 12.4,
+          "BB": 13.9,
+          "FX": 13.3
+         }
+        },
+        {
+         "athlete": "celia-serber",
+         "parts": {
+          "VT": 13.3,
+          "UB": 13.166
+         }
+        }
+       ],
+       "qualified": "Q"
+      },
+      {
+       "nation": "CAN",
+       "rank": 7,
+       "total": 160.13,
+       "parts": {
+        "VT": 41.966,
+        "UB": 39.799,
+        "BB": 38.266,
+        "FX": 40.099
+       },
+       "members": [
+        {
+         "athlete": "ellie-black",
+         "parts": {
+          "VT": 14.1,
+          "UB": 13.433,
+          "BB": 12.8,
+          "FX": 13.133
+         }
+        },
+        {
+         "athlete": "gabrielle-black",
+         "parts": {
+          "VT": 13.6,
+          "BB": 12.066,
+          "FX": 13.3
+         }
+        },
+        {
+         "athlete": "coralie-demers",
+         "parts": {
+          "UB": 13.4
+         }
+        },
+        {
+         "athlete": "lia-monica-fontaine",
+         "parts": {
+          "VT": 14.066,
+          "UB": 11.766,
+          "BB": 11.433,
+          "FX": 13.366
+         }
+        },
+        {
+         "athlete": "lia-redick",
+         "parts": {
+          "VT": 13.8,
+          "UB": 12.966,
+          "BB": 13.4,
+          "FX": 13.433
+         }
+        }
+       ],
+       "qualified": "Q"
+      },
+      {
+       "nation": "BRA",
+       "rank": 8,
+       "total": 159.131,
+       "parts": {
+        "VT": 40.266,
+        "UB": 39.2,
+        "BB": 40.933,
+        "FX": 38.732
+       },
+       "members": [
+        {
+         "athlete": "rebeca-andrade",
+         "parts": {
+          "VT": 14.4,
+          "BB": 13.033
+         }
+        },
+        {
+         "athlete": "thais-fidelis",
+         "parts": {
+          "UB": 12.2,
+          "BB": 13.5,
+          "FX": 12.733
+         }
+        },
+        {
+         "athlete": "lorrane-oliveira",
+         "parts": {
+          "VT": 12.866,
+          "UB": 13.7,
+          "BB": 12.466,
+          "FX": 13.133
+         }
+        },
+        {
+         "athlete": "flavia-saraiva",
+         "parts": {
+          "VT": 13.0,
+          "UB": 13.3,
+          "BB": 14.4,
+          "FX": 12.866
+         }
+        },
+        {
+         "athlete": "sophia-weisberg",
+         "parts": {
+          "VT": 12.766,
+          "UB": 10.033,
+          "FX": 12.566
+         }
+        }
+       ],
+       "qualified": "Q"
+      },
+      {
+       "nation": "GBR",
+       "rank": 9,
+       "total": 158.963,
+       "parts": {
+        "VT": 41.8,
+        "UB": 40.232,
+        "BB": 37.099,
+        "FX": 39.832
+       },
+       "members": [
+        {
+         "athlete": "becky-downie",
+         "parts": {
+          "UB": 14.066
+         }
+        },
+        {
+         "athlete": "ruby-evans",
+         "parts": {
+          "VT": 14.1,
+          "UB": 12.966,
+          "BB": 11.5,
+          "FX": 13.133
+         }
+        },
+        {
+         "athlete": "alice-kinsella",
+         "parts": {
+          "VT": 13.9,
+          "UB": 13.033,
+          "BB": 11.866,
+          "FX": 13.266
+         }
+        },
+        {
+         "athlete": "alia-leat",
+         "parts": {
+          "VT": 13.3,
+          "BB": 13.0,
+          "FX": 11.8
+         }
+        },
+        {
+         "athlete": "abigail-martin",
+         "parts": {
+          "VT": 13.8,
+          "UB": 13.133,
+          "BB": 12.233,
+          "FX": 13.433
+         }
+        }
+       ],
+       "qualified": "R1"
+      },
+      {
+       "nation": "GER",
+       "rank": 10,
+       "total": 158.332,
+       "parts": {
+        "VT": 40.632,
+        "UB": 40.698,
+        "BB": 39.999,
+        "FX": 37.332
+       },
+       "members": [
+        {
+         "athlete": "helen-kevric",
+         "parts": {
+          "UB": 14.766,
+          "BB": 13.633
+         }
+        },
+        {
+         "athlete": "emma-malewski",
+         "parts": {
+          "VT": 13.033,
+          "UB": 11.333,
+          "BB": 13.166,
+          "FX": 12.066
+         }
+        },
+        {
+         "athlete": "madita-mayr",
+         "parts": {
+          "VT": 13.266,
+          "BB": 13.166,
+          "FX": 12.533
+         }
+        },
+        {
+         "athlete": "lea-marie-quaas",
+         "parts": {
+          "VT": 13.5,
+          "UB": 13.166,
+          "BB": 13.2,
+          "FX": 12.033
+         }
+        },
+        {
+         "athlete": "karina-schonmaier",
+         "parts": {
+          "VT": 13.866,
+          "UB": 12.766,
+          "FX": 12.733
+         }
+        }
+       ],
+       "qualified": "R2",
+       "inconsistent": [
+        "team parts sum != total"
+       ]
+      },
+      {
+       "nation": "NED",
+       "rank": 11,
+       "total": 158.029,
+       "parts": {
+        "VT": 39.466,
+        "UB": 41.932,
+        "BB": 39.698,
+        "FX": 36.933
+       },
+       "members": [
+        {
+         "athlete": "vera-ubbink",
+         "parts": {
+          "VT": 12.833,
+          "BB": 13.166,
+          "FX": 11.8
+         }
+        },
+        {
+         "athlete": "vera-van-pol",
+         "parts": {
+          "VT": 13.633,
+          "UB": 13.2,
+          "BB": 12.2,
+          "FX": 11.4
+         }
+        },
+        {
+         "athlete": "sanna-veerman",
+         "parts": {
+          "VT": 11.933,
+          "UB": 14.166,
+          "FX": 11.9
+         }
+        },
+        {
+         "athlete": "naomi-visser",
+         "parts": {
+          "VT": 13.0,
+          "UB": 14.466,
+          "BB": 13.266,
+          "FX": 11.9
+         }
+        },
+        {
+         "athlete": "sanne-wevers",
+         "parts": {
+          "UB": 13.3,
+          "BB": 13.266
+         }
+        }
+       ],
+       "qualified": "R3",
+       "inconsistent": [
+        "FX top-3 members 35.600 != 36.933"
+       ]
+      },
+      {
+       "nation": "AUS",
+       "rank": 12,
+       "total": 156.228,
+       "parts": {
+        "VT": 40.232,
+        "UB": 38.966,
+        "BB": 40.065,
+        "FX": 36.965
+       },
+       "members": [
+        {
+         "athlete": "kate-mcdonald",
+         "parts": {
+          "UB": 13.133,
+          "BB": 13.066,
+          "FX": 11.733
+         }
+        },
+        {
+         "athlete": "ruby-pass",
+         "parts": {
+          "VT": 14.033,
+          "UB": 11.533,
+          "BB": 13.133,
+          "FX": 12.666
+         }
+        },
+        {
+         "athlete": "breanna-scott",
+         "parts": {
+          "VT": 13.133,
+          "UB": 13.133,
+          "BB": 13.866,
+          "FX": 12.566
+         }
+        },
+        {
+         "athlete": "lucy-stewart",
+         "parts": {
+          "UB": 12.7,
+          "BB": 12.966,
+          "FX": 11.6
+         }
+        },
+        {
+         "athlete": "emily-whitehead",
+         "parts": {
+          "VT": 13.066
+         }
+        }
+       ],
+       "qualified": "R4"
+      }
+     ]
+    },
+    {
+     "round": "qualifica",
+     "discipline": "WAG",
+     "apparatus": "AA",
+     "results": [
+      {
+       "athlete": "kaylia-nemour",
+       "rank": 1,
+       "total": 55.999,
+       "parts": {
+        "VT": 14.033,
+        "UB": 14.933,
+        "BB": 14.133,
+        "FX": 12.9
+       },
+       "qualified": "Q"
+      },
+      {
+       "athlete": "skye-blakely",
+       "rank": 2,
+       "total": 55.465,
+       "parts": {
+        "VT": 14.0,
+        "UB": 14.333,
+        "BB": 14.166,
+        "FX": 12.966
+       },
+       "qualified": "Q"
+      },
+      {
+       "athlete": "liudmila-roshchina",
+       "rank": 3,
+       "total": 55.098,
+       "parts": {
+        "VT": 14.0,
+        "UB": 14.266,
+        "BB": 13.566,
+        "FX": 13.266
+       },
+       "qualified": "Q"
+      },
+      {
+       "athlete": "elena-colas",
+       "rank": 4,
+       "total": 55.032,
+       "parts": {
+        "VT": 13.233,
+        "UB": 14.533,
+        "BB": 14.133,
+        "FX": 13.133
+       },
+       "qualified": "Q"
+      },
+      {
+       "athlete": "ke-qinqin",
+       "rank": 5,
+       "total": 54.699,
+       "parts": {
+        "VT": 14.266,
+        "UB": 14.133,
+        "BB": 13.9,
+        "FX": 12.4
+       },
+       "qualified": "Q"
+      },
+      {
+       "athlete": "zhang-qingying",
+       "rank": 6,
+       "total": 54.565,
+       "parts": {
+        "VT": 13.133,
+        "UB": 13.766,
+        "BB": 15.1,
+        "FX": 12.566
+       },
+       "qualified": "Q"
+      },
+      {
+       "athlete": "claire-pease",
+       "rank": 7,
+       "total": 54.432,
+       "parts": {
+        "VT": 14.033,
+        "UB": 14.066,
+        "BB": 13.0,
+        "FX": 13.333
+       },
+       "qualified": "Q"
+      },
+      {
+       "athlete": "naomi-visser",
+       "rank": 8,
+       "total": 51.965,
+       "parts": {
+        "VT": 13.0,
+        "UB": 14.466,
+        "BB": 13.266,
+        "FX": 13.233
+       },
+       "inconsistent": [
+        "AA parts sum != total 51.965"
+       ],
+       "qualified": "Q"
+      },
+      {
+       "athlete": "alena-glotova",
+       "rank": 9,
+       "total": 51.865,
+       "parts": {
+        "VT": 13.1,
+        "UB": 14.4,
+        "BB": 13.666,
+        "FX": 12.766
+       },
+       "inconsistent": [
+        "AA parts sum != total 51.865"
+       ],
+       "qualified": "Q"
+      },
+      {
+       "athlete": "lia-redick",
+       "rank": 10,
+       "total": 53.599,
+       "parts": {
+        "VT": 13.8,
+        "UB": 12.966,
+        "BB": 13.4,
+        "FX": 13.433
+       },
+       "qualified": "Q"
+      },
+      {
+       "athlete": "alba-petisco",
+       "rank": 11,
+       "total": 53.599,
+       "parts": {
+        "VT": 13.3,
+        "UB": 13.5,
+        "BB": 13.566,
+        "FX": 13.233
+       },
+       "qualified": "Q"
+      },
+      {
+       "athlete": "flavia-saraiva",
+       "rank": 12,
+       "total": 53.566,
+       "parts": {
+        "VT": 13.0,
+        "UB": 13.3,
+        "BB": 14.4,
+        "FX": 12.866
+       },
+       "qualified": "Q"
+      },
+      {
+       "athlete": "rina-kishi",
+       "rank": 13,
+       "total": 53.499,
+       "parts": {
+        "VT": 14.0,
+        "UB": 13.4,
+        "BB": 13.633,
+        "FX": 12.466
+       },
+       "qualified": "Q"
+      },
+      {
+       "athlete": "charleigh-bullock",
+       "rank": 14,
+       "total": 53.499,
+       "parts": {
+        "VT": 14.1,
+        "UB": 13.566,
+        "BB": 13.033,
+        "FX": 12.8
+       },
+       "qualified": "–"
+      },
+      {
+       "athlete": "ellie-black",
+       "rank": 15,
+       "total": 53.466,
+       "parts": {
+        "VT": 14.1,
+        "UB": 13.433,
+        "BB": 12.8,
+        "FX": 13.133
+       },
+       "qualified": "Q"
+      },
+      {
+       "athlete": "maiana-prat",
+       "rank": 16,
+       "total": 53.032,
+       "parts": {
+        "VT": 13.733,
+        "UB": 12.4,
+        "BB": 13.9,
+        "FX": 13.3
+       },
+       "inconsistent": [
+        "AA parts sum != total 53.032"
+       ],
+       "qualified": "Q"
+      },
+      {
+       "athlete": "giulia-perotti",
+       "rank": 17,
+       "total": 53.032,
+       "parts": {
+        "VT": 13.033,
+        "UB": 14.366,
+        "BB": 13.833,
+        "FX": 11.8
+       },
+       "qualified": "Q"
+      },
+      {
+       "athlete": "sofia-tonelli",
+       "rank": 18,
+       "total": 52.7,
+       "parts": {
+        "VT": 13.9,
+        "UB": 13.5,
+        "BB": 13.6,
+        "FX": 11.7
+       },
+       "qualified": "Q"
+      },
+      {
+       "athlete": "breanna-scott",
+       "rank": 19,
+       "total": 52.698,
+       "parts": {
+        "VT": 13.133,
+        "UB": 13.133,
+        "BB": 13.866,
+        "FX": 12.566
+       },
+       "qualified": "Q"
+      },
+      {
+       "athlete": "abigail-martin",
+       "rank": 20,
+       "total": 52.599,
+       "parts": {
+        "VT": 13.8,
+        "UB": 13.133,
+        "BB": 12.233,
+        "FX": 13.433
+       },
+       "qualified": "Q"
+      },
+      {
+       "athlete": "aiko-sugihara",
+       "rank": 21,
+       "total": 52.266,
+       "parts": {
+        "VT": 14.2,
+        "UB": 11.966,
+        "BB": 13.0,
+        "FX": 13.1
+       },
+       "qualified": "Q"
+      },
+      {
+       "athlete": "lorrane-oliveira",
+       "rank": 22,
+       "total": 52.165,
+       "parts": {
+        "VT": 12.866,
+        "UB": 13.7,
+        "BB": 12.466,
+        "FX": 13.133
+       },
+       "qualified": "Q"
+      },
+      {
+       "athlete": "lisa-vaelen",
+       "rank": 23,
+       "total": 52.065,
+       "parts": {
+        "VT": 14.0,
+        "UB": 13.366,
+        "BB": 11.766,
+        "FX": 12.933
+       },
+       "qualified": "Q"
+      },
+      {
+       "athlete": "alice-kinsella",
+       "rank": 24,
+       "total": 52.065,
+       "parts": {
+        "VT": 13.9,
+        "UB": 13.033,
+        "BB": 11.866,
+        "FX": 13.266
+       },
+       "qualified": "Q"
+      },
+      {
+       "athlete": "greta-mayer",
+       "rank": 25,
+       "total": 51.999,
+       "parts": {
+        "VT": 13.333,
+        "UB": 12.733,
+        "BB": 13.333,
+        "FX": 12.6
+       },
+       "qualified": "Q"
+      },
+      {
+       "athlete": "july-marano",
+       "rank": 26,
+       "total": 51.999,
+       "parts": {
+        "VT": 13.433,
+        "UB": 13.3,
+        "BB": 12.633,
+        "FX": 12.633
+       },
+       "qualified": "–"
+      },
+      {
+       "athlete": "lea-marie-quaas",
+       "rank": 27,
+       "total": 51.899,
+       "parts": {
+        "VT": 13.5,
+        "UB": 13.166,
+        "BB": 13.2,
+        "FX": 12.033
+       },
+       "qualified": "R1",
+       "reserve": true
+      },
+      {
+       "athlete": "lena-bickel",
+       "rank": 28,
+       "total": 51.799,
+       "parts": {
+        "VT": 13.5,
+        "UB": 13.166,
+        "BB": 12.133,
+        "FX": 13.0
+       },
+       "qualified": "R2",
+       "reserve": true
+      },
+      {
+       "athlete": "kristina-hrudetska",
+       "rank": 29,
+       "total": 51.732,
+       "parts": {
+        "VT": 13.0,
+        "UB": 13.566,
+        "BB": 12.933,
+        "FX": 12.233
+       },
+       "qualified": "R3",
+       "reserve": true
+      },
+      {
+       "athlete": "ruby-evans",
+       "rank": 30,
+       "total": 51.699,
+       "parts": {
+        "VT": 14.1,
+        "UB": 12.966,
+        "BB": 11.5,
+        "FX": 13.133
+       },
+       "qualified": "–"
+      },
+      {
+       "athlete": "lorette-charpy",
+       "rank": 31,
+       "total": 51.699,
+       "parts": {
+        "VT": 13.233,
+        "UB": 13.0,
+        "BB": 13.4,
+        "FX": 12.066
+       },
+       "qualified": "–"
+      },
+      {
+       "athlete": "michelle-pineda",
+       "rank": 32,
+       "total": 51.699,
+       "parts": {
+        "VT": 12.9,
+        "UB": 12.5,
+        "BB": 13.233,
+        "FX": 13.066
+       },
+       "qualified": "R4",
+       "reserve": true
+      }
+     ]
+    },
+    {
+     "round": "qualifica",
+     "discipline": "WAG",
+     "apparatus": "VT",
+     "results": [
+      {
+       "athlete": "rebeca-andrade",
+       "rank": 1,
+       "vaults": [
+        {
+         "d": 5.0,
+         "e": 9.4,
+         "penalty": 0.0,
+         "total": 14.4
+        },
+        {
+         "d": 4.8,
+         "e": 9.466,
+         "penalty": 0.0,
+         "total": 14.266
+        }
+       ],
+       "bonus": 0.2,
+       "total": 14.533,
+       "qualified": "Q"
+      },
+      {
+       "athlete": "yeo-seo-jeong",
+       "rank": 2,
+       "vaults": [
+        {
+         "d": 5.4,
+         "e": 9.166,
+         "penalty": 0.0,
+         "total": 14.566
+        },
+        {
+         "d": 5.0,
+         "e": 9.0,
+         "penalty": 0.0,
+         "total": 14.0
+        }
+       ],
+       "bonus": 0.2,
+       "total": 14.483,
+       "qualified": "Q"
+      },
+      {
+       "athlete": "claire-pease",
+       "rank": 3,
+       "vaults": [
+        {
+         "d": 5.6,
+         "e": 8.533,
+         "penalty": 0.1,
+         "total": 14.033
+        },
+        {
+         "d": 5.0,
+         "e": 9.133,
+         "penalty": 0.0,
+         "total": 14.133
+        }
+       ],
+       "bonus": 0.2,
+       "total": 14.283,
+       "qualified": "Q"
+      },
+      {
+       "athlete": "lia-monica-fontaine",
+       "rank": 4,
+       "vaults": [
+        {
+         "d": 5.0,
+         "e": 9.066,
+         "penalty": 0.0,
+         "total": 14.066
+        },
+        {
+         "d": 4.8,
+         "e": 8.933,
+         "penalty": 0.0,
+         "total": 13.733
+        }
+       ],
+       "bonus": 0.2,
+       "total": 14.099,
+       "qualified": "Q"
+      },
+      {
+       "athlete": "skye-blakely",
+       "rank": 5,
+       "vaults": [
+        {
+         "d": 5.0,
+         "e": 9.0,
+         "penalty": 0.0,
+         "total": 14.0
+        },
+        {
+         "d": 4.8,
+         "e": 8.933,
+         "penalty": 0.0,
+         "total": 13.733
+        }
+       ],
+       "bonus": 0.2,
+       "total": 14.066,
+       "qualified": "Q"
+      },
+      {
+       "athlete": "ellie-black",
+       "rank": 6,
+       "vaults": [
+        {
+         "d": 4.8,
+         "e": 9.3,
+         "penalty": 0.0,
+         "total": 14.1
+        },
+        {
+         "d": 4.4,
+         "e": 8.966,
+         "penalty": 0.0,
+         "total": 13.366
+        }
+       ],
+       "bonus": 0.2,
+       "total": 13.933,
+       "qualified": "Q"
+      },
+      {
+       "athlete": "abigail-martin",
+       "rank": 7,
+       "vaults": [
+        {
+         "d": 5.0,
+         "e": 8.8,
+         "penalty": 0.0,
+         "total": 13.8
+        },
+        {
+         "d": 4.8,
+         "e": 8.7,
+         "penalty": 0.0,
+         "total": 13.5
+        }
+       ],
+       "bonus": 0.2,
+       "total": 13.85,
+       "qualified": "Q"
+      },
+      {
+       "athlete": "victoria-mata",
+       "rank": 8,
+       "vaults": [
+        {
+         "d": 5.4,
+         "e": 8.733,
+         "penalty": 0.0,
+         "total": 14.133
+        },
+        {
+         "d": 4.2,
+         "e": 8.9,
+         "penalty": 0.0,
+         "total": 13.1
+        }
+       ],
+       "bonus": 0.2,
+       "total": 13.816,
+       "qualified": "Q"
+      },
+      {
+       "athlete": "lisa-vaelen",
+       "rank": 9,
+       "vaults": [
+        {
+         "d": 5.4,
+         "e": 8.6,
+         "penalty": 0.0,
+         "total": 14.0
+        },
+        {
+         "d": 4.8,
+         "e": 8.433,
+         "penalty": 0.0,
+         "total": 13.233
+        }
+       ],
+       "bonus": 0.2,
+       "total": 13.816,
+       "qualified": "R1",
+       "reserve": true
+      },
+      {
+       "athlete": "aleksandra-anufrieva",
+       "rank": 10,
+       "vaults": [
+        {
+         "d": 5.4,
+         "e": 8.633,
+         "penalty": 0.0,
+         "total": 14.033
+        },
+        {
+         "d": 4.4,
+         "e": 8.766,
+         "penalty": 0.0,
+         "total": 13.166
+        }
+       ],
+       "bonus": 0.2,
+       "total": 13.799,
+       "qualified": "R2",
+       "reserve": true
+      },
+      {
+       "athlete": "alice-vlkova",
+       "rank": 11,
+       "vaults": [
+        {
+         "d": 4.6,
+         "e": 8.9,
+         "penalty": 0.0,
+         "total": 13.5
+        },
+        {
+         "d": 4.4,
+         "e": 8.8,
+         "penalty": 0.0,
+         "total": 13.2
+        }
+       ],
+       "bonus": 0.2,
+       "total": 13.55,
+       "qualified": "R3",
+       "reserve": true
+      }
+     ]
+    },
+    {
+     "round": "qualifica",
+     "discipline": "WAG",
+     "apparatus": "UB",
+     "results": [
+      {
+       "athlete": "kaylia-nemour",
+       "rank": 1,
+       "d": 7.1,
+       "e": 7.833,
+       "penalty": 0.0,
+       "total": 14.933,
+       "qualified": "Q"
+      },
+      {
+       "athlete": "helen-kevric",
+       "rank": 2,
+       "d": 6.4,
+       "e": 8.366,
+       "penalty": 0.0,
+       "total": 14.766,
+       "qualified": "Q"
+      },
+      {
+       "athlete": "elena-colas",
+       "rank": 3,
+       "d": 6.3,
+       "e": 8.233,
+       "penalty": 0.0,
+       "total": 14.533,
+       "qualified": "Q"
+      },
+      {
+       "athlete": "elisa-iorio",
+       "rank": 4,
+       "d": 6.3,
+       "e": 8.166,
+       "penalty": 0.0,
+       "total": 14.466,
+       "qualified": "Q"
+      },
+      {
+       "athlete": "naomi-visser",
+       "rank": 4,
+       "d": 6.3,
+       "e": 8.166,
+       "penalty": 0.0,
+       "total": 14.466,
+       "qualified": "Q"
+      },
+      {
+       "athlete": "alena-glotova",
+       "rank": 6,
+       "d": 6.2,
+       "e": 8.2,
+       "penalty": 0.0,
+       "total": 14.4,
+       "qualified": "Q"
+      },
+      {
+       "athlete": "giulia-perotti",
+       "rank": 7,
+       "d": 6.2,
+       "e": 8.166,
+       "penalty": 0.0,
+       "total": 14.366,
+       "qualified": "Q"
+      },
+      {
+       "athlete": "skye-blakely",
+       "rank": 8,
+       "d": 6.2,
+       "e": 8.133,
+       "penalty": 0.0,
+       "total": 14.333,
+       "qualified": "Q"
+      },
+      {
+       "athlete": "liudmila-roshchina",
+       "rank": 9,
+       "d": 6.5,
+       "e": 7.766,
+       "penalty": 0.0,
+       "total": 14.266,
+       "qualified": "R1",
+       "reserve": true
+      },
+      {
+       "athlete": "sanna-veerman",
+       "rank": 10,
+       "d": 6.3,
+       "e": 7.866,
+       "penalty": 0.0,
+       "total": 14.166,
+       "qualified": "R2",
+       "reserve": true
+      },
+      {
+       "athlete": "ke-qinqin",
+       "rank": 11,
+       "d": 5.9,
+       "e": 8.233,
+       "penalty": 0.0,
+       "total": 14.133,
+       "qualified": "R3",
+       "reserve": true
+      }
+     ]
+    },
+    {
+     "round": "qualifica",
+     "discipline": "WAG",
+     "apparatus": "BB",
+     "results": [
+      {
+       "athlete": "zhang-qingying",
+       "rank": 1,
+       "d": 6.8,
+       "e": 8.3,
+       "penalty": 0.0,
+       "total": 15.1,
+       "qualified": "Q"
+      },
+      {
+       "athlete": "qiu-qiyuan",
+       "rank": 2,
+       "d": 6.5,
+       "e": 8.466,
+       "penalty": 0.0,
+       "total": 14.966,
+       "qualified": "Q"
+      },
+      {
+       "athlete": "flavia-saraiva",
+       "rank": 3,
+       "d": 6.1,
+       "e": 8.3,
+       "penalty": 0.0,
+       "total": 14.4,
+       "qualified": "Q"
+      },
+      {
+       "athlete": "mana-okamura",
+       "rank": 4,
+       "d": 6.0,
+       "e": 8.266,
+       "penalty": 0.0,
+       "total": 14.266,
+       "qualified": "Q"
+      },
+      {
+       "athlete": "manila-esposito",
+       "rank": 5,
+       "d": 5.8,
+       "e": 8.4,
+       "penalty": 0.0,
+       "total": 14.2,
+       "qualified": "Q"
+      },
+      {
+       "athlete": "skye-blakely",
+       "rank": 6,
+       "d": 6.2,
+       "e": 7.966,
+       "penalty": 0.0,
+       "total": 14.166,
+       "qualified": "Q"
+      },
+      {
+       "athlete": "elena-colas",
+       "rank": 7,
+       "d": 5.8,
+       "e": 8.333,
+       "penalty": 0.0,
+       "total": 14.133,
+       "qualified": "Q"
+      },
+      {
+       "athlete": "kaylia-nemour",
+       "rank": 8,
+       "d": 6.2,
+       "e": 7.933,
+       "penalty": 0.0,
+       "total": 14.133,
+       "qualified": "Q"
+      },
+      {
+       "athlete": "hwang-seo-hyun",
+       "rank": 9,
+       "d": 6.0,
+       "e": 7.933,
+       "penalty": 0.0,
+       "total": 13.933,
+       "qualified": "R1",
+       "reserve": true
+      },
+      {
+       "athlete": "maiana-prat",
+       "rank": 10,
+       "d": 6.1,
+       "e": 7.9,
+       "penalty": 0.1,
+       "total": 13.9,
+       "qualified": "R2",
+       "reserve": true
+      },
+      {
+       "athlete": "ke-qinqin",
+       "rank": 11,
+       "d": 6.3,
+       "e": 7.6,
+       "penalty": 0.0,
+       "total": 13.9,
+       "qualified": "–"
+      },
+      {
+       "athlete": "breanna-scott",
+       "rank": 12,
+       "d": 5.8,
+       "e": 8.066,
+       "penalty": 0.0,
+       "total": 13.866,
+       "qualified": "R3",
+       "reserve": true
+      }
+     ]
+    },
+    {
+     "round": "qualifica",
+     "discipline": "WAG",
+     "apparatus": "FX",
+     "results": [
+      {
+       "athlete": "reese-esponda",
+       "rank": 1,
+       "d": 6.0,
+       "e": 7.733,
+       "penalty": 0.1,
+       "total": 13.633,
+       "qualified": "Q"
+      },
+      {
+       "athlete": "lia-redick",
+       "rank": 2,
+       "d": 5.4,
+       "e": 8.033,
+       "penalty": 0.0,
+       "total": 13.433,
+       "qualified": "Q"
+      },
+      {
+       "athlete": "abigail-martin",
+       "rank": 3,
+       "d": 5.8,
+       "e": 7.733,
+       "penalty": 0.1,
+       "total": 13.433,
+       "qualified": "Q"
+      },
+      {
+       "athlete": "lia-monica-fontaine",
+       "rank": 4,
+       "d": 5.7,
+       "e": 7.666,
+       "penalty": 0.0,
+       "total": 13.366,
+       "qualified": "Q"
+      },
+      {
+       "athlete": "claire-pease",
+       "rank": 5,
+       "d": 6.0,
+       "e": 7.633,
+       "penalty": 0.3,
+       "total": 13.333,
+       "qualified": "Q"
+      },
+      {
+       "athlete": "gabrielle-black",
+       "rank": 6,
+       "d": 5.3,
+       "e": 8.0,
+       "penalty": 0.0,
+       "total": 13.3,
+       "qualified": "–"
+      },
+      {
+       "athlete": "maiana-prat",
+       "rank": 7,
+       "d": 5.6,
+       "e": 7.7,
+       "penalty": 0.0,
+       "total": 13.3,
+       "qualified": "Q"
+      },
+      {
+       "athlete": "alice-kinsella",
+       "rank": 8,
+       "d": 5.4,
+       "e": 7.866,
+       "penalty": 0.0,
+       "total": 13.266,
+       "qualified": "Q"
+      },
+      {
+       "athlete": "liudmila-roshchina",
+       "rank": 9,
+       "d": 5.8,
+       "e": 7.466,
+       "penalty": 0.0,
+       "total": 13.266,
+       "qualified": "Q"
+      },
+      {
+       "athlete": "manila-esposito",
+       "rank": 10,
+       "d": 5.6,
+       "e": 7.733,
+       "penalty": 0.1,
+       "total": 13.233,
+       "qualified": "R1",
+       "reserve": true
+      },
+      {
+       "athlete": "naomi-visser",
+       "rank": 11,
+       "d": 5.5,
+       "e": 7.733,
+       "penalty": 0.0,
+       "total": 13.233,
+       "qualified": "R2",
+       "reserve": true
+      },
+      {
+       "athlete": "alba-petisco",
+       "rank": 12,
+       "d": 5.7,
+       "e": 7.533,
+       "penalty": 0.0,
+       "total": 13.233,
+       "qualified": "R3",
+       "reserve": true
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}
