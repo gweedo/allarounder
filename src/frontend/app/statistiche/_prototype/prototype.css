@@ -1,0 +1,263 @@
+/* PROTOTYPE (#189), throwaway, never merge to main. Uses the Tabellone tokens
+   from globals.css; nothing here is a new design token. */
+
+.proto-banner {
+  margin: 0 auto;
+  padding: var(--space-2) var(--space-4);
+  background: #fef3c7;
+  border-bottom: 1px solid #f59e0b;
+  color: #92400e;
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  text-align: center;
+}
+
+.stats-page h1 { font-size: var(--text-2xl); margin: 0 0 var(--space-2); }
+.stats-page h2 {
+  margin: var(--space-7) 0 var(--space-3);
+  font-size: var(--text-xl);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+.stats-page h3 { margin: var(--space-5) 0 var(--space-2); font-size: var(--text-lg); }
+
+.stats-kicker {
+  margin: 0 0 var(--space-1);
+  color: var(--color-brand-ink);
+  font-family: var(--font-ui);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.stats-updated {
+  color: var(--color-text-muted);
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
+}
+
+/* ---- Tables (shortlist #5) ---- */
+
+.stat-table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin: 0 0 var(--space-5);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+}
+.stat-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
+  font-variant-numeric: tabular-nums;
+}
+.stat-table caption {
+  padding: var(--space-3) var(--space-3) var(--space-2);
+  caption-side: top;
+  text-align: left;
+  font-family: var(--font-display);
+  font-size: var(--text-base);
+  font-weight: 700;
+}
+.stat-table th,
+.stat-table td {
+  padding: var(--space-2) var(--space-3);
+  border-top: 1px solid var(--color-border);
+  text-align: left;
+  white-space: nowrap;
+}
+.stat-table thead th {
+  background: var(--color-brand-deep);
+  color: #fff;
+  font-size: var(--text-xs);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.stat-table thead abbr { text-decoration: none; border-bottom: 1px dotted currentColor; cursor: help; }
+.stat-table tbody tr:nth-child(even) { background: var(--color-bg); }
+.stat-table .num { text-align: right; }
+.stat-table .total { font-weight: 700; }
+.stat-table .rank { width: 3rem; font-family: var(--font-display); font-weight: 700; }
+.stat-table .group-row th {
+  background: #eef5fb;
+  color: var(--color-brand-deep);
+  font-family: var(--font-display);
+  font-size: var(--text-sm);
+  text-transform: none;
+}
+.stat-table tfoot td { font-weight: 700; border-top: 2px solid var(--color-brand-deep); }
+.stat-table a { color: var(--color-brand-ink); }
+/* Keep the athlete column visible while the numbers scroll on phones. */
+.stat-table .sticky {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  background: inherit;
+}
+.stat-table tbody tr { background: var(--color-surface); }
+.stat-table thead .sticky { background: var(--color-brand-deep); }
+/* Long names wrap instead of eating a phone-width screen. */
+.stat-table .sticky { min-width: 7.5rem; max-width: 11rem; white-space: normal; }
+.stat-table .best { background: #eef5fb; }
+
+/* ---- Medals ---- */
+
+.medal {
+  display: inline-block;
+  margin-left: var(--space-1);
+  padding: 0 0.4rem;
+  border-radius: var(--radius-pill);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  vertical-align: 0.1em;
+}
+.medal--oro { background: #f6d860; color: #4a3a00; }
+.medal--argento { background: #d9dde2; color: #2e3440; }
+.medal--bronzo { background: #e2b48a; color: #4a2a0d; }
+
+.medal-box { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-2); text-align: center; }
+.medal-box div { padding: var(--space-3) var(--space-1); border-radius: var(--radius-sm); }
+.medal-box strong { display: block; font-family: var(--font-display); font-size: var(--text-2xl); line-height: 1; }
+.medal-box span { font-family: var(--font-ui); font-size: var(--text-xs); text-transform: uppercase; letter-spacing: 0.06em; }
+.medal-box .oro { background: #f6d860; color: #4a3a00; }
+.medal-box .argento { background: #d9dde2; color: #2e3440; }
+.medal-box .bronzo { background: #e2b48a; color: #4a2a0d; }
+.medal-box .totale { background: var(--color-brand-deep); color: #fff; }
+
+/* ---- Counters (shortlist #4) ---- */
+
+.stat-counters {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+  gap: var(--space-3);
+  margin: var(--space-5) 0;
+}
+.stat-counter {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-3);
+  border-radius: var(--radius-sm);
+  background: var(--color-tile);
+  color: var(--color-tile-text);
+}
+.stat-counter__value {
+  font-family: var(--font-display);
+  font-size: 2.1rem;
+  font-weight: 700;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.stat-counter__label,
+.stat-counter__note {
+  font-family: var(--font-ui);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.stat-counter__note { color: #b8d8ee; letter-spacing: 0.04em; text-transform: none; }
+
+/* CSS-only histogram: numbers stay as text, bars sized in %. */
+.histogram {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  align-items: end;
+  gap: var(--space-2);
+  height: 9rem;
+  margin: 0;
+  padding: var(--space-3) var(--space-3) 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  list-style: none;
+  font-family: var(--font-ui);
+  font-size: var(--text-xs);
+}
+.histogram li { display: flex; flex-direction: column; justify-content: flex-end; height: 100%; text-align: center; }
+.histogram .bar { display: block; min-height: 2px; border-radius: 2px 2px 0 0; background: var(--color-brand); }
+.histogram .count { font-weight: 600; }
+.histogram .pos { padding: var(--space-1) 0; border-top: 1px solid var(--color-border); color: var(--color-text-muted); }
+
+/* ---- Layout bits ---- */
+
+.athlete-facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+  gap: var(--space-2) var(--space-4);
+  margin: var(--space-4) 0;
+  font-family: var(--font-ui);
+}
+.athlete-facts dt { color: var(--color-text-muted); font-size: var(--text-xs); text-transform: uppercase; letter-spacing: 0.06em; }
+.athlete-facts dd { margin: 0; font-weight: 600; }
+
+.link-strip { display: flex; flex-wrap: wrap; gap: var(--space-2); margin: 0 0 var(--space-4); padding: 0; list-style: none; }
+.link-strip a,
+.link-strip span {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  color: var(--color-brand-ink);
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
+  text-decoration: none;
+}
+.link-strip span { color: var(--color-text-muted); }
+.link-strip a:hover { border-color: var(--color-brand-ink); }
+.link-strip-label { margin: 0 0 var(--space-1); font-family: var(--font-ui); font-size: var(--text-xs); text-transform: uppercase; letter-spacing: 0.06em; color: var(--color-text-muted); }
+
+.stats-summary { font-size: var(--text-article); }
+.stats-toc { font-family: var(--font-ui); }
+
+.stats-list { margin: 0; padding: 0; list-style: none; display: grid; gap: var(--space-2); }
+.stats-list li { padding: var(--space-3); border: 1px solid var(--color-border); border-radius: var(--radius); background: var(--color-surface); }
+.stats-list a { font-family: var(--font-display); font-size: var(--text-lg); font-weight: 700; color: var(--color-text); }
+.stats-list .meta { display: block; color: var(--color-text-muted); font-family: var(--font-ui); font-size: var(--text-sm); }
+
+.two-col { display: grid; gap: var(--space-5); }
+.two-col > * { min-width: 0; } /* let tables scroll inside the column, not the page */
+@media (min-width: 60rem) { .two-col { grid-template-columns: 1fr 1fr; } }
+
+/* ---- Variants (athlete page only) ---- */
+.variant-b { display: none; }
+html[data-variant="B"] .variant-a { display: none; }
+html[data-variant="B"] .variant-b { display: block; }
+
+.proto-switcher {
+  position: fixed;
+  bottom: var(--space-4);
+  left: 50%;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  max-width: calc(100vw - 2rem);
+  padding: var(--space-2) var(--space-3);
+  transform: translateX(-50%);
+  border-radius: var(--radius-pill);
+  background: #111;
+  color: #fff;
+  box-shadow: 0 6px 24px rgb(0 0 0 / 0.35);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  white-space: nowrap;
+}
+.proto-switcher span { overflow: hidden; text-overflow: ellipsis; }
+.proto-switcher button {
+  min-width: var(--tap-target);
+  min-height: var(--tap-target);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: #333;
+  color: #fff;
+  font-size: var(--text-lg);
+  cursor: pointer;
+}
+.proto-switcher button:focus-visible { outline: 2px solid #fff; }
+.has-switcher { padding-bottom: 6rem; }

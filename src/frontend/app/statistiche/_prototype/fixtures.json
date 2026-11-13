@@ -1,0 +1,2468 @@
+{
+ "prototype": true,
+ "note": "DATI INVENTATI per il prototipo #189: atleti, società, sedi e punteggi sono fittizi.",
+ "season": 2026,
+ "updatedAt": "2026-11-13",
+ "athletes": [
+  {
+   "slug": "giulia-ferraresi",
+   "name": "Giulia Ferraresi",
+   "nation": "ITA",
+   "discipline": "WAG",
+   "birthYear": 2005,
+   "club": "Ginnastica Riva Chiara"
+  },
+  {
+   "slug": "chiara-montanaro",
+   "name": "Chiara Montanaro",
+   "nation": "ITA",
+   "discipline": "WAG",
+   "birthYear": 2007,
+   "club": "Polisportiva Lagomare"
+  },
+  {
+   "slug": "sofia-brambati",
+   "name": "Sofia Brambati",
+   "nation": "ITA",
+   "discipline": "WAG",
+   "birthYear": 2006,
+   "club": "Società Ginnastica Valdoria"
+  },
+  {
+   "slug": "elena-corradi",
+   "name": "Elena Corradi",
+   "nation": "ITA",
+   "discipline": "WAG",
+   "birthYear": 2008,
+   "club": "Ginnastica Riva Chiara"
+  },
+  {
+   "slug": "lea-duvernoy",
+   "name": "Léa Duvernoy",
+   "nation": "FRA",
+   "discipline": "WAG",
+   "birthYear": 2004
+  },
+  {
+   "slug": "hanna-weidlich",
+   "name": "Hanna Weidlich",
+   "nation": "GER",
+   "discipline": "WAG",
+   "birthYear": 2006
+  },
+  {
+   "slug": "ellie-marsden",
+   "name": "Ellie Marsden",
+   "nation": "GBR",
+   "discipline": "WAG",
+   "birthYear": 2005
+  },
+  {
+   "slug": "tommaso-rinaldelli",
+   "name": "Tommaso Rinaldelli",
+   "nation": "ITA",
+   "discipline": "MAG",
+   "birthYear": 2002,
+   "club": "Pro Ginnastica Montebello"
+  },
+  {
+   "slug": "davide-scoccia",
+   "name": "Davide Scoccia",
+   "nation": "ITA",
+   "discipline": "MAG",
+   "birthYear": 2003,
+   "club": "Polisportiva Lagomare"
+  },
+  {
+   "slug": "pietro-valsecchi",
+   "name": "Pietro Valsecchi",
+   "nation": "ITA",
+   "discipline": "MAG",
+   "birthYear": 2004,
+   "club": "Società Ginnastica Valdoria"
+  },
+  {
+   "slug": "filippo-mazzanti",
+   "name": "Filippo Mazzanti",
+   "nation": "ITA",
+   "discipline": "MAG",
+   "birthYear": 2005,
+   "club": "Pro Ginnastica Montebello"
+  },
+  {
+   "slug": "jonas-achterberg",
+   "name": "Jonas Achterberg",
+   "nation": "NED",
+   "discipline": "MAG",
+   "birthYear": 2001
+  },
+  {
+   "slug": "mateusz-wrona",
+   "name": "Mateusz Wrona",
+   "nation": "POL",
+   "discipline": "MAG",
+   "birthYear": 2003
+  },
+  {
+   "slug": "alvaro-quesada",
+   "name": "Álvaro Quesada",
+   "nation": "ESP",
+   "discipline": "MAG",
+   "birthYear": 2002
+  }
+ ],
+ "competitions": [
+  {
+   "slug": "coppa-del-mondo-valdoria-2026",
+   "name": "Coppa del Mondo di Valdoria 2026",
+   "level": "internazionale",
+   "tier": "Coppa del Mondo",
+   "city": "Valdoria",
+   "country": "ITA",
+   "startDate": "2026-03-12",
+   "endDate": "2026-03-15",
+   "summary": "Prima tappa di Coppa del Mondo della stagione, solo finali di specialità. Testo segnaposto: qui la redazione scriverà due o tre righe sulla gara.",
+   "phases": [
+    {
+     "round": "finale",
+     "discipline": "WAG",
+     "apparatus": "VT",
+     "results": [
+      {
+       "athlete": "ellie-marsden",
+       "vaults": [
+        {
+         "d": 6.3,
+         "e": 7.156,
+         "penalty": 0,
+         "total": 13.456
+        },
+        {
+         "d": 5.7,
+         "e": 8.341,
+         "penalty": 0,
+         "total": 14.041
+        }
+       ],
+       "total": 13.748,
+       "rank": 1
+      },
+      {
+       "athlete": "hanna-weidlich",
+       "vaults": [
+        {
+         "d": 5.5,
+         "e": 7.992,
+         "penalty": 0,
+         "total": 13.492
+        },
+        {
+         "d": 5.2,
+         "e": 8.467,
+         "penalty": 0,
+         "total": 13.667
+        }
+       ],
+       "total": 13.579,
+       "rank": 2
+      },
+      {
+       "athlete": "lea-duvernoy",
+       "vaults": [
+        {
+         "d": 5.8,
+         "e": 8.208,
+         "penalty": 0,
+         "total": 14.008
+        },
+        {
+         "d": 5.1,
+         "e": 8.015,
+         "penalty": 0,
+         "total": 13.115
+        }
+       ],
+       "total": 13.561,
+       "rank": 3
+      },
+      {
+       "athlete": "sofia-brambati",
+       "vaults": [
+        {
+         "d": 5.1,
+         "e": 8.336,
+         "penalty": 0.3,
+         "total": 13.136
+        },
+        {
+         "d": 4.8,
+         "e": 7.951,
+         "penalty": 0,
+         "total": 12.751
+        }
+       ],
+       "total": 12.944,
+       "rank": 4
+      },
+      {
+       "athlete": "giulia-ferraresi",
+       "vaults": [
+        {
+         "d": 5.6,
+         "e": 7.6,
+         "penalty": 0,
+         "total": 13.2
+        },
+        {
+         "d": 5.1,
+         "e": 6.856,
+         "penalty": 0,
+         "total": 11.956
+        }
+       ],
+       "total": 12.578,
+       "rank": 5
+      },
+      {
+       "athlete": "chiara-montanaro",
+       "vaults": [
+        {
+         "d": 4.7,
+         "e": 6.658,
+         "penalty": 0,
+         "total": 11.358
+        },
+        {
+         "d": 4.5,
+         "e": 7.744,
+         "penalty": 0,
+         "total": 12.244
+        }
+       ],
+       "total": 11.801,
+       "rank": 6
+      }
+     ]
+    },
+    {
+     "round": "finale",
+     "discipline": "WAG",
+     "apparatus": "UB",
+     "results": [
+      {
+       "athlete": "ellie-marsden",
+       "d": 6.3,
+       "e": 8.36,
+       "penalty": 0,
+       "total": 14.66,
+       "rank": 1
+      },
+      {
+       "athlete": "giulia-ferraresi",
+       "d": 5.3,
+       "e": 8.314,
+       "penalty": 0,
+       "total": 13.614,
+       "rank": 2
+      },
+      {
+       "athlete": "hanna-weidlich",
+       "d": 5.1,
+       "e": 8.504,
+       "penalty": 0,
+       "total": 13.604,
+       "rank": 3
+      },
+      {
+       "athlete": "sofia-brambati",
+       "d": 5.4,
+       "e": 7.855,
+       "penalty": 0,
+       "total": 13.255,
+       "rank": 4
+      },
+      {
+       "athlete": "lea-duvernoy",
+       "d": 5.8,
+       "e": 6.729,
+       "penalty": 0.1,
+       "total": 12.429,
+       "rank": 5
+      },
+      {
+       "athlete": "chiara-montanaro",
+       "d": 4.7,
+       "e": 7.814,
+       "penalty": 0.3,
+       "total": 12.214,
+       "rank": 6
+      }
+     ]
+    },
+    {
+     "round": "finale",
+     "discipline": "WAG",
+     "apparatus": "BB",
+     "results": [
+      {
+       "athlete": "lea-duvernoy",
+       "d": 6.3,
+       "e": 8.095,
+       "penalty": 0,
+       "total": 14.395,
+       "rank": 1
+      },
+      {
+       "athlete": "giulia-ferraresi",
+       "d": 5.8,
+       "e": 8.017,
+       "penalty": 0,
+       "total": 13.817,
+       "rank": 2
+      },
+      {
+       "athlete": "hanna-weidlich",
+       "d": 5.2,
+       "e": 8.667,
+       "penalty": 0.1,
+       "total": 13.767,
+       "rank": 3
+      },
+      {
+       "athlete": "chiara-montanaro",
+       "d": 5.0,
+       "e": 8.292,
+       "penalty": 0,
+       "total": 13.292,
+       "rank": 4
+      },
+      {
+       "athlete": "sofia-brambati",
+       "d": 4.6,
+       "e": 7.984,
+       "penalty": 0,
+       "total": 12.584,
+       "rank": 5
+      },
+      {
+       "athlete": "elena-corradi",
+       "d": 4.6,
+       "e": 6.63,
+       "penalty": 0,
+       "total": 11.23,
+       "rank": 6
+      }
+     ]
+    },
+    {
+     "round": "finale",
+     "discipline": "WAG",
+     "apparatus": "FX",
+     "results": [
+      {
+       "athlete": "ellie-marsden",
+       "d": 6.4,
+       "e": 7.564,
+       "penalty": 0,
+       "total": 13.964,
+       "rank": 1
+      },
+      {
+       "athlete": "lea-duvernoy",
+       "d": 5.6,
+       "e": 8.338,
+       "penalty": 0,
+       "total": 13.938,
+       "rank": 2
+      },
+      {
+       "athlete": "hanna-weidlich",
+       "d": 5.8,
+       "e": 7.621,
+       "penalty": 0.3,
+       "total": 13.121,
+       "rank": 3
+      },
+      {
+       "athlete": "chiara-montanaro",
+       "d": 4.9,
+       "e": 8.206,
+       "penalty": 0,
+       "total": 13.106,
+       "rank": 4
+      },
+      {
+       "athlete": "sofia-brambati",
+       "d": 5.2,
+       "e": 7.686,
+       "penalty": 0,
+       "total": 12.886,
+       "rank": 5
+      },
+      {
+       "athlete": "elena-corradi",
+       "d": 4.4,
+       "e": 7.227,
+       "penalty": 0.1,
+       "total": 11.527,
+       "rank": 6
+      }
+     ]
+    },
+    {
+     "round": "finale",
+     "discipline": "MAG",
+     "apparatus": "FX",
+     "results": [
+      {
+       "athlete": "tommaso-rinaldelli",
+       "d": 6.2,
+       "e": 8.747,
+       "penalty": 0,
+       "total": 14.947,
+       "rank": 1
+      },
+      {
+       "athlete": "filippo-mazzanti",
+       "d": 5.2,
+       "e": 8.941,
+       "penalty": 0.1,
+       "total": 14.041,
+       "rank": 2
+      },
+      {
+       "athlete": "davide-scoccia",
+       "d": 5.9,
+       "e": 7.611,
+       "penalty": 0,
+       "total": 13.511,
+       "rank": 3
+      },
+      {
+       "athlete": "alvaro-quesada",
+       "d": 5.6,
+       "e": 8.19,
+       "penalty": 0.3,
+       "total": 13.49,
+       "rank": 4
+      },
+      {
+       "athlete": "mateusz-wrona",
+       "d": 5.7,
+       "e": 7.785,
+       "penalty": 0,
+       "total": 13.485,
+       "rank": 5
+      },
+      {
+       "athlete": "pietro-valsecchi",
+       "d": 5.9,
+       "e": 7.623,
+       "penalty": 0.3,
+       "total": 13.223,
+       "rank": 6
+      }
+     ]
+    },
+    {
+     "round": "finale",
+     "discipline": "MAG",
+     "apparatus": "PH",
+     "results": [
+      {
+       "athlete": "tommaso-rinaldelli",
+       "d": 5.8,
+       "e": 8.01,
+       "penalty": 0,
+       "total": 13.81,
+       "rank": 1
+      },
+      {
+       "athlete": "filippo-mazzanti",
+       "d": 5.8,
+       "e": 8.224,
+       "penalty": 0.3,
+       "total": 13.724,
+       "rank": 2
+      },
+      {
+       "athlete": "davide-scoccia",
+       "d": 5.9,
+       "e": 7.77,
+       "penalty": 0.3,
+       "total": 13.37,
+       "rank": 3
+      },
+      {
+       "athlete": "mateusz-wrona",
+       "d": 5.7,
+       "e": 7.455,
+       "penalty": 0,
+       "total": 13.155,
+       "rank": 4
+      },
+      {
+       "athlete": "jonas-achterberg",
+       "d": 5.8,
+       "e": 7.198,
+       "penalty": 0,
+       "total": 12.998,
+       "rank": 5
+      },
+      {
+       "athlete": "alvaro-quesada",
+       "d": 5.7,
+       "e": 6.465,
+       "penalty": 0,
+       "total": 12.165,
+       "rank": 6
+      }
+     ]
+    },
+    {
+     "round": "finale",
+     "discipline": "MAG",
+     "apparatus": "SR",
+     "results": [
+      {
+       "athlete": "mateusz-wrona",
+       "d": 5.8,
+       "e": 7.927,
+       "penalty": 0,
+       "total": 13.727,
+       "rank": 1
+      },
+      {
+       "athlete": "pietro-valsecchi",
+       "d": 5.6,
+       "e": 7.747,
+       "penalty": 0.1,
+       "total": 13.247,
+       "rank": 2
+      },
+      {
+       "athlete": "tommaso-rinaldelli",
+       "d": 5.3,
+       "e": 7.895,
+       "penalty": 0,
+       "total": 13.195,
+       "rank": 3
+      },
+      {
+       "athlete": "alvaro-quesada",
+       "d": 5.4,
+       "e": 7.73,
+       "penalty": 0,
+       "total": 13.13,
+       "rank": 4
+      },
+      {
+       "athlete": "jonas-achterberg",
+       "d": 5.3,
+       "e": 7.708,
+       "penalty": 0,
+       "total": 13.008,
+       "rank": 5
+      },
+      {
+       "athlete": "davide-scoccia",
+       "d": 5.2,
+       "e": 7.602,
+       "penalty": 0,
+       "total": 12.802,
+       "rank": 6
+      }
+     ]
+    },
+    {
+     "round": "finale",
+     "discipline": "MAG",
+     "apparatus": "VT",
+     "results": [
+      {
+       "athlete": "alvaro-quesada",
+       "vaults": [
+        {
+         "d": 5.5,
+         "e": 8.5,
+         "penalty": 0,
+         "total": 14.0
+        },
+        {
+         "d": 5.3,
+         "e": 8.314,
+         "penalty": 0,
+         "total": 13.614
+        }
+       ],
+       "total": 13.807,
+       "rank": 1
+      },
+      {
+       "athlete": "davide-scoccia",
+       "vaults": [
+        {
+         "d": 5.9,
+         "e": 8.266,
+         "penalty": 0,
+         "total": 14.166
+        },
+        {
+         "d": 5.6,
+         "e": 7.84,
+         "penalty": 0,
+         "total": 13.44
+        }
+       ],
+       "total": 13.803,
+       "rank": 2
+      },
+      {
+       "athlete": "jonas-achterberg",
+       "vaults": [
+        {
+         "d": 5.8,
+         "e": 7.369,
+         "penalty": 0,
+         "total": 13.169
+        },
+        {
+         "d": 5.6,
+         "e": 8.265,
+         "penalty": 0,
+         "total": 13.865
+        }
+       ],
+       "total": 13.517,
+       "rank": 3
+      },
+      {
+       "athlete": "tommaso-rinaldelli",
+       "vaults": [
+        {
+         "d": 6.0,
+         "e": 8.011,
+         "penalty": 0,
+         "total": 14.011
+        },
+        {
+         "d": 5.5,
+         "e": 7.432,
+         "penalty": 0,
+         "total": 12.932
+        }
+       ],
+       "total": 13.471,
+       "rank": 4
+      },
+      {
+       "athlete": "pietro-valsecchi",
+       "vaults": [
+        {
+         "d": 6.0,
+         "e": 7.413,
+         "penalty": 0,
+         "total": 13.413
+        },
+        {
+         "d": 5.8,
+         "e": 7.786,
+         "penalty": 0.1,
+         "total": 13.486
+        }
+       ],
+       "total": 13.45,
+       "rank": 5
+      },
+      {
+       "athlete": "mateusz-wrona",
+       "vaults": [
+        {
+         "d": 5.5,
+         "e": 8.007,
+         "penalty": 0.1,
+         "total": 13.407
+        },
+        {
+         "d": 5.0,
+         "e": 7.965,
+         "penalty": 0,
+         "total": 12.965
+        }
+       ],
+       "total": 13.186,
+       "rank": 6
+      }
+     ]
+    },
+    {
+     "round": "finale",
+     "discipline": "MAG",
+     "apparatus": "PB",
+     "results": [
+      {
+       "athlete": "tommaso-rinaldelli",
+       "d": 5.6,
+       "e": 8.989,
+       "penalty": 0,
+       "total": 14.589,
+       "rank": 1
+      },
+      {
+       "athlete": "alvaro-quesada",
+       "d": 5.4,
+       "e": 8.359,
+       "penalty": 0.1,
+       "total": 13.659,
+       "rank": 2
+      },
+      {
+       "athlete": "davide-scoccia",
+       "d": 5.9,
+       "e": 7.682,
+       "penalty": 0.3,
+       "total": 13.282,
+       "rank": 3
+      },
+      {
+       "athlete": "pietro-valsecchi",
+       "d": 5.3,
+       "e": 7.835,
+       "penalty": 0,
+       "total": 13.135,
+       "rank": 4
+      },
+      {
+       "athlete": "filippo-mazzanti",
+       "d": 5.3,
+       "e": 8.072,
+       "penalty": 0.3,
+       "total": 13.072,
+       "rank": 5
+      },
+      {
+       "athlete": "mateusz-wrona",
+       "d": 5.4,
+       "e": 7.937,
+       "penalty": 0.3,
+       "total": 13.037,
+       "rank": 6
+      }
+     ]
+    },
+    {
+     "round": "finale",
+     "discipline": "MAG",
+     "apparatus": "HB",
+     "results": [
+      {
+       "athlete": "tommaso-rinaldelli",
+       "d": 5.9,
+       "e": 8.891,
+       "penalty": 0,
+       "total": 14.791,
+       "rank": 1
+      },
+      {
+       "athlete": "davide-scoccia",
+       "d": 6.0,
+       "e": 8.636,
+       "penalty": 0,
+       "total": 14.636,
+       "rank": 2
+      },
+      {
+       "athlete": "pietro-valsecchi",
+       "d": 5.7,
+       "e": 7.561,
+       "penalty": 0.3,
+       "total": 12.961,
+       "rank": 3
+      },
+      {
+       "athlete": "filippo-mazzanti",
+       "d": 5.3,
+       "e": 7.655,
+       "penalty": 0,
+       "total": 12.955,
+       "rank": 4
+      },
+      {
+       "athlete": "mateusz-wrona",
+       "d": 5.0,
+       "e": 7.886,
+       "penalty": 0,
+       "total": 12.886,
+       "rank": 5
+      },
+      {
+       "athlete": "jonas-achterberg",
+       "d": 5.0,
+       "e": 7.505,
+       "penalty": 0,
+       "total": 12.505,
+       "rank": 6
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "slug": "europei-lagomare-2026",
+   "name": "Campionati Europei di Lagomare 2026",
+   "level": "internazionale",
+   "tier": "Europei",
+   "city": "Lagomare",
+   "country": "ITA",
+   "startDate": "2026-04-22",
+   "endDate": "2026-04-26",
+   "summary": "Europei con qualificazioni, finale all-around e finali di specialità. Testo segnaposto: la narrazione della gara, scritta dalla redazione, va qui sopra le tabelle.",
+   "phases": [
+    {
+     "round": "qualifica",
+     "discipline": "WAG",
+     "apparatus": "AA",
+     "results": [
+      {
+       "athlete": "lea-duvernoy",
+       "parts": {
+        "VT": 14.103,
+        "UB": 14.237,
+        "BB": 14.431,
+        "FX": 14.468
+       },
+       "total": 57.239,
+       "rank": 1
+      },
+      {
+       "athlete": "ellie-marsden",
+       "parts": {
+        "VT": 15.005,
+        "UB": 13.645,
+        "BB": 14.166,
+        "FX": 13.262
+       },
+       "total": 56.078,
+       "rank": 2
+      },
+      {
+       "athlete": "giulia-ferraresi",
+       "parts": {
+        "VT": 13.275,
+        "UB": 14.229,
+        "BB": 13.146,
+        "FX": 13.21
+       },
+       "total": 53.86,
+       "rank": 3
+      },
+      {
+       "athlete": "hanna-weidlich",
+       "parts": {
+        "VT": 13.094,
+        "UB": 12.315,
+        "BB": 13.492,
+        "FX": 12.921
+       },
+       "total": 51.822,
+       "rank": 4
+      },
+      {
+       "athlete": "chiara-montanaro",
+       "parts": {
+        "VT": 12.629,
+        "UB": 12.638,
+        "BB": 12.909,
+        "FX": 12.854
+       },
+       "total": 51.03,
+       "rank": 5
+      },
+      {
+       "athlete": "sofia-brambati",
+       "parts": {
+        "VT": 12.18,
+        "UB": 13.3,
+        "BB": 13.235,
+        "FX": 11.224
+       },
+       "total": 49.939,
+       "rank": 6
+      },
+      {
+       "athlete": "elena-corradi",
+       "parts": {
+        "VT": 11.947,
+        "UB": 12.144,
+        "BB": 12.365,
+        "FX": 12.023
+       },
+       "total": 48.479,
+       "rank": 7
+      }
+     ]
+    },
+    {
+     "round": "finale-aa",
+     "discipline": "WAG",
+     "apparatus": "AA",
+     "results": [
+      {
+       "athlete": "ellie-marsden",
+       "parts": {
+        "VT": 13.954,
+        "UB": 14.169,
+        "BB": 13.47,
+        "FX": 14.181
+       },
+       "total": 55.774,
+       "rank": 1
+      },
+      {
+       "athlete": "lea-duvernoy",
+       "parts": {
+        "VT": 13.11,
+        "UB": 14.549,
+        "BB": 14.164,
+        "FX": 13.636
+       },
+       "total": 55.459,
+       "rank": 2
+      },
+      {
+       "athlete": "giulia-ferraresi",
+       "parts": {
+        "VT": 13.328,
+        "UB": 12.897,
+        "BB": 14.289,
+        "FX": 13.499
+       },
+       "total": 54.013,
+       "rank": 3
+      },
+      {
+       "athlete": "hanna-weidlich",
+       "parts": {
+        "VT": 13.194,
+        "UB": 12.763,
+        "BB": 13.135,
+        "FX": 13.752
+       },
+       "total": 52.844,
+       "rank": 4
+      },
+      {
+       "athlete": "sofia-brambati",
+       "parts": {
+        "VT": 12.964,
+        "UB": 13.393,
+        "BB": 12.418,
+        "FX": 13.656
+       },
+       "total": 52.431,
+       "rank": 5
+      },
+      {
+       "athlete": "chiara-montanaro",
+       "parts": {
+        "VT": 13.078,
+        "UB": 12.707,
+        "BB": 12.816,
+        "FX": 12.857
+       },
+       "total": 51.458,
+       "rank": 6
+      }
+     ]
+    },
+    {
+     "round": "finale",
+     "discipline": "WAG",
+     "apparatus": "VT",
+     "results": [
+      {
+       "athlete": "ellie-marsden",
+       "vaults": [
+        {
+         "d": 6.3,
+         "e": 8.532,
+         "penalty": 0.1,
+         "total": 14.732
+        },
+        {
+         "d": 6.0,
+         "e": 8.206,
+         "penalty": 0,
+         "total": 14.206
+        }
+       ],
+       "total": 14.469,
+       "rank": 1
+      },
+      {
+       "athlete": "hanna-weidlich",
+       "vaults": [
+        {
+         "d": 5.5,
+         "e": 7.924,
+         "penalty": 0,
+         "total": 13.424
+        },
+        {
+         "d": 5.2,
+         "e": 8.361,
+         "penalty": 0,
+         "total": 13.561
+        }
+       ],
+       "total": 13.492,
+       "rank": 2
+      },
+      {
+       "athlete": "lea-duvernoy",
+       "vaults": [
+        {
+         "d": 5.8,
+         "e": 7.701,
+         "penalty": 0.1,
+         "total": 13.401
+        },
+        {
+         "d": 5.1,
+         "e": 8.467,
+         "penalty": 0,
+         "total": 13.567
+        }
+       ],
+       "total": 13.484,
+       "rank": 3
+      },
+      {
+       "athlete": "giulia-ferraresi",
+       "vaults": [
+        {
+         "d": 5.7,
+         "e": 6.983,
+         "penalty": 0,
+         "total": 12.683
+        },
+        {
+         "d": 5.1,
+         "e": 7.731,
+         "penalty": 0.1,
+         "total": 12.731
+        }
+       ],
+       "total": 12.707,
+       "rank": 4
+      },
+      {
+       "athlete": "chiara-montanaro",
+       "vaults": [
+        {
+         "d": 4.8,
+         "e": 6.79,
+         "penalty": 0,
+         "total": 11.59
+        },
+        {
+         "d": 4.3,
+         "e": 7.606,
+         "penalty": 0,
+         "total": 11.906
+        }
+       ],
+       "total": 11.748,
+       "rank": 5
+      }
+     ]
+    },
+    {
+     "round": "finale",
+     "discipline": "WAG",
+     "apparatus": "UB",
+     "results": [
+      {
+       "athlete": "ellie-marsden",
+       "d": 6.2,
+       "e": 8.178,
+       "penalty": 0.1,
+       "total": 14.278,
+       "rank": 1
+      },
+      {
+       "athlete": "lea-duvernoy",
+       "d": 5.8,
+       "e": 7.992,
+       "penalty": 0.1,
+       "total": 13.692,
+       "rank": 2
+      },
+      {
+       "athlete": "giulia-ferraresi",
+       "d": 5.5,
+       "e": 8.099,
+       "penalty": 0,
+       "total": 13.599,
+       "rank": 3
+      },
+      {
+       "athlete": "chiara-montanaro",
+       "d": 4.7,
+       "e": 8.207,
+       "penalty": 0,
+       "total": 12.907,
+       "rank": 4
+      },
+      {
+       "athlete": "sofia-brambati",
+       "d": 5.3,
+       "e": 7.59,
+       "penalty": 0,
+       "total": 12.89,
+       "rank": 5
+      }
+     ]
+    },
+    {
+     "round": "finale",
+     "discipline": "WAG",
+     "apparatus": "BB",
+     "results": [
+      {
+       "athlete": "lea-duvernoy",
+       "d": 6.1,
+       "e": 7.994,
+       "penalty": 0,
+       "total": 14.094,
+       "rank": 1
+      },
+      {
+       "athlete": "giulia-ferraresi",
+       "d": 5.4,
+       "e": 8.588,
+       "penalty": 0,
+       "total": 13.988,
+       "rank": 2
+      },
+      {
+       "athlete": "hanna-weidlich",
+       "d": 5.3,
+       "e": 8.687,
+       "penalty": 0,
+       "total": 13.987,
+       "rank": 3
+      },
+      {
+       "athlete": "ellie-marsden",
+       "d": 6.2,
+       "e": 7.691,
+       "penalty": 0.1,
+       "total": 13.791,
+       "rank": 4
+      },
+      {
+       "athlete": "sofia-brambati",
+       "d": 4.4,
+       "e": 7.222,
+       "penalty": 0,
+       "total": 11.622,
+       "rank": 5
+      }
+     ]
+    },
+    {
+     "round": "finale",
+     "discipline": "WAG",
+     "apparatus": "FX",
+     "results": [
+      {
+       "athlete": "ellie-marsden",
+       "d": 6.4,
+       "e": 8.309,
+       "penalty": 0,
+       "total": 14.709,
+       "rank": 1
+      },
+      {
+       "athlete": "giulia-ferraresi",
+       "d": 5.4,
+       "e": 8.294,
+       "penalty": 0,
+       "total": 13.694,
+       "rank": 2
+      },
+      {
+       "athlete": "lea-duvernoy",
+       "d": 5.6,
+       "e": 7.032,
+       "penalty": 0,
+       "total": 12.632,
+       "rank": 3
+      },
+      {
+       "athlete": "chiara-montanaro",
+       "d": 5.1,
+       "e": 7.665,
+       "penalty": 0.3,
+       "total": 12.465,
+       "rank": 4
+      },
+      {
+       "athlete": "hanna-weidlich",
+       "d": 5.5,
+       "e": 6.691,
+       "penalty": 0,
+       "total": 12.191,
+       "rank": 5
+      }
+     ]
+    },
+    {
+     "round": "qualifica",
+     "discipline": "MAG",
+     "apparatus": "AA",
+     "results": [
+      {
+       "athlete": "tommaso-rinaldelli",
+       "parts": {
+        "FX": 14.308,
+        "PH": 14.104,
+        "SR": 14.413,
+        "VT": 13.831,
+        "PB": 13.77,
+        "HB": 14.871
+       },
+       "total": 85.297,
+       "rank": 1
+      },
+      {
+       "athlete": "davide-scoccia",
+       "parts": {
+        "FX": 14.092,
+        "PH": 13.97,
+        "SR": 13.035,
+        "VT": 14.771,
+        "PB": 14.181,
+        "HB": 13.202
+       },
+       "total": 83.251,
+       "rank": 2
+      },
+      {
+       "athlete": "alvaro-quesada",
+       "parts": {
+        "FX": 13.907,
+        "PH": 12.987,
+        "SR": 13.701,
+        "VT": 15.112,
+        "PB": 13.714,
+        "HB": 13.624
+       },
+       "total": 83.045,
+       "rank": 3
+      },
+      {
+       "athlete": "pietro-valsecchi",
+       "parts": {
+        "FX": 14.054,
+        "PH": 13.812,
+        "SR": 12.991,
+        "VT": 14.194,
+        "PB": 13.452,
+        "HB": 14.038
+       },
+       "total": 82.541,
+       "rank": 4
+      },
+      {
+       "athlete": "mateusz-wrona",
+       "parts": {
+        "FX": 13.814,
+        "PH": 14.683,
+        "SR": 13.448,
+        "VT": 12.203,
+        "PB": 13.377,
+        "HB": 12.311
+       },
+       "total": 79.836,
+       "rank": 5
+      },
+      {
+       "athlete": "filippo-mazzanti",
+       "parts": {
+        "FX": 12.713,
+        "PH": 13.916,
+        "SR": 12.622,
+        "VT": 13.726,
+        "PB": 12.456,
+        "HB": 11.919
+       },
+       "total": 77.352,
+       "rank": 6
+      },
+      {
+       "athlete": "jonas-achterberg",
+       "parts": {
+        "FX": 12.925,
+        "PH": 13.123,
+        "SR": 11.923,
+        "VT": 13.412,
+        "PB": 12.877,
+        "HB": 12.277
+       },
+       "total": 76.537,
+       "rank": 7
+      }
+     ]
+    },
+    {
+     "round": "finale-aa",
+     "discipline": "MAG",
+     "apparatus": "AA",
+     "results": [
+      {
+       "athlete": "tommaso-rinaldelli",
+       "parts": {
+        "FX": 14.733,
+        "PH": 14.082,
+        "SR": 14.161,
+        "VT": 13.631,
+        "PB": 14.271,
+        "HB": 14.081
+       },
+       "total": 84.959,
+       "rank": 1
+      },
+      {
+       "athlete": "davide-scoccia",
+       "parts": {
+        "FX": 14.571,
+        "PH": 14.004,
+        "SR": 13.396,
+        "VT": 14.041,
+        "PB": 13.407,
+        "HB": 12.976
+       },
+       "total": 82.395,
+       "rank": 2
+      },
+      {
+       "athlete": "pietro-valsecchi",
+       "parts": {
+        "FX": 13.688,
+        "PH": 13.478,
+        "SR": 13.325,
+        "VT": 14.038,
+        "PB": 13.956,
+        "HB": 13.475
+       },
+       "total": 81.96,
+       "rank": 3
+      },
+      {
+       "athlete": "filippo-mazzanti",
+       "parts": {
+        "FX": 13.242,
+        "PH": 14.105,
+        "SR": 13.978,
+        "VT": 13.667,
+        "PB": 12.889,
+        "HB": 13.592
+       },
+       "total": 81.473,
+       "rank": 4
+      },
+      {
+       "athlete": "alvaro-quesada",
+       "parts": {
+        "FX": 13.715,
+        "PH": 12.811,
+        "SR": 13.466,
+        "VT": 13.252,
+        "PB": 13.795,
+        "HB": 13.741
+       },
+       "total": 80.78,
+       "rank": 5
+      },
+      {
+       "athlete": "mateusz-wrona",
+       "parts": {
+        "FX": 13.661,
+        "PH": 13.567,
+        "SR": 13.608,
+        "VT": 13.792,
+        "PB": 12.075,
+        "HB": 12.907
+       },
+       "total": 79.61,
+       "rank": 6
+      }
+     ]
+    },
+    {
+     "round": "finale",
+     "discipline": "MAG",
+     "apparatus": "FX",
+     "results": [
+      {
+       "athlete": "tommaso-rinaldelli",
+       "d": 6.2,
+       "e": 7.755,
+       "penalty": 0.1,
+       "total": 13.855,
+       "rank": 1
+      },
+      {
+       "athlete": "pietro-valsecchi",
+       "d": 5.8,
+       "e": 7.817,
+       "penalty": 0,
+       "total": 13.617,
+       "rank": 2
+      },
+      {
+       "athlete": "mateusz-wrona",
+       "d": 5.5,
+       "e": 7.982,
+       "penalty": 0,
+       "total": 13.482,
+       "rank": 3
+      },
+      {
+       "athlete": "alvaro-quesada",
+       "d": 5.7,
+       "e": 7.265,
+       "penalty": 0,
+       "total": 12.965,
+       "rank": 4
+      },
+      {
+       "athlete": "davide-scoccia",
+       "d": 6.1,
+       "e": 6.455,
+       "penalty": 0,
+       "total": 12.555,
+       "rank": 5
+      }
+     ]
+    },
+    {
+     "round": "finale",
+     "discipline": "MAG",
+     "apparatus": "PH",
+     "results": [
+      {
+       "athlete": "pietro-valsecchi",
+       "d": 6.2,
+       "e": 8.234,
+       "penalty": 0,
+       "total": 14.434,
+       "rank": 1
+      },
+      {
+       "athlete": "tommaso-rinaldelli",
+       "d": 6.1,
+       "e": 7.973,
+       "penalty": 0,
+       "total": 14.073,
+       "rank": 2
+      },
+      {
+       "athlete": "filippo-mazzanti",
+       "d": 5.6,
+       "e": 8.535,
+       "penalty": 0.1,
+       "total": 14.035,
+       "rank": 3
+      },
+      {
+       "athlete": "mateusz-wrona",
+       "d": 5.7,
+       "e": 8.158,
+       "penalty": 0,
+       "total": 13.858,
+       "rank": 4
+      },
+      {
+       "athlete": "davide-scoccia",
+       "d": 5.6,
+       "e": 7.618,
+       "penalty": 0,
+       "total": 13.218,
+       "rank": 5
+      }
+     ]
+    },
+    {
+     "round": "finale",
+     "discipline": "MAG",
+     "apparatus": "SR",
+     "results": [
+      {
+       "athlete": "tommaso-rinaldelli",
+       "d": 5.4,
+       "e": 8.53,
+       "penalty": 0.3,
+       "total": 13.63,
+       "rank": 1
+      },
+      {
+       "athlete": "mateusz-wrona",
+       "d": 5.7,
+       "e": 7.726,
+       "penalty": 0,
+       "total": 13.426,
+       "rank": 2
+      },
+      {
+       "athlete": "pietro-valsecchi",
+       "d": 5.7,
+       "e": 7.817,
+       "penalty": 0.3,
+       "total": 13.217,
+       "rank": 3
+      },
+      {
+       "athlete": "alvaro-quesada",
+       "d": 5.6,
+       "e": 7.674,
+       "penalty": 0.1,
+       "total": 13.174,
+       "rank": 4
+      },
+      {
+       "athlete": "davide-scoccia",
+       "d": 5.2,
+       "e": 7.637,
+       "penalty": 0.1,
+       "total": 12.737,
+       "rank": 5
+      }
+     ]
+    },
+    {
+     "round": "finale",
+     "discipline": "MAG",
+     "apparatus": "VT",
+     "results": [
+      {
+       "athlete": "davide-scoccia",
+       "vaults": [
+        {
+         "d": 6.0,
+         "e": 8.003,
+         "penalty": 0,
+         "total": 14.003
+        },
+        {
+         "d": 5.5,
+         "e": 8.925,
+         "penalty": 0,
+         "total": 14.425
+        }
+       ],
+       "total": 14.214,
+       "rank": 1
+      },
+      {
+       "athlete": "alvaro-quesada",
+       "vaults": [
+        {
+         "d": 5.6,
+         "e": 8.719,
+         "penalty": 0,
+         "total": 14.319
+        },
+        {
+         "d": 5.3,
+         "e": 8.385,
+         "penalty": 0,
+         "total": 13.685
+        }
+       ],
+       "total": 14.002,
+       "rank": 2
+      },
+      {
+       "athlete": "tommaso-rinaldelli",
+       "vaults": [
+        {
+         "d": 6.0,
+         "e": 8.107,
+         "penalty": 0,
+         "total": 14.107
+        },
+        {
+         "d": 5.5,
+         "e": 8.033,
+         "penalty": 0,
+         "total": 13.533
+        }
+       ],
+       "total": 13.82,
+       "rank": 3
+      },
+      {
+       "athlete": "pietro-valsecchi",
+       "vaults": [
+        {
+         "d": 5.8,
+         "e": 7.923,
+         "penalty": 0,
+         "total": 13.723
+        },
+        {
+         "d": 5.7,
+         "e": 8.027,
+         "penalty": 0.3,
+         "total": 13.427
+        }
+       ],
+       "total": 13.575,
+       "rank": 4
+      },
+      {
+       "athlete": "filippo-mazzanti",
+       "vaults": [
+        {
+         "d": 5.5,
+         "e": 8.354,
+         "penalty": 0.3,
+         "total": 13.554
+        },
+        {
+         "d": 5.0,
+         "e": 8.26,
+         "penalty": 0,
+         "total": 13.26
+        }
+       ],
+       "total": 13.407,
+       "rank": 5
+      }
+     ]
+    },
+    {
+     "round": "finale",
+     "discipline": "MAG",
+     "apparatus": "PB",
+     "results": [
+      {
+       "athlete": "pietro-valsecchi",
+       "d": 5.3,
+       "e": 9.136,
+       "penalty": 0.3,
+       "total": 14.136,
+       "rank": 1
+      },
+      {
+       "athlete": "alvaro-quesada",
+       "d": 5.4,
+       "e": 8.504,
+       "penalty": 0.1,
+       "total": 13.804,
+       "rank": 2
+      },
+      {
+       "athlete": "davide-scoccia",
+       "d": 5.6,
+       "e": 8.015,
+       "penalty": 0,
+       "total": 13.615,
+       "rank": 3
+      },
+      {
+       "athlete": "mateusz-wrona",
+       "d": 5.3,
+       "e": 8.414,
+       "penalty": 0.1,
+       "total": 13.614,
+       "rank": 4
+      },
+      {
+       "athlete": "tommaso-rinaldelli",
+       "d": 5.5,
+       "e": 7.593,
+       "penalty": 0,
+       "total": 13.093,
+       "rank": 5
+      }
+     ]
+    },
+    {
+     "round": "finale",
+     "discipline": "MAG",
+     "apparatus": "HB",
+     "results": [
+      {
+       "athlete": "davide-scoccia",
+       "d": 5.8,
+       "e": 8.771,
+       "penalty": 0.3,
+       "total": 14.271,
+       "rank": 1
+      },
+      {
+       "athlete": "alvaro-quesada",
+       "d": 5.9,
+       "e": 8.113,
+       "penalty": 0,
+       "total": 14.013,
+       "rank": 2
+      },
+      {
+       "athlete": "pietro-valsecchi",
+       "d": 5.6,
+       "e": 8.253,
+       "penalty": 0,
+       "total": 13.853,
+       "rank": 3
+      },
+      {
+       "athlete": "tommaso-rinaldelli",
+       "d": 5.7,
+       "e": 8.033,
+       "penalty": 0,
+       "total": 13.733,
+       "rank": 4
+      },
+      {
+       "athlete": "mateusz-wrona",
+       "d": 4.9,
+       "e": 8.151,
+       "penalty": 0,
+       "total": 13.051,
+       "rank": 5
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "slug": "serie-a-montebello-2026",
+   "name": "Serie A 2026 – 1ª prova, Montebello",
+   "level": "nazionale",
+   "tier": "Serie A",
+   "city": "Montebello",
+   "country": "ITA",
+   "startDate": "2026-02-28",
+   "endDate": "2026-02-28",
+   "summary": "Prima prova del campionato a squadre. Nel prototipo mostriamo solo la classifica individuale. Testo segnaposto.",
+   "phases": [
+    {
+     "round": "prova",
+     "discipline": "WAG",
+     "apparatus": "AA",
+     "results": [
+      {
+       "athlete": "giulia-ferraresi",
+       "parts": {
+        "VT": 13.457,
+        "UB": 13.042,
+        "BB": 14.157,
+        "FX": 14.004
+       },
+       "total": 54.66,
+       "rank": 1
+      },
+      {
+       "athlete": "sofia-brambati",
+       "parts": {
+        "VT": 12.461,
+        "UB": 13.614,
+        "BB": 11.962,
+        "FX": 13.221
+       },
+       "total": 51.258,
+       "rank": 2
+      },
+      {
+       "athlete": "chiara-montanaro",
+       "parts": {
+        "VT": 12.31,
+        "UB": 12.887,
+        "BB": 13.258,
+        "FX": 12.687
+       },
+       "total": 51.142,
+       "rank": 3
+      },
+      {
+       "athlete": "elena-corradi",
+       "parts": {
+        "VT": 12.327,
+        "UB": 11.911,
+        "BB": 12.628,
+        "FX": 12.641
+       },
+       "total": 49.507,
+       "rank": 4
+      }
+     ]
+    },
+    {
+     "round": "prova",
+     "discipline": "MAG",
+     "apparatus": "AA",
+     "results": [
+      {
+       "athlete": "tommaso-rinaldelli",
+       "parts": {
+        "FX": 15.17,
+        "PH": 13.998,
+        "SR": 13.929,
+        "VT": 14.108,
+        "PB": 13.539,
+        "HB": 14.093
+       },
+       "total": 84.837,
+       "rank": 1
+      },
+      {
+       "athlete": "pietro-valsecchi",
+       "parts": {
+        "FX": 13.82,
+        "PH": 14.429,
+        "SR": 13.413,
+        "VT": 14.454,
+        "PB": 13.804,
+        "HB": 14.223
+       },
+       "total": 84.143,
+       "rank": 2
+      },
+      {
+       "athlete": "davide-scoccia",
+       "parts": {
+        "FX": 14.615,
+        "PH": 13.965,
+        "SR": 13.329,
+        "VT": 14.467,
+        "PB": 14.05,
+        "HB": 13.672
+       },
+       "total": 84.098,
+       "rank": 3
+      },
+      {
+       "athlete": "filippo-mazzanti",
+       "parts": {
+        "FX": 13.702,
+        "PH": 13.383,
+        "SR": 14.517,
+        "VT": 13.114,
+        "PB": 13.244,
+        "HB": 13.72
+       },
+       "total": 81.68,
+       "rank": 4
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "slug": "campionato-italiano-assoluto-2026",
+   "name": "Campionato Italiano Assoluto 2026",
+   "level": "nazionale",
+   "tier": "Campionato Italiano",
+   "city": "Riva Chiara",
+   "country": "ITA",
+   "startDate": "2026-06-05",
+   "endDate": "2026-06-07",
+   "summary": "Titoli italiani all-around e di specialità. Testo segnaposto.",
+   "phases": [
+    {
+     "round": "finale-aa",
+     "discipline": "WAG",
+     "apparatus": "AA",
+     "results": [
+      {
+       "athlete": "giulia-ferraresi",
+       "parts": {
+        "VT": 13.258,
+        "UB": 12.269,
+        "BB": 14.053,
+        "FX": 13.446
+       },
+       "total": 53.026,
+       "rank": 1
+      },
+      {
+       "athlete": "sofia-brambati",
+       "parts": {
+        "VT": 12.708,
+        "UB": 13.098,
+        "BB": 12.128,
+        "FX": 13.216
+       },
+       "total": 51.15,
+       "rank": 2
+      },
+      {
+       "athlete": "chiara-montanaro",
+       "parts": {
+        "VT": 12.858,
+        "UB": 12.308,
+        "BB": 12.252,
+        "FX": 12.631
+       },
+       "total": 50.049,
+       "rank": 3
+      },
+      {
+       "athlete": "elena-corradi",
+       "parts": {
+        "VT": 12.209,
+        "UB": 12.194,
+        "BB": 12.219,
+        "FX": 12.167
+       },
+       "total": 48.789,
+       "rank": 4
+      }
+     ]
+    },
+    {
+     "round": "finale",
+     "discipline": "WAG",
+     "apparatus": "VT",
+     "results": [
+      {
+       "athlete": "elena-corradi",
+       "vaults": [
+        {
+         "d": 5.1,
+         "e": 8.228,
+         "penalty": 0,
+         "total": 13.328
+        },
+        {
+         "d": 4.9,
+         "e": 7.888,
+         "penalty": 0,
+         "total": 12.788
+        }
+       ],
+       "total": 13.058,
+       "rank": 1
+      },
+      {
+       "athlete": "giulia-ferraresi",
+       "vaults": [
+        {
+         "d": 5.7,
+         "e": 7.248,
+         "penalty": 0,
+         "total": 12.948
+        },
+        {
+         "d": 5.3,
+         "e": 7.737,
+         "penalty": 0,
+         "total": 13.037
+        }
+       ],
+       "total": 12.992,
+       "rank": 2
+      },
+      {
+       "athlete": "sofia-brambati",
+       "vaults": [
+        {
+         "d": 5.0,
+         "e": 7.842,
+         "penalty": 0.1,
+         "total": 12.742
+        },
+        {
+         "d": 4.7,
+         "e": 7.986,
+         "penalty": 0.3,
+         "total": 12.386
+        }
+       ],
+       "total": 12.564,
+       "rank": 3
+      },
+      {
+       "athlete": "chiara-montanaro",
+       "vaults": [
+        {
+         "d": 4.7,
+         "e": 7.935,
+         "penalty": 0,
+         "total": 12.635
+        },
+        {
+         "d": 4.6,
+         "e": 7.154,
+         "penalty": 0,
+         "total": 11.754
+        }
+       ],
+       "total": 12.194,
+       "rank": 4
+      }
+     ]
+    },
+    {
+     "round": "finale",
+     "discipline": "WAG",
+     "apparatus": "UB",
+     "results": [
+      {
+       "athlete": "sofia-brambati",
+       "d": 5.5,
+       "e": 7.834,
+       "penalty": 0,
+       "total": 13.334,
+       "rank": 1
+      },
+      {
+       "athlete": "chiara-montanaro",
+       "d": 4.7,
+       "e": 8.082,
+       "penalty": 0,
+       "total": 12.782,
+       "rank": 2
+      },
+      {
+       "athlete": "giulia-ferraresi",
+       "d": 5.3,
+       "e": 7.437,
+       "penalty": 0.1,
+       "total": 12.637,
+       "rank": 3
+      },
+      {
+       "athlete": "elena-corradi",
+       "d": 4.6,
+       "e": 7.883,
+       "penalty": 0.3,
+       "total": 12.183,
+       "rank": 4
+      }
+     ]
+    },
+    {
+     "round": "finale",
+     "discipline": "WAG",
+     "apparatus": "BB",
+     "results": [
+      {
+       "athlete": "giulia-ferraresi",
+       "d": 5.8,
+       "e": 8.043,
+       "penalty": 0.3,
+       "total": 13.543,
+       "rank": 1
+      },
+      {
+       "athlete": "sofia-brambati",
+       "d": 4.5,
+       "e": 8.245,
+       "penalty": 0,
+       "total": 12.745,
+       "rank": 2
+      },
+      {
+       "athlete": "elena-corradi",
+       "d": 4.6,
+       "e": 8.038,
+       "penalty": 0,
+       "total": 12.638,
+       "rank": 3
+      },
+      {
+       "athlete": "chiara-montanaro",
+       "d": 5.0,
+       "e": 6.694,
+       "penalty": 0,
+       "total": 11.694,
+       "rank": 4
+      }
+     ]
+    },
+    {
+     "round": "finale",
+     "discipline": "WAG",
+     "apparatus": "FX",
+     "results": [
+      {
+       "athlete": "giulia-ferraresi",
+       "d": 5.7,
+       "e": 8.451,
+       "penalty": 0,
+       "total": 14.151,
+       "rank": 1
+      },
+      {
+       "athlete": "chiara-montanaro",
+       "d": 5.1,
+       "e": 7.709,
+       "penalty": 0.1,
+       "total": 12.709,
+       "rank": 2
+      },
+      {
+       "athlete": "sofia-brambati",
+       "d": 5.0,
+       "e": 7.609,
+       "penalty": 0,
+       "total": 12.609,
+       "rank": 3
+      },
+      {
+       "athlete": "elena-corradi",
+       "d": 4.4,
+       "e": 7.616,
+       "penalty": 0,
+       "total": 12.016,
+       "rank": 4
+      }
+     ]
+    },
+    {
+     "round": "finale-aa",
+     "discipline": "MAG",
+     "apparatus": "AA",
+     "results": [
+      {
+       "athlete": "pietro-valsecchi",
+       "parts": {
+        "FX": 13.687,
+        "PH": 13.671,
+        "SR": 13.852,
+        "VT": 13.282,
+        "PB": 14.078,
+        "HB": 14.017
+       },
+       "total": 82.587,
+       "rank": 1
+      },
+      {
+       "athlete": "davide-scoccia",
+       "parts": {
+        "FX": 14.23,
+        "PH": 13.19,
+        "SR": 13.02,
+        "VT": 14.008,
+        "PB": 13.641,
+        "HB": 13.837
+       },
+       "total": 81.926,
+       "rank": 2
+      },
+      {
+       "athlete": "tommaso-rinaldelli",
+       "parts": {
+        "FX": 13.367,
+        "PH": 13.729,
+        "SR": 13.897,
+        "VT": 12.694,
+        "PB": 13.355,
+        "HB": 13.922
+       },
+       "total": 80.964,
+       "rank": 3
+      },
+      {
+       "athlete": "filippo-mazzanti",
+       "parts": {
+        "FX": 13.606,
+        "PH": 12.269,
+        "SR": 13.43,
+        "VT": 12.958,
+        "PB": 12.971,
+        "HB": 13.398
+       },
+       "total": 78.632,
+       "rank": 4
+      }
+     ]
+    },
+    {
+     "round": "finale",
+     "discipline": "MAG",
+     "apparatus": "FX",
+     "results": [
+      {
+       "athlete": "davide-scoccia",
+       "d": 6.0,
+       "e": 8.243,
+       "penalty": 0,
+       "total": 14.243,
+       "rank": 1
+      },
+      {
+       "athlete": "pietro-valsecchi",
+       "d": 6.2,
+       "e": 7.755,
+       "penalty": 0,
+       "total": 13.955,
+       "rank": 2
+      },
+      {
+       "athlete": "tommaso-rinaldelli",
+       "d": 6.1,
+       "e": 7.103,
+       "penalty": 0,
+       "total": 13.203,
+       "rank": 3
+      },
+      {
+       "athlete": "filippo-mazzanti",
+       "d": 5.1,
+       "e": 7.745,
+       "penalty": 0,
+       "total": 12.845,
+       "rank": 4
+      }
+     ]
+    },
+    {
+     "round": "finale",
+     "discipline": "MAG",
+     "apparatus": "PH",
+     "results": [
+      {
+       "athlete": "filippo-mazzanti",
+       "d": 5.9,
+       "e": 8.055,
+       "penalty": 0,
+       "total": 13.955,
+       "rank": 1
+      },
+      {
+       "athlete": "tommaso-rinaldelli",
+       "d": 5.9,
+       "e": 7.784,
+       "penalty": 0,
+       "total": 13.684,
+       "rank": 2
+      },
+      {
+       "athlete": "pietro-valsecchi",
+       "d": 6.0,
+       "e": 7.349,
+       "penalty": 0,
+       "total": 13.349,
+       "rank": 3
+      },
+      {
+       "athlete": "davide-scoccia",
+       "d": 5.8,
+       "e": 6.754,
+       "penalty": 0,
+       "total": 12.554,
+       "rank": 4
+      }
+     ]
+    },
+    {
+     "round": "finale",
+     "discipline": "MAG",
+     "apparatus": "SR",
+     "results": [
+      {
+       "athlete": "tommaso-rinaldelli",
+       "d": 5.5,
+       "e": 8.529,
+       "penalty": 0.3,
+       "total": 13.729,
+       "rank": 1
+      },
+      {
+       "athlete": "filippo-mazzanti",
+       "d": 5.8,
+       "e": 7.917,
+       "penalty": 0,
+       "total": 13.717,
+       "rank": 2
+      },
+      {
+       "athlete": "pietro-valsecchi",
+       "d": 5.6,
+       "e": 8.202,
+       "penalty": 0.1,
+       "total": 13.702,
+       "rank": 3
+      },
+      {
+       "athlete": "davide-scoccia",
+       "d": 5.4,
+       "e": 8.157,
+       "penalty": 0,
+       "total": 13.557,
+       "rank": 4
+      }
+     ]
+    },
+    {
+     "round": "finale",
+     "discipline": "MAG",
+     "apparatus": "VT",
+     "results": [
+      {
+       "athlete": "pietro-valsecchi",
+       "vaults": [
+        {
+         "d": 6.1,
+         "e": 8.418,
+         "penalty": 0.3,
+         "total": 14.218
+        },
+        {
+         "d": 5.7,
+         "e": 7.975,
+         "penalty": 0.3,
+         "total": 13.375
+        }
+       ],
+       "total": 13.796,
+       "rank": 1
+      },
+      {
+       "athlete": "davide-scoccia",
+       "vaults": [
+        {
+         "d": 5.9,
+         "e": 8.03,
+         "penalty": 0,
+         "total": 13.93
+        },
+        {
+         "d": 5.6,
+         "e": 7.748,
+         "penalty": 0,
+         "total": 13.348
+        }
+       ],
+       "total": 13.639,
+       "rank": 2
+      },
+      {
+       "athlete": "filippo-mazzanti",
+       "vaults": [
+        {
+         "d": 5.8,
+         "e": 8.374,
+         "penalty": 0.3,
+         "total": 13.874
+        },
+        {
+         "d": 5.3,
+         "e": 7.685,
+         "penalty": 0.1,
+         "total": 12.885
+        }
+       ],
+       "total": 13.38,
+       "rank": 3
+      },
+      {
+       "athlete": "tommaso-rinaldelli",
+       "vaults": [
+        {
+         "d": 5.9,
+         "e": 7.861,
+         "penalty": 0.3,
+         "total": 13.461
+        },
+        {
+         "d": 5.5,
+         "e": 7.37,
+         "penalty": 0,
+         "total": 12.87
+        }
+       ],
+       "total": 13.165,
+       "rank": 4
+      }
+     ]
+    },
+    {
+     "round": "finale",
+     "discipline": "MAG",
+     "apparatus": "PB",
+     "results": [
+      {
+       "athlete": "pietro-valsecchi",
+       "d": 5.3,
+       "e": 8.721,
+       "penalty": 0.1,
+       "total": 13.921,
+       "rank": 1
+      },
+      {
+       "athlete": "davide-scoccia",
+       "d": 5.9,
+       "e": 7.461,
+       "penalty": 0,
+       "total": 13.361,
+       "rank": 2
+      },
+      {
+       "athlete": "filippo-mazzanti",
+       "d": 5.3,
+       "e": 7.627,
+       "penalty": 0,
+       "total": 12.927,
+       "rank": 3
+      },
+      {
+       "athlete": "tommaso-rinaldelli",
+       "d": 5.3,
+       "e": 7.872,
+       "penalty": 0.3,
+       "total": 12.872,
+       "rank": 4
+      }
+     ]
+    },
+    {
+     "round": "finale",
+     "discipline": "MAG",
+     "apparatus": "HB",
+     "results": [
+      {
+       "athlete": "tommaso-rinaldelli",
+       "d": 5.8,
+       "e": 8.893,
+       "penalty": 0,
+       "total": 14.693,
+       "rank": 1
+      },
+      {
+       "athlete": "pietro-valsecchi",
+       "d": 5.5,
+       "e": 8.427,
+       "penalty": 0.3,
+       "total": 13.627,
+       "rank": 2
+      },
+      {
+       "athlete": "davide-scoccia",
+       "d": 5.6,
+       "e": 7.882,
+       "penalty": 0,
+       "total": 13.482,
+       "rank": 3
+      },
+      {
+       "athlete": "filippo-mazzanti",
+       "d": 5.3,
+       "e": 7.959,
+       "penalty": 0,
+       "total": 13.259,
+       "rank": 4
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}
