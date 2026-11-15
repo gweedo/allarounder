@@ -32,18 +32,28 @@ APPARATUS = {
 ROUNDS = (("qualifica", "rankqualif", "scorequalif"), ("finale", "rankfinal", "scorefinal"))
 
 
+def _field(row: dict[str, Any], key: str, kind: type | tuple[type, ...]) -> Any:
+    value = row.get(key)
+    if not isinstance(value, kind) or isinstance(value, bool):
+        raise SourceError(f"field {key!r} is {value!r}, expected {kind}")
+    return value
+
+
 def _athlete(gymnast: dict[str, Any], nation: str) -> Athlete:
-    return Athlete(name=f"{gymnast['firstname']} {gymnast['lastname']}", nation=nation, wg_id=gymnast["id"])
+    name = f"{_field(gymnast, 'firstname', str)} {_field(gymnast, 'lastname', str)}"
+    return Athlete(name=name, nation=nation, wg_id=_field(gymnast, "id", int))
 
 
 def _row(row: dict[str, Any], apparatus: str, rank_key: str, score_key: str) -> Result | TeamResult:
-    nation = row["country"]
+    nation = _field(row, "country", str)
+    rank, total = _field(row, rank_key, int), float(_field(row, score_key, (int, float)))
+    gymnasts = _field(row, "gymnasts", list)
     if apparatus == "TEAM":
-        members = tuple(TeamMember(athlete=_athlete(g, nation), parts={}) for g in row["gymnasts"])
-        return TeamResult(nation=nation, rank=row[rank_key], total=row[score_key], parts={}, members=members)
-    if len(row["gymnasts"]) != 1:
-        raise SourceError(f"individual row with {len(row['gymnasts'])} gymnasts")
-    return Result(athlete=_athlete(row["gymnasts"][0], nation), rank=row[rank_key], total=row[score_key])
+        members = tuple(TeamMember(athlete=_athlete(g, nation), parts={}) for g in gymnasts)
+        return TeamResult(nation=nation, rank=rank, total=total, parts={}, members=members)
+    if len(gymnasts) != 1:
+        raise SourceError(f"individual row with {len(gymnasts)} gymnasts")
+    return Result(athlete=_athlete(gymnasts[0], nation), rank=rank, total=total)
 
 
 class WorldGymnasticsSource:
@@ -51,7 +61,11 @@ class WorldGymnasticsSource:
         self._http = http
 
     def _get(self, path: str, **params: int) -> Any:
-        return self._http.get_json(BASE + path, {k: str(v) for k, v in params.items()})["data"]
+        response = self._http.get_json(BASE + path, {k: str(v) for k, v in params.items()})
+        data = response.get("data") if isinstance(response, dict) else None
+        if not isinstance(data, list):
+            raise SourceError(f"wg {path}: response has no 'data' list")
+        return data
 
     def fetch(self, ref: str) -> SourceResult:
         raw: list[Any] = []

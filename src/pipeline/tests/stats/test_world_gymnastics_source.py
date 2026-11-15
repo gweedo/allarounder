@@ -11,6 +11,7 @@ from typing import Any
 import pytest
 
 from domain.stats.model import Phase, Result, SourceResult, TeamResult
+from stats.sources import SourceError
 from stats.sources.world_gymnastics import WorldGymnasticsSource
 
 FIXTURES = Path(__file__).parent / "fixtures" / "wg-17247"
@@ -61,3 +62,31 @@ def test_rows_carry_official_rank_total_nation_and_gymnast_id(worlds: SourceResu
     assert isinstance(japan, TeamResult)
     assert (japan.nation, japan.rank, japan.total, japan.members[0].athlete.wg_id) == ("JPN", 1, 251.928, 58869)
     assert len(by_label["qualifica/MAG/AA"].results) == 102  # every all-around finisher, ranks 1-102
+
+
+def _drifted(edit: Any) -> FakeWorldGymnastics:
+    fake = FakeWorldGymnastics()
+    edit(fake.responses)
+    return fake
+
+
+FX = "17247/results/?ageCategory=2&category=58"
+
+
+@pytest.mark.parametrize(
+    ("case", "edit"),
+    [
+        ("unknown category", lambda r: r["17247/categories/?idDiscipline=2"]["data"].append(
+            {"id": 99, "name": "Rope Climb"})),
+        ("missing nation", lambda r: r[FX]["data"][0].pop("country")),
+        ("missing gymnasts", lambda r: r[FX]["data"][0].pop("gymnasts")),
+        ("score is not a number", lambda r: r[FX]["data"][0].update(scorefinal="14,633")),
+        ("rank is not a number", lambda r: r[FX]["data"][0].update(rankfinal=None)),
+        ("no data envelope", lambda r: r.update({FX: {"error": "maintenance"}})),
+        ("individual row with two gymnasts", lambda r: r[FX]["data"][0]["gymnasts"].append(
+            {"id": 1, "firstname": "A", "lastname": "B"})),
+    ],
+)
+def test_unexpected_feed_data_raises_source_error(case: str, edit: Any) -> None:
+    with pytest.raises(SourceError):
+        WorldGymnasticsSource(_drifted(edit)).fetch("17247")
