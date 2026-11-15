@@ -99,8 +99,8 @@ def _detail_of(backup: Row) -> dict:
 
 def _with_detail(official: Row, backup: Row | None) -> Row:
     if backup is None:
-        return replace(official, verified=True)
-    merged = replace(official, **_detail_of(backup), verified=True)
+        return replace(official, verified=True, source="wg")
+    merged = replace(official, **_detail_of(backup), verified=True, source="wg", detail_source="wikipedia")
     if isinstance(merged, Result) and isinstance(backup, Result) and backup.athlete.wiki:
         merged = replace(merged, athlete=replace(merged.athlete, wiki=backup.athlete.wiki))  # identity alias
     return merged
@@ -232,6 +232,7 @@ def verify_competition(competition: Competition, sources: Mapping[str, Source]) 
     if "wg" not in fetched:
         assert wiki is not None
         phases = tuple(_screen(p, dropped) for p in wiki.phases)
+        phases = tuple(replace(p, results=tuple(replace(r, source="wikipedia") for r in p.results)) for p in phases)
         _check_complete(competition, phases)
         _check_canary(competition, phases)
         return _verified(competition, phases, dropped, fetched)

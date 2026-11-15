@@ -402,3 +402,21 @@ def test_merged_athlete_keeps_both_the_official_id_and_the_wikipedia_title() -> 
 
     assert out.competition.phases[0].results[0].athlete == Athlete(
         name="Frederick RICHARD", nation="USA", wiki="Fred Richard", wg_id=1001)
+
+
+def test_rows_record_their_source_and_where_their_detail_came_from() -> None:
+    """Merged rows carry Wikipedia (CC BY-SA) detail: the page must credit it."""
+    routine = Routine(d=5.7, e=8.833, penalty=0.0, bonus=0.1, total=14.633)
+    merged = verify_competition(competition(wg="17247", wikipedia=WIKI_REF), both(
+        (fx_qual(Result(athlete=WG_RICHARD, rank=1, total=14.633), Result(athlete=WG_JARMAN, rank=2, total=14.6)),),
+        (fx_qual(Result(athlete=RICHARD, rank=1, total=14.633, routine=routine)),),
+    ))
+    wiki_only = verify_competition(competition(wikipedia=WIKI_REF), {"wikipedia": FakeSource({WIKI_REF: SourceResult(
+        source="wikipedia", revision="1", phases=(fx_qual(Result(athlete=RICHARD, rank=1, total=14.633,
+                                                                 routine=routine)),))})})
+
+    richard, jarman = merged.competition.phases[0].results
+    [wiki_richard] = wiki_only.competition.phases[0].results
+    assert (richard.source, richard.detail_source) == ("wg", "wikipedia")
+    assert (jarman.source, jarman.detail_source) == ("wg", None)
+    assert (wiki_richard.source, wiki_richard.detail_source) == ("wikipedia", None)

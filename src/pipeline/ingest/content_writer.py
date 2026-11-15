@@ -17,6 +17,7 @@ from typing import Any
 
 import yaml
 
+from ingest.jsonfile import write_json
 from ingest.models import ArticleMeta, GeneratedArticle, SlugRef
 
 _INDEX_KEYS = ("articles", "categories", "authors", "guests", "tags")
@@ -62,11 +63,7 @@ def load_index(content_dir: Path) -> dict[str, Any]:
 
 
 def save_index(content_dir: Path, index: dict[str, Any]) -> None:
-    content_dir.mkdir(parents=True, exist_ok=True)
-    index_path = content_dir / "index.json"
-    index_path.write_text(
-        json.dumps(index, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
-    )
+    write_json(content_dir / "index.json", index)
 
 
 def _slug_ref_dict(ref: SlugRef) -> dict[str, str]:

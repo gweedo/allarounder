@@ -38,6 +38,8 @@ class Result:
     bonus: float = 0.0  # result-level bonus (women's vault)
     parts: dict[str, float] | None = None  # all-around: apparatus -> score, in order
     verified: bool = False
+    source: str = ""  # set by verification: "wg" or "wikipedia"
+    detail_source: str | None = None  # where the score detail came from, if not `source`
 
 
 @dataclass(frozen=True)
@@ -54,6 +56,8 @@ class TeamResult:
     parts: dict[str, float]  # apparatus subtotals, in order
     members: tuple[TeamMember, ...] = ()
     verified: bool = False
+    source: str = ""
+    detail_source: str | None = None
 
 
 @dataclass(frozen=True)
@@ -92,4 +96,5 @@ class Competition:
     end_date: str
     sources: dict[str, str] = field(default_factory=dict)
     canary: Canary | None = None
+    medals: tuple[str, ...] = ()  # rounds whose phases award medals (#198: not inferred)
     phases: tuple[Phase, ...] = ()
