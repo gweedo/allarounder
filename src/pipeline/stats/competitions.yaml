@@ -1,0 +1,18 @@
+# Competitions a stats run builds (issue #193; a Sheet tab replaces this later).
+# One entry per competition. `slug` is locked once the competition is published.
+# `medals`: the rounds whose phases award medals (qualifica, finale-aa, finale).
+# `sources`: at least one of wg (World Gymnastics event id) and wikipedia (en.wiki page title).
+# `canary` (optional, Wikipedia-only competitions): one known row the source must reproduce.
+
+- slug: mondiali-2026-rotterdam
+  name: Campionati mondiali di ginnastica artistica 2026
+  level: internazionale
+  tier: Mondiali
+  city: Rotterdam
+  country: NED
+  start_date: 2026-10-17
+  end_date: 2026-10-25
+  medals: [finale, finale-aa]
+  sources:
+    wg: 17247
+    wikipedia: 2026_World_Artistic_Gymnastics_Championships

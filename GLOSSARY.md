@@ -42,7 +42,7 @@ _Avoid_: Thumbnail, hero image, featured image
 
 **Event**:
 A community meetup, competition, or in-person gathering that Allarounder promotes. Has a title, date, location, description, optional cost, optional max capacity, and optional external registration link. Informational only in v1 — no on-site registration or seat management. In-house registration is deferred to a future version. **Not built:** decided pre-pivot (`DECISIONS.md`, "Events in v1"), but the static site has no Event content type or `/eventi/` route, and ADR-0018's v1 scope omits it.
-_Avoid_: Competition (too narrow), activity
+_Avoid_: Competition (that word is the stats record, see Statistics), activity
 
 ## Taxonomy
 
@@ -53,3 +53,25 @@ _Avoid_: Topic (use for tags), section, type
 **Tag**:
 A freeform keyword that describes an article's subject matter. An article can have zero or more tags. Tags support related-content discovery and SEO long-tail.
 _Avoid_: Label, keyword (internally), topic (use Category for broad areas)
+
+## Statistics
+
+**Competition**:
+One gymnastics championship in the stats data (e.g. the 2026 Worlds in Rotterdam): slug, Italian name, level, tier, city, country, dates, the rounds that award medals, and its sources. Listed in `src/pipeline/stats/competitions.yaml`; one JSON file per competition. Shown as "Gara" in the UI. Stats only, not an Event.
+_Avoid_: Event, meet, gara (in code)
+
+**Phase**:
+One results table of a Competition: a round (`qualifica`, `finale-aa`, `finale`) × a discipline (`MAG`, `WAG`) × an apparatus (`FX` … `BB`, `AA`, `TEAM`). Carries `medals` (from the competition's medal rounds) and `fieldComplete` (false when the source lists only qualifiers).
+_Avoid_: Event (FIG's word for an apparatus), table, session
+
+**Result**:
+One row of a Phase: an athlete (or a nation, for teams) with the source's own rank and total, plus optional score detail. Its `kind` (`routine`, `vault`, `allAround`, `team`) follows from the apparatus and fixes which detail it may carry.
+_Avoid_: Score (a Result has several), entry
+
+**Source**:
+Where stats numbers come from, behind one seam in `src/pipeline/stats/sources/`: **World Gymnastics** (official, primary: ranks, totals, the full field) and **Wikipedia** (backup: D/E/bonus/penalty detail). A row records its `source` and, when Wikipedia added detail to an official row, its `detailSource`.
+_Avoid_: Feed, provider, scraper
+
+**Verified row**:
+A Result whose official total and rank come from World Gymnastics (`verified: true`). A Wikipedia row reaches the output only by matching an official row and adding up arithmetically, or, for a Wikipedia-only Competition, as `verified: false`, hidden on the site until an editor approves it.
+_Avoid_: Checked, valid, approved (approval is the editor's step)
