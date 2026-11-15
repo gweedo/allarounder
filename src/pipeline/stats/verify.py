@@ -19,6 +19,7 @@ from domain.stats.model import (
     Result,
     Routine,
     SourceResult,
+    TeamMember,
     TeamResult,
 )
 from stats.sources import SourceError
@@ -89,10 +90,32 @@ def _best_match(official: Row, candidates: list[Row]) -> Row | None:
     return best[0] if best else None
 
 
-def _detail_of(backup: Row) -> dict:
+def _members(official: tuple[TeamMember, ...], backup: tuple[TeamMember, ...]) -> tuple[TeamMember, ...]:
+    """Backup members (they carry the scores) on the official athletes (they
+    carry the ids): paired by name in any word order; one member left over on
+    each side is the same person under another name."""
+    if not official:
+        return backup
+    pool = list(official)
+    paired: list[TeamMember | None] = []
+    for member in backup:
+        same = next((o for o in pool if _name_tokens(o.athlete.name) == _name_tokens(member.athlete.name)), None)
+        if same:
+            pool.remove(same)
+        paired.append(same)
+    if len(pool) == 1 and paired.count(None) == 1:
+        paired[paired.index(None)] = pool[0]
+    return tuple(
+        member if same is None else TeamMember(athlete=replace(same.athlete, wiki=member.athlete.wiki),
+                                               parts=member.parts)
+        for member, same in zip(backup, paired, strict=True))
+
+
+def _detail_of(official: Row, backup: Row) -> dict:
     """What a verified backup row may add to the official row: score detail only."""
     if isinstance(backup, TeamResult):
-        return {"parts": backup.parts, "members": backup.members}
+        assert isinstance(official, TeamResult)
+        return {"parts": backup.parts, "members": _members(official.members, backup.members)}
     return {"routine": backup.routine, "vaults": backup.vaults, "bonus": backup.bonus,
             "parts": backup.parts}
 
@@ -100,7 +123,7 @@ def _detail_of(backup: Row) -> dict:
 def _with_detail(official: Row, backup: Row | None) -> Row:
     if backup is None:
         return replace(official, verified=True, source="wg")
-    merged = replace(official, **_detail_of(backup), verified=True, source="wg", detail_source="wikipedia")
+    merged = replace(official, **_detail_of(official, backup), verified=True, source="wg", detail_source="wikipedia")
     if isinstance(merged, Result) and isinstance(backup, Result) and backup.athlete.wiki:
         merged = replace(merged, athlete=replace(merged.athlete, wiki=backup.athlete.wiki))  # identity alias
     return merged

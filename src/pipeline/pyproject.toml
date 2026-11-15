@@ -33,7 +33,7 @@ addopts = "--tb=short"
 
 [tool.coverage.run]
 source = ["domain", "ingest", "stats"]
-omit = ["ingest/cli.py", "ingest/flush_esito.py"]
+omit = ["ingest/cli.py", "ingest/flush_esito.py", "stats/cli.py"]
 
 [tool.coverage.report]
 fail_under = 80

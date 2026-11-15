@@ -420,3 +420,30 @@ def test_rows_record_their_source_and_where_their_detail_came_from() -> None:
     assert (richard.source, richard.detail_source) == ("wg", "wikipedia")
     assert (jarman.source, jarman.detail_source) == ("wg", None)
     assert (wiki_richard.source, wiki_richard.detail_source) == ("wikipedia", None)
+
+
+def test_merged_team_members_keep_their_official_ids() -> None:
+    """Live 2026 Worlds: WG lists "Siyu DU", Wikipedia "Du Siyu". Members are
+    paired by name in any word order; one member left on each side is the same
+    person ("Rebecca DOWNIE" / "Becky Downie")."""
+    wg_du, wg_downie = Athlete(name="Siyu DU", nation="CHN", wg_id=11), Athlete(name="Rebecca DOWNIE", nation="CHN",
+                                                                                   wg_id=12)
+    wiki_du, wiki_downie = Athlete(name="Du Siyu", nation="CHN", wiki="Du Siyu"), Athlete(
+        name="Becky Downie", nation="CHN", wiki="Becky Downie")
+    sources = both(
+        (Phase(round="qualifica", discipline="WAG", apparatus="TEAM", results=(
+            TeamResult(nation="CHN", rank=1, total=27.0, parts={}, members=(
+                TeamMember(athlete=wg_downie, parts={}), TeamMember(athlete=wg_du, parts={}))),)),),
+        (Phase(round="qualifica", discipline="WAG", apparatus="TEAM", results=(
+            TeamResult(nation="CHN", rank=1, total=27.0, parts={"BB": 27.0}, members=(
+                TeamMember(athlete=wiki_du, parts={"BB": 13.5}), TeamMember(athlete=wiki_downie, parts={"BB": 13.5}),
+            )),)),),
+    )
+
+    [china] = verify_competition(competition(wg="17247", wikipedia=WIKI_REF), sources).competition.phases[0].results
+
+    assert isinstance(china, TeamResult)
+    assert [(m.athlete, m.parts) for m in china.members] == [
+        (replace(wg_du, wiki="Du Siyu"), {"BB": 13.5}),
+        (replace(wg_downie, wiki="Becky Downie"), {"BB": 13.5}),
+    ]

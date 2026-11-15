@@ -292,3 +292,27 @@ def test_the_report_lists_revisions_row_counts_and_dropped_rows(tmp_path: Path) 
     assert f"wikipedia `{WIKI}` (revision `1385215085`)" in report
     assert "| qualifica/MAG/FX | 2 | 2 | 0 | 1 |" in report  # rows, verified, unverified, with detail
     assert "- qualifica/MAG/FX, Jake Jarman (GBR): no official row with the same nation and total" in report
+
+
+def test_the_committed_competitions_file_is_valid() -> None:
+    from stats.cli import DEFAULT_CONFIG
+
+    assert [c.slug for c in load_competitions(DEFAULT_CONFIG)] == ["mondiali-2026-rotterdam"]
+
+
+def test_same_slug_same_nation_and_no_conflicting_id_is_the_same_athlete(tmp_path: Path) -> None:
+    """Live 2026 Worlds: "Fusuke MAEDA" (WG id only, from a WG-only row) and
+    "Fusuke Maeda" (Wikipedia title only, as a team member) are one person."""
+    out = tmp_path / "stats"
+    out.mkdir()
+    (out / "athletes.json").write_text(json.dumps([
+        {"slug": "fusuke-maeda", "name": "Fusuke MAEDA", "nation": "JPN", "discipline": "MAG", "wgId": 5}]))
+    team = TeamResult(nation="JPN", rank=1, total=14.0, parts={"FX": 14.0}, members=(
+        TeamMember(athlete=Athlete(name="Fusuke Maeda", nation="JPN", wiki="Fusuke Maeda"), parts={"FX": 14.0}),))
+    outcome = run_stats(write(tmp_path, WIKI_ONLY_YAML), sources(None, (
+        Phase(round="qualifica", discipline="MAG", apparatus="TEAM", results=(team,)),)), out)
+
+    assert outcome.ok, outcome.report
+    assert read(out, "athletes.json") == [  # type: ignore[comparison-overlap]
+        {"slug": "fusuke-maeda", "name": "Fusuke MAEDA", "nation": "JPN", "discipline": "MAG", "wgId": 5,
+         "wiki": "Fusuke Maeda"}]
