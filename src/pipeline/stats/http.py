@@ -76,7 +76,8 @@ class PoliteHttpClient:
         self._last = self._clock()
 
     def _retry_after(self, response: Response | None, backoff: float) -> float:
-        header = (response.headers.get("Retry-After") if response else None) or ""
+        headers = {k.lower(): v for k, v in response.headers.items()} if response else {}
+        header = headers.get("retry-after") or ""
         return float(header) if header.strip().isdigit() else backoff
 
     def get_json(self, url: str, params: dict[str, str]) -> Any:

@@ -114,3 +114,10 @@ def test_other_failures_raise_source_error_without_retrying(response: Response) 
     with pytest.raises(SourceError):
         http.get_json("https://example.org/a", {})
     assert len(transport.calls) == 1
+
+
+def test_retry_after_is_found_whatever_its_header_case() -> None:
+    http, _, clock = client(Response(status=503, headers={"retry-after": "2"}, body=b""), ok({}))
+
+    http.get_json("https://example.org/a", {})
+    assert clock.slept == [2.0]
