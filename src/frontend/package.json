@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "js-yaml": "^4.3.2",
-    "next": "^15.5.28",
+    "next": "^15.5.29",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "rehype-sanitize": "^6.0.0",
